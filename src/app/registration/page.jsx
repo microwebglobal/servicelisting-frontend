@@ -16,6 +16,12 @@ const Registration = () => {
       >
         Register As Service Provider
       </Link>
+      <Link
+        href="/login"
+        className="w-full max-w-xs px-6 py-3 text-center font-semibold text-white bg-green-500 rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300"
+      >
+        Login
+      </Link>
     </div>
   );
 };

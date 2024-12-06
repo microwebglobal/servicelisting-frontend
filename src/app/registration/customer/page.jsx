@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import OTPVerification from "@components/OtpVerify";
+import OTPVerification from "@components/CustomerReg";
 import { useRouter } from "next/navigation";
+import SetLocation from "@components/SetLocation";
 
 const CustomerReg = () => {
   const router = useRouter();
@@ -37,7 +38,7 @@ const CustomerReg = () => {
   const handleVerification = async () => {
     try {
       await axios.post("http://localhost:8080/api/users/", formData);
-      router.push("/profile/customer");
+      setStep(3);
     } catch (err) {
       alert("Registration failed.");
     }
@@ -47,6 +48,8 @@ const CustomerReg = () => {
     return (
       <OTPVerification mobile={formData.mobile} onVerify={handleVerification} />
     );
+  } else if (step === 3) {
+    return <SetLocation />;
   }
 
   return (
@@ -143,3 +146,5 @@ const CustomerReg = () => {
 };
 
 export default CustomerReg;
+
+//AIzaSyCJtNNLCh343h9T1vBlno_a-6wrfSm_DMc
