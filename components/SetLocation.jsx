@@ -1,25 +1,18 @@
 "use client";
 import React, { useState, useRef } from "react";
-import {
-  GoogleMap,
-  useLoadScript,
-  Marker,
-  Autocomplete,
-} from "@react-google-maps/api";
+import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const libraries = ["places"];
-const mapContainerStyle = {
-  width: "100%",
-  height: "400px",
-  borderRadius: "8px",
-  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-};
 const center = {
   lat: 6.9271,
   lng: 79.8612,
 };
 
 const SetLocation = () => {
+  const router = useRouter();
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyCJtNNLCh343h9T1vBlno_a-6wrfSm_DMc",
     libraries,
@@ -28,6 +21,14 @@ const SetLocation = () => {
   const [selectedLocation, setSelectedLocation] = useState(center);
   const [searchInput, setSearchInput] = useState("");
   const autocompleteRef = useRef(null);
+
+  const [addressDetails, setAddressDetails] = useState({
+    street: "",
+    city: "",
+    state: "",
+    country: "",
+    postalCode: "",
+  });
 
   const handlePlaceChanged = () => {
     const place = autocompleteRef.current.getPlace();
@@ -38,68 +39,110 @@ const SetLocation = () => {
       };
       setSelectedLocation(location);
       setSearchInput(place.formatted_address || "");
+
+      // Extract address components
+      const addressComponents = place.address_components || []; //array of objects including part of a adress
+      const getAddressComponent = (type) => {
+        //write helper function to extract parts
+        const component = addressComponents.find((comp) =>
+          comp.types.includes(type)
+        );
+        return component ? component.long_name : "";
+      };
+
+      setAddressDetails({
+        street: getAddressComponent("route"),
+        city: getAddressComponent("locality"),
+        state: getAddressComponent("administrative_area_level_1"),
+        country: getAddressComponent("country"),
+        postalCode: getAddressComponent("postal_code"),
+      });
+    }
+  };
+
+  const handleAdressSubmit = async () => {
+    const requestBody = {
+      u_id: localStorage.getItem("uId"),
+      address_type: "primary",
+      street: addressDetails.street,
+      city: addressDetails.city,
+      state: addressDetails.state,
+      postal_code: addressDetails.postalCode,
+      country: addressDetails.country,
+      long: selectedLocation.lng,
+      lat: selectedLocation.lat,
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/adress/",
+        requestBody
+      );
+      console.log("Response:", response.data);
+      console.log(requestBody);
+      router.push("/profile/customer");
+    } catch (error) {
+      console.error("Error:", error);
+      console.log(requestBody);
     }
   };
 
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
-    <div
-      className="flex flex-col items-center bg-gray-50 py-20 rounded-lg max-w-4xl mx-auto"
-      style={{ paddingLeft: "150px", paddingRight: "150px" }}
-    >
-      <h2 className="text-2xl font-bold text-blue-600 mb-20">
-        Set Your Location
-      </h2>
-
-      <Autocomplete
-        onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
-        onPlaceChanged={handlePlaceChanged}
-      >
-        <input
-          type="text"
-          className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md mb-10"
-          placeholder="Search for a location"
-          style={{ marginBottom: "100px", width: "500px" }}
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white flex gap-14 p-8 rounded-lg shadow-md w-3/4">
+        <Image
+          src="/assets/images/reg_img.png"
+          alt="John Doe"
+          width={500}
+          height={100}
+          className="border-solid border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
         />
-      </Autocomplete>
+        <div>
+          <h2 className="text-2xl font-bold text-blue-600 mb-10">
+            Select Your Location
+          </h2>
 
-      <div
-        className="w-full mt-6 rounded-lg overflow-hidden"
-        style={{ marginLeft: "40px", marginRight: "40px" }}
-      >
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          center={selectedLocation}
-          zoom={14}
-          onClick={(e) => {
-            setSelectedLocation({
-              lat: e.latLng.lat(),
-              lng: e.latLng.lng(),
-            });
-          }}
-        >
-          <Marker
-            position={selectedLocation}
-            draggable
-            onDragEnd={(e) => {
-              setSelectedLocation({
-                lat: e.latLng.lat(),
-                lng: e.latLng.lng(),
-              });
-            }}
-          />
-        </GoogleMap>
-      </div>
+          <Autocomplete
+            onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+            onPlaceChanged={handlePlaceChanged}
+          >
+            <input
+              type="text"
+              className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
+              placeholder="Search for a location"
+              style={{ marginBottom: "100px", width: "400px" }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </Autocomplete>
 
-      <div className="mt-6 p-4 bg-white rounded-lg shadow-md w-full sm:w-96">
-        <h3 className="text-lg font-semibold text-gray-700">
-          Selected Location:
-        </h3>
-        <p className="text-gray-600">Latitude: {selectedLocation.lat}</p>
-        <p className="text-gray-600">Longitude: {selectedLocation.lng}</p>
+          <div className=" p-4  w-full">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Selected Location:
+            </h3>
+            <p className="text-gray-600">Latitude: {selectedLocation.lat}</p>
+            <p className="text-gray-600">Longitude: {selectedLocation.lng}</p>
+
+            <h3 className="text-lg font-semibold text-gray-700 mt-4">
+              Address:
+            </h3>
+            <p className="text-gray-600">Street: {addressDetails.street}</p>
+            <p className="text-gray-600">City: {addressDetails.city}</p>
+            <p className="text-gray-600">State: {addressDetails.state}</p>
+            <p className="text-gray-600">Country: {addressDetails.country}</p>
+            <p className="text-gray-600">
+              Postal Code: {addressDetails.postalCode}
+            </p>
+          </div>
+          <button
+            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition mb-5"
+            onClick={handleAdressSubmit}
+          >
+            Continue
+          </button>
+        </div>
       </div>
     </div>
   );

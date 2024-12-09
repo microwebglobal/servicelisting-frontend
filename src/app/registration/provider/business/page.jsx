@@ -58,6 +58,7 @@ const BusinessRegister = () => {
         otp,
       });
       console.log(response);
+      localStorage.setItem("uId", response.data.u_id);
       setProviderProfile({ ...providerProfile, u_id: response.data.u_id });
       setStep(3); // After successful verification, move to the next step
     } catch (err) {
