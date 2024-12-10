@@ -3,21 +3,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Modal from "react-modal";
-import {
-  GoogleMap,
-  useLoadScript,
-  Marker,
-  Autocomplete,
-} from "@react-google-maps/api";
+import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
+import AddNewAdres from "@components/AddNewAdres";
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState({});
   const [isOpen, setIsOpen] = useState(false);
-  const [adress, setAdress] = useState({});
-  const [selectedLocation, setSelectedLocation] = useState({
-    lat: 6.9271,
-    lng: 79.8612,
-  });
+  const [addAddres, setAddAddres] = useState(false);
+  const [allAdress, setAllAdress] = useState([]);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyCJtNNLCh343h9T1vBlno_a-6wrfSm_DMc",
@@ -45,12 +38,7 @@ export default function ProfilePage() {
       const response = await axios.get(
         `http://localhost:8080/api/adress//user/${uId}`
       );
-      setAdress(response.data[0]);
-      setSelectedLocation({
-        lat: parseFloat(response.data[0].lat),
-        lng: parseFloat(response.data[0].long),
-      });
-      console.log(selectedLocation);
+      setAllAdress(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -68,6 +56,11 @@ export default function ProfilePage() {
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
+
+  const handleAddNewAddres = () => {
+    setAddAddres(true);
+    console.log(addAddres);
+  };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
@@ -197,6 +190,7 @@ export default function ProfilePage() {
             </button>
           </div>
         </div>
+
         <Modal
           isOpen={isOpen}
           onRequestClose={closeModal}
@@ -204,64 +198,102 @@ export default function ProfilePage() {
           className="m-10 bg-white p-8 rounded-xl shadow-xl transform transition-all duration-300 ease-in-out w-2/4"
           overlayClassName="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50"
         >
-          <div className="w-full">
-            <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
-              Your Locations
-            </h2>
+          {!addAddres ? (
+            <div
+              className="w-full"
+              style={{
+                maxHeight: "80vh",
+                overflowY: "auto",
+              }}
+            >
+              <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+                Your Locations
+              </h2>
+              {allAdress
+                .sort((a) => (a.address_type === "primary" ? -1 : 1))
+                .map((addr, index) => (
+                  <div key={index}>
+                    <h3 className="text-lg bg-slate-200 text-gray-700 rounded-lg px-6 py-2 font-semibold mb-4 mt-10">
+                      {addr.address_type} Address
+                    </h3>
+                    <div className="flex justify-between">
+                      <ul className="space-y-6 ml-5 flex-1">
+                        <li className="flex flex-col space-y-2">
+                          <span className="font-semibold text-gray-600">
+                            Street
+                          </span>
+                          <span className="text-gray-800">{addr.street}</span>
+                        </li>
+                        <li className="flex flex-col space-y-2">
+                          <span className="font-semibold text-gray-600">
+                            City
+                          </span>
+                          <span className="text-gray-800">{addr.city}</span>
+                        </li>
+                        <li className="flex flex-col space-y-2">
+                          <span className="font-semibold text-gray-600">
+                            Country
+                          </span>
+                          <span className="text-gray-800">{addr.country}</span>
+                        </li>
+                        <li className="flex flex-col space-y-2">
+                          <span className="font-semibold text-gray-600">
+                            State
+                          </span>
+                          <span className="text-gray-800">{addr.state}</span>
+                        </li>
+                        <li className="flex flex-col space-y-2">
+                          <span className="font-semibold text-gray-600">
+                            Postal Code
+                          </span>
+                          <span className="text-gray-800">
+                            {addr.postal_code}
+                          </span>
+                        </li>
+                      </ul>
+                      <div className="w-full rounded-lg overflow-hidden flex-1 ml-5">
+                        <GoogleMap
+                          mapContainerStyle={{
+                            width: "100%",
+                            height: "100%",
+                            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+                          }}
+                          center={{
+                            lat: parseFloat(addr.lat),
+                            lng: parseFloat(addr.long),
+                          }}
+                          zoom={14}
+                        >
+                          <Marker
+                            position={{
+                              lat: parseFloat(addr.lat),
+                              lng: parseFloat(addr.long),
+                            }}
+                          />
+                        </GoogleMap>
+                      </div>
+                    </div>
+                  </div>
+                ))}
 
-            <h3 className="text-lg bg-slate-200 text-gray-700 rounded-lg px-6 py-2 font-semibold mb-4">
-              Primary Address
-            </h3>
-            <div className="flex justify-between">
-              <ul className="space-y-6 ml-5 flex-1">
-                <li className="flex flex-col space-y-2">
-                  <span className="font-semibold text-gray-600">Street</span>
-                  <span className="text-gray-800">{adress.street}</span>
-                </li>
-                <li className="flex flex-col space-y-2">
-                  <span className="font-semibold text-gray-600">City</span>
-                  <span className="text-gray-800">{adress.city}</span>
-                </li>
-                <li className="flex flex-col space-y-2">
-                  <span className="font-semibold text-gray-600">Country</span>
-                  <span className="text-gray-800">{adress.country}</span>
-                </li>
-                <li className="flex flex-col space-y-2">
-                  <span className="font-semibold text-gray-600">State</span>
-                  <span className="text-gray-800">{adress.state}</span>
-                </li>
-                <li className="flex flex-col space-y-2">
-                  <span className="font-semibold text-gray-600">
-                    Postal Code
-                  </span>
-                  <span className="text-gray-800">{adress.postal_code}</span>
-                </li>
-              </ul>
-
-              <div className="w-full rounded-lg overflow-hidden flex-1 ml-5">
-                <GoogleMap
-                  mapContainerStyle={{
-                    width: "100%",
-                    height: "100%",
-                    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-                  }}
-                  center={selectedLocation}
-                  zoom={14}
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={closeModal}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 ease-in-out mx-5"
                 >
-                  <Marker position={selectedLocation} />
-                </GoogleMap>
+                  Close
+                </button>
+                <button
+                  onClick={handleAddNewAddres}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 ease-in-out"
+                >
+                  Add New Address
+                </button>
               </div>
             </div>
-
-            <div className="flex justify-center mt-6">
-              <button
-                onClick={closeModal}
-                className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 ease-in-out"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          ) : (
+            <AddNewAdres />
+          )}
         </Modal>
       </main>
     </div>

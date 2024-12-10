@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 const libraries = ["places"];
 const center = {
@@ -11,7 +10,7 @@ const center = {
   lng: 79.8612,
 };
 
-const SetLocation = () => {
+const AddNewAdres = () => {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const { isLoaded } = useLoadScript({
@@ -26,6 +25,7 @@ const SetLocation = () => {
   const [cities, setCities] = useState([]);
   const [selectedState, setSelectedState] = useState({});
   const [selectedCity, setSelectedCity] = useState("");
+  const [addresType, setAddresType] = useState("");
 
   const [addressDetails, setAddressDetails] = useState({
     street: "",
@@ -97,7 +97,7 @@ const SetLocation = () => {
   const handleAdressSubmit = async () => {
     const requestBody = {
       u_id: localStorage.getItem("uId"),
-      address_type: "primary",
+      address_type: addresType,
       street: addressDetails.street,
       city: selectedCity,
       state: selectedState.name,
@@ -114,36 +114,28 @@ const SetLocation = () => {
       );
       console.log("Response:", response.data);
       console.log(requestBody);
-      router.push("/profile/customer");
+      window.location.reload();
     } catch (error) {
       console.error("Error:", error);
-      console.log(requestBody);
+      alert("error");
     }
   };
 
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white flex gap-14 p-8 rounded-lg shadow-md w-3/4">
-        <Image
-          src="/assets/images/reg_img.png"
-          alt="John Doe"
-          width={500}
-          height={100}
-          className="border-solid border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
-        />
+    <div className="flex items-center justify-center min-h-scree">
+      <div className=" flex gap-14 p-8 rounded-lg w-3/4">
         {step == 1 && (
           <div>
             <h2 className="text-2xl font-bold text-blue-600 mb-10">
               Select Your State And City
             </h2>
 
-            <label className="mt-10">State:</label>
             <select
               value={selectedState?.state_id || ""}
               onChange={handleStateChange}
-              className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md w-full mb-10 mt-4"
+              className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md w-full mt-10 mb-10"
             >
               <option value="">Select a state</option>
               {states.map((state) => (
@@ -154,21 +146,18 @@ const SetLocation = () => {
             </select>
 
             {selectedState && (
-              <>
-                <label className="mt-10">City:</label>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md w-full mb-10 mt-4"
-                >
-                  <option value="">Select a city</option>
-                  {cities.map((city) => (
-                    <option key={city.city_id} value={city.name}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-              </>
+              <select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md w-full mb-10"
+              >
+                <option value="">Select a city</option>
+                {cities.map((city) => (
+                  <option key={city.city_id} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
             )}
 
             <button
@@ -183,7 +172,7 @@ const SetLocation = () => {
         {step == 2 && (
           <div>
             <h2 className="text-2xl font-bold text-blue-600 mb-10">
-              Enter Your Primary Address
+              Select Your Location
             </h2>
 
             <Autocomplete
@@ -201,6 +190,15 @@ const SetLocation = () => {
                 onChange={(e) => setSearchInput(e.target.value)}
               />
             </Autocomplete>
+
+            <input
+              type="text"
+              className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
+              placeholder="Add Tag"
+              style={{ marginBottom: "100px", width: "400px" }}
+              value={addresType}
+              onChange={(e) => setAddresType(e.target.value)}
+            />
 
             {/* <div className=" p-4  w-full">
               <h3 className="text-lg font-semibold text-gray-700">
@@ -233,4 +231,4 @@ const SetLocation = () => {
   );
 };
 
-export default SetLocation;
+export default AddNewAdres;
