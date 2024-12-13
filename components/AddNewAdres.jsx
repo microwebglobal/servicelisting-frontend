@@ -194,7 +194,7 @@ const AddNewAdres = () => {
             <input
               type="text"
               className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
-              placeholder="Add Tag"
+              placeholder="ex: Home, Office..."
               style={{ marginBottom: "100px", width: "400px" }}
               value={addresType}
               onChange={(e) => setAddresType(e.target.value)}

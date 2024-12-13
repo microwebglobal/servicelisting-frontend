@@ -11,7 +11,7 @@ const center = {
   lng: 79.8612,
 };
 
-const SetLocation = () => {
+const ProviderLocation = ({ onLocSubmit, onLocation }) => {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const { isLoaded } = useLoadScript({
@@ -136,8 +136,7 @@ const SetLocation = () => {
   };
 
   const handleAdressSubmit = async () => {
-    const requestBody = {
-      u_id: localStorage.getItem("uId"),
+    onLocSubmit({
       address_type: "primary",
       street: addressDetails.street,
       city: selectedCity,
@@ -146,19 +145,13 @@ const SetLocation = () => {
       country: "india",
       long: selectedLocation.lng,
       lat: selectedLocation.lat,
-    };
+    });
+    console.log(addressDetails);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/adress/",
-        requestBody
-      );
-      console.log("Response:", response.data);
-      console.log(requestBody);
-      router.push("/profile/customer");
+      onLocation();
     } catch (error) {
       console.error("Error:", error);
-      console.log(requestBody);
     }
   };
 
@@ -252,4 +245,4 @@ const SetLocation = () => {
   );
 };
 
-export default SetLocation;
+export default ProviderLocation;
