@@ -1,7 +1,8 @@
 import "@styles/globals.css";
-import { Poppins } from "next/font/google";
+import { Poppins, Work_Sans } from "next/font/google";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "700"] });
+const workSans = Work_Sans({ subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata = {
   title: "",
@@ -10,7 +11,7 @@ export const metadata = {
 
 const RootLayout = ({ children }) => (
   <html lang="en">
-    <body className={poppins.className}>
+    <body className={workSans.className}>
       <div className="main">
         <div className="gradient" />
       </div>

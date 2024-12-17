@@ -12,7 +12,6 @@ const CustomerReg = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
-    user_name: "",
     email: "",
     mobile: "",
     photo: "path/to/photo.jpg",
@@ -74,10 +73,10 @@ const CustomerReg = () => {
         )}
         {step === 1 && (
           <div>
-            <h2 className="text-2xl font-semibold text-center mb-1">
+            <h2 className="text-3xl font-semibold text-center mb-1">
               Let's Set You Up!
             </h2>
-            <p className="text-center mb-8">Sign up To Continue</p>
+            <p className="text-center mb-14">Sign up To Continue</p>
             <div className="flex-col w-96">
               <form onSubmit={handleSubmit}>
                 <div className="mb-7 ">
@@ -92,18 +91,7 @@ const CustomerReg = () => {
                     className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div className="mb-7">
-                  <input
-                    type="text"
-                    placeholder="User Name"
-                    required
-                    value={formData.user_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, user_name: e.target.value })
-                    }
-                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+
                 <div className="mb-7">
                   <input
                     type="email"
@@ -142,15 +130,20 @@ const CustomerReg = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-2 bg-black text-white font-semibold rounded-md hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-5"
+                  className="w-full py-2 bg-indigo-500 text-white font-semibold rounded-md hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-5 mt-4"
                 >
                   Register
                 </button>
               </form>
-              <Link href="/login" className="text-center mx-auto">
-                Already have an account{" "}
-                <span className="text-indigo-700 ">sign in</span>
-              </Link>
+              <div className="flex justify-center items-center">
+                <Link
+                  href="/login"
+                  className="text-center mx-auto align-middle"
+                >
+                  Already have an account{" "}
+                  <span className="text-indigo-700">sign in</span>
+                </Link>
+              </div>
             </div>
           </div>
         )}

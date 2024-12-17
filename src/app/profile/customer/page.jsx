@@ -13,7 +13,7 @@ export default function ProfilePage() {
   const [allAdress, setAllAdress] = useState([]);
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyCJtNNLCh343h9T1vBlno_a-6wrfSm_DMc",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
   });
 
   const openModal = () => setIsOpen(true);
@@ -22,6 +22,8 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchUserData = async () => {
       const uId = localStorage.getItem("uId");
+
+      console.log(process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY);
 
       const response = await axios.get(
         `http://localhost:8080/api/users/${uId}`

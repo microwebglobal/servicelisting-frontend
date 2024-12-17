@@ -44,14 +44,16 @@ const OTPVerification = ({ mobile, onVerify }) => {
       />
       <button
         onClick={handleVerify}
-        className="w-full px-4 py-2 font-semibold text-white bg-black rounded-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-300 mt-8 mb-5"
+        className="w-full px-4 py-2 font-semibold text-white bg-indigo-500 rounded-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-300 mt-8 mb-5"
       >
         Verify
       </button>
-      <Link href="/login" className="text-center mx-auto">
-        Already have an account{" "}
-        <span className="text-indigo-700 ">sign in</span>
-      </Link>
+      <div className="flex justify-center items-center">
+        <Link href="/login" className="text-center mx-auto align-middle">
+          Already have an account{" "}
+          <span className="text-indigo-700">sign in</span>
+        </Link>
+      </div>
       <div className="mt-10 flex items-center">
         <hr className="flex-grow border-t border-gray-300" />
         <span className="px-4 text-gray-600">Or Continue With</span>

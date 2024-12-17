@@ -79,8 +79,22 @@ const Page = () => {
                 height={100}
                 className="rounded-full"
               />
-              <h2 className="text-lg font-semibold text-gray-800">
+              <h2 className="text-lg font-semibold text-gray-800 flex mt-3">
                 {userData.name}
+                <div className="relative flex ">
+                  <span className="ml-3 mt-1.5">
+                    <Image
+                      src="/assets/images/verify_badge.png"
+                      alt="Verified Badge"
+                      width={15}
+                      height={15}
+                      className="cursor-pointer"
+                    />
+                    <div className="absolute left-1/2 transform -translate-x-1/2 bottom-2 text-black text-xs font-medium px-2 py-1 rounded shadow-lg opacity-0 transition-opacity duration-300 hover:opacity-100">
+                      Verified Service Provider
+                    </div>
+                  </span>
+                </div>
               </h2>
               <p className="text-sm text-gray-500">
                 {profileData.business_name}
