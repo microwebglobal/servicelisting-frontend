@@ -17,7 +17,7 @@ const Navbar = () => {
         >
           Register as a Professional
         </a>
-        <Link href="/login">
+        <Link href="/login/user">
           <button className="bg-white text-indigo-500 px-3 py-1 rounded-lg font-semibold">
             Login
           </button>
