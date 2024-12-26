@@ -11,7 +11,9 @@ const ProviderServices = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/services/`);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/services/`
+        );
         setServices(response.data);
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -45,7 +47,10 @@ const ProviderServices = () => {
           status: "active",
         };
 
-        return axios.post("http://localhost:8080/api/proserv/", requestBody);
+        return axios.post(
+          `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/proserv/`,
+          requestBody
+        );
       });
 
       const responses = await Promise.all(requests);

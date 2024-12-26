@@ -21,7 +21,7 @@ const CustomerReg = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/otp/send-otp",
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/otp/send-otp`,
         {
           mobile: formData.mobile,
         }
@@ -37,11 +37,33 @@ const CustomerReg = () => {
   const handleVerification = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/users/",
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/auth/register`,
         formData
       );
+      // Using setTimeout to manage waiting for user profile creation
+      setTimeout(async () => {
+        try {
+          const response1 = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/customer-profiles/`,
+            {
+              u_id: localStorage.getItem("userId"),
+              tier_status: "Bronze",
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("acessToken")}`, // Add your token here
+              },
+            }
+          );
+        } catch (err) {
+          console.log(err);
+        }
+      }, 1000);
+
       console.log(response.data);
-      localStorage.setItem("uId", response.data.u_id);
+      localStorage.setItem("acessToken", response.data.accessToken);
+      localStorage.setItem("refreshToken", response.data.refreshToken);
+      localStorage.setItem("userId", response.data.user.id);
       setStep(3);
     } catch (err) {
       alert("Registration failed.");
@@ -92,24 +114,6 @@ const CustomerReg = () => {
                   />
                 </div>
 
-                <div className="mb-7">
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    required
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  {!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
-                    formData.email && (
-                      <p className="text-red-500 text-xs mt-1">
-                        Please enter a valid email address.
-                      </p>
-                    )}
-                </div>
                 <div className="mb-10">
                   <input
                     type="text"

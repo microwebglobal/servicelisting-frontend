@@ -20,9 +20,15 @@ const Page = () => {
         // Fetch user and profile data
         const [userResponse, profileResponse, providerServicesResponse] =
           await Promise.all([
-            axios.get(`http://localhost:8080/api/users/${uId}`),
-            axios.get(`http://localhost:8080/api/providerpro/user/${uId}`),
-            axios.get(`http://localhost:8080/api/proserv/provider/${spId}`),
+            axios.get(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/users/${uId}`
+            ),
+            axios.get(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/providerpro/user/${uId}`
+            ),
+            axios.get(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/proserv/provider/${spId}`
+            ),
           ]);
 
         setUserData(userResponse.data);
@@ -32,7 +38,9 @@ const Page = () => {
         // Fetch detailed services data from services table
         const serviceRequests = providerServicesResponse.data.map((service) =>
           axios
-            .get(`http://localhost:8080/api/services/${service.service_id}`)
+            .get(
+              `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/services/${service.service_id}`
+            )
             .then((res) => res.data)
             .catch((err) => {
               console.error(

@@ -20,18 +20,21 @@ const BusinessRegister = () => {
   const [userId, setUserId] = useState(0);
   const [userDetails, setUserDetails] = useState({
     name: "",
-    user_name: "",
     email: "",
     mobile: "",
+    nic: "",
+    dob: "",
+    gender: "",
     photo: "path/to/photo.jpg",
     role: "service_provider",
   });
   const [providerProfile, setProviderProfile] = useState({
     u_id: "",
-    business_type: "business",
+    business_type: "",
     business_name: "",
     reg_number: "",
     gst_number: "",
+    verification_status: "pending",
     about: "",
   });
 
@@ -64,7 +67,7 @@ const BusinessRegister = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/otp/send-otp",
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/otp/send-otp`,
         {
           mobile: userDetails.mobile,
         }
@@ -102,15 +105,15 @@ const BusinessRegister = () => {
   // Handle OTP verification after sending OTP
   const handleVerification = async (otp) => {
     try {
-      const response = await axios.post("http://localhost:8080/api/users/", {
-        ...userDetails,
-        otp,
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/auth/register`,
+        userDetails
+      );
       console.log(response);
-      localStorage.setItem("uId", response.data.u_id);
+      localStorage.setItem("userId", response.data.user.id);
 
       const requestBody = {
-        u_id: response.data.u_id,
+        u_id: response.data.user.id,
         address_type: "primary",
         street: providerLocation.street,
         city: providerLocation.city,
@@ -120,7 +123,10 @@ const BusinessRegister = () => {
         long: providerLocation.long,
         lat: providerLocation.lat,
       };
-      await axios.post("http://localhost:8080/api/adress/", requestBody);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/adress/`,
+        requestBody
+      );
       setProviderProfile({ ...providerProfile, u_id: response.data.u_id });
       setStep(3); // After successful verification, move to the next step
     } catch (err) {
@@ -131,11 +137,23 @@ const BusinessRegister = () => {
   // Handle profile form submit
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
+
+    const requestBody = {
+      u_id: localStorage.getItem("userId"),
+      business_type: providerProfile.business_type,
+      business_name: providerProfile.business_name,
+      reg_number: providerProfile.reg_number,
+      gst_number: providerProfile.gst_number,
+      verification_status: "pending",
+      about: providerProfile.about,
+    };
+
     try {
       // First request: create provider profile
+      console.log(providerProfile);
       const response = await axios.post(
-        "http://localhost:8080/api/providerpro/",
-        providerProfile
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api//provider_profile/`,
+        requestBody
       );
 
       console.log(response.data.sp_id);
@@ -156,7 +174,7 @@ const BusinessRegister = () => {
       setTimeout(async () => {
         try {
           const response1 = await axios.post(
-            "http://localhost:8080/api/doc",
+            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/doc`,
             newDocuments
           );
           alert("Profile created");
@@ -228,69 +246,94 @@ const BusinessRegister = () => {
 
         {step === 1 && (
           <div className="flex-col w-96">
-            <form onSubmit={handleUserSubmit} className="w-full max-w-lg ">
-              <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-                Step 1: Basic Details
-              </h2>
-              <div className="mb-4">
-                <input
-                  name="name"
-                  placeholder="Full Name"
-                  value={userDetails.name}
-                  onChange={(e) =>
-                    setUserDetails({ ...userDetails, name: e.target.value })
-                  }
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-              <div className="mb-4">
-                <input
-                  name="user_name"
-                  placeholder="User Name"
-                  value={userDetails.user_name}
-                  onChange={(e) =>
-                    setUserDetails({
-                      ...userDetails,
-                      user_name: e.target.value,
-                    })
-                  }
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-              <div className="mb-4">
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                  value={userDetails.email}
-                  onChange={(e) =>
-                    setUserDetails({ ...userDetails, email: e.target.value })
-                  }
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-              <div className="mb-4">
-                <input
-                  type="text"
-                  placeholder="Mobile Number"
-                  value={userDetails.mobile}
-                  onChange={(e) =>
-                    setUserDetails({ ...userDetails, mobile: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
+            <h2 className="text-3xl font-semibold text-center mb-1">
+              Personal Information
+            </h2>
+            <p className="text-center mb-14">Sign up To Continue</p>
+            <div className="flex-col w-96">
+              <form onSubmit={handleUserSubmit} className="w-full max-w-lg ">
+                <div className="mb-4">
+                  <input
+                    name="name"
+                    placeholder="Full Name"
+                    value={userDetails.name}
+                    onChange={(e) =>
+                      setUserDetails({ ...userDetails, name: e.target.value })
+                    }
+                    required
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="mb-4">
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    value={userDetails.email}
+                    onChange={(e) =>
+                      setUserDetails({ ...userDetails, email: e.target.value })
+                    }
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    placeholder="Mobile Number"
+                    value={userDetails.mobile}
+                    onChange={(e) =>
+                      setUserDetails({ ...userDetails, mobile: e.target.value })
+                    }
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    placeholder="National Identity Card No"
+                    value={userDetails.nic}
+                    onChange={(e) =>
+                      setUserDetails({ ...userDetails, nic: e.target.value })
+                    }
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="mb-4">
+                  <input
+                    type="date"
+                    placeholder="Date Of Birth"
+                    value={userDetails.dob}
+                    onChange={(e) =>
+                      setUserDetails({ ...userDetails, dob: e.target.value })
+                    }
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="mb-4">
+                  <select
+                    value={userDetails.gender}
+                    onChange={(e) =>
+                      setUserDetails({ ...userDetails, gender: e.target.value })
+                    }
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="" disabled>
+                      Select Gender
+                    </option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
 
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
-              >
-                Next
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-indigo-500 text-white font-semibold rounded-md hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-5 mt-4"
+                >
+                  Next
+                </button>
+              </form>
+            </div>
           </div>
         )}
 
@@ -302,174 +345,196 @@ const BusinessRegister = () => {
         )}
 
         {step === 3 && (
-          <form
-            onSubmit={handleProfileSubmit}
-            className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg"
-          >
-            <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-              Step 3: Service Provider Profile
+          <div className="flex-col">
+            <h2 className="text-3xl font-semibold text-center mb-1">
+              Business Information
             </h2>
-            <div className="mb-6">
-              <input
-                name="business_name"
-                type="text"
-                placeholder="Business Name"
-                value={providerProfile.business_name}
-                onChange={(e) =>
-                  setProviderProfile({
-                    ...providerProfile,
-                    business_name: e.target.value,
-                  })
-                }
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            <div className="mb-6">
-              <input
-                name="reg_number"
-                type="text"
-                placeholder="REG Number"
-                value={providerProfile.reg_number}
-                onChange={(e) =>
-                  setProviderProfile({
-                    ...providerProfile,
-                    reg_number: e.target.value,
-                  })
-                }
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            <div className="mb-6">
-              <input
-                name="gst_number"
-                type="text"
-                placeholder="GST Number"
-                value={providerProfile.gst_number}
-                onChange={(e) =>
-                  setProviderProfile({
-                    ...providerProfile,
-                    gst_number: e.target.value,
-                  })
-                }
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            <div className="mb-6">
-              <textarea
-                name="about"
-                placeholder="About your business"
-                value={providerProfile.about}
-                onChange={(e) =>
-                  setProviderProfile({
-                    ...providerProfile,
-                    about: e.target.value,
-                  })
-                }
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            {imageURL == null ? (
-              <>
-                <div className="mb-4">
-                  <label className="block text-gray-700">Upload NIC:</label>
-                  <input
-                    type="file"
-                    name="image"
-                    onChange={(e) => setImage(e.target.files[0])}
-                    className="border border-none rounded-md p-2 "
-                  />
-                  {uploadProgress > 0 && (
-                    <div className="w-full max-w-sm mt-4">
-                      <div className="relative pt-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-semibold inline-block py-1 px-2 rounded text-teal-600 bg-teal-200">
-                            Upload Progress
-                          </span>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 rounded text-teal-600 bg-teal-200">
-                            {Math.round(uploadProgress)}%
-                          </span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="relative flex items-center justify-center w-full">
-                            <div className="w-full bg-gray-200 rounded">
-                              <div
-                                className="bg-teal-600 text-xs leading-none py-1 text-center text-white rounded"
-                                style={{ width: `${uploadProgress}%` }}
-                              />
+            <p className="text-center mb-10">Set Up your business profile</p>
+
+            <form onSubmit={handleProfileSubmit}>
+              <div className="mb-6">
+                <select
+                  name="business_type"
+                  value={providerProfile.business_type}
+                  onChange={(e) =>
+                    setProviderProfile({
+                      ...providerProfile,
+                      business_type: e.target.value,
+                    })
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option value="" disabled>
+                    Select your Business Type
+                  </option>
+                  <option value="individual">Individual</option>
+                  <option value="business">Business</option>
+                </select>
+              </div>
+
+              <div className="mb-6">
+                <input
+                  name="business_name"
+                  type="text"
+                  placeholder="Business Name"
+                  value={providerProfile.business_name}
+                  onChange={(e) =>
+                    setProviderProfile({
+                      ...providerProfile,
+                      business_name: e.target.value,
+                    })
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div className="mb-6">
+                <input
+                  name="reg_number"
+                  type="text"
+                  placeholder="REG Number"
+                  value={providerProfile.reg_number}
+                  onChange={(e) =>
+                    setProviderProfile({
+                      ...providerProfile,
+                      reg_number: e.target.value,
+                    })
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div className="mb-6">
+                <input
+                  name="gst_number"
+                  type="text"
+                  placeholder="GST Number"
+                  value={providerProfile.gst_number}
+                  onChange={(e) =>
+                    setProviderProfile({
+                      ...providerProfile,
+                      gst_number: e.target.value,
+                    })
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div className="mb-6">
+                <textarea
+                  name="about"
+                  placeholder="About your business"
+                  value={providerProfile.about}
+                  onChange={(e) =>
+                    setProviderProfile({
+                      ...providerProfile,
+                      about: e.target.value,
+                    })
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              {imageURL == null ? (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-gray-700">Upload NIC:</label>
+                    <input
+                      type="file"
+                      name="image"
+                      onChange={(e) => setImage(e.target.files[0])}
+                      className="border border-none rounded-md p-2 "
+                    />
+                    {uploadProgress > 0 && (
+                      <div className="w-full max-w-sm mt-4">
+                        <div className="relative pt-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-semibold inline-block py-1 px-2 rounded text-teal-600 bg-teal-200">
+                              Upload Progress
+                            </span>
+                            <span className="text-xs font-semibold inline-block py-1 px-2 rounded text-teal-600 bg-teal-200">
+                              {Math.round(uploadProgress)}%
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="relative flex items-center justify-center w-full">
+                              <div className="w-full bg-gray-200 rounded">
+                                <div
+                                  className="bg-teal-600 text-xs leading-none py-1 text-center text-white rounded"
+                                  style={{ width: `${uploadProgress}%` }}
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center mb-4">
-                  <button
-                    onClick={handleUpload}
-                    disabled={loading}
-                    className="bg-black text-white text-xl px-4 py-2 rounded-md mt-5"
-                  >
-                    {loading ? "Uploading..." : "Upload"}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="mb-4">
-                  <label className="block text-gray-700">Upload File:</label>
-                  <input
-                    type="file"
-                    name="image"
-                    onChange={(e) => setImage(e.target.files[0])}
-                    className="border border-none rounded-md p-2 "
-                  />
-                  {uploadProgress > 0 && (
-                    <div className="w-full max-w-sm mt-4">
-                      <div className="relative pt-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-semibold inline-block py-1 px-2 rounded text-teal-600 bg-teal-200">
-                            Upload Progress
-                          </span>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 rounded text-teal-600 bg-teal-200">
-                            {Math.round(uploadProgress)}%
-                          </span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="relative flex items-center justify-center w-full">
-                            <div className="w-full bg-gray-200 rounded">
-                              <div
-                                className="bg-teal-600 text-xs leading-none py-1 text-center text-white rounded"
-                                style={{ width: `${uploadProgress}%` }}
-                              />
+                    )}
+                  </div>
+                  <div className="flex items-center mb-4">
+                    <button
+                      onClick={handleUpload}
+                      disabled={loading}
+                      className="bg-black text-white text-xl px-4 py-2 rounded-md mt-5"
+                    >
+                      {loading ? "Uploading..." : "Upload"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-gray-700">Upload File:</label>
+                    <input
+                      type="file"
+                      name="image"
+                      onChange={(e) => setImage(e.target.files[0])}
+                      className="border border-none rounded-md p-2 "
+                    />
+                    {uploadProgress > 0 && (
+                      <div className="w-full max-w-sm mt-4">
+                        <div className="relative pt-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-semibold inline-block py-1 px-2 rounded text-teal-600 bg-teal-200">
+                              Upload Progress
+                            </span>
+                            <span className="text-xs font-semibold inline-block py-1 px-2 rounded text-teal-600 bg-teal-200">
+                              {Math.round(uploadProgress)}%
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="relative flex items-center justify-center w-full">
+                              <div className="w-full bg-gray-200 rounded">
+                                <div
+                                  className="bg-teal-600 text-xs leading-none py-1 text-center text-white rounded"
+                                  style={{ width: `${uploadProgress}%` }}
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center mb-4">
-                  <button
-                    onClick={handleUpload}
-                    disabled={loading}
-                    className="bg-black text-white text-xl px-4 py-2 rounded-md mt-5"
-                  >
-                    {loading ? "Uploading..." : "Upload"}
-                  </button>
-                </div>
-              </>
-            )}
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
-            >
-              Finish
-            </button>
-          </form>
+                    )}
+                  </div>
+                  <div className="flex items-center mb-4">
+                    <button
+                      onClick={handleUpload}
+                      disabled={loading}
+                      className="bg-black text-white text-xl px-4 py-2 rounded-md mt-5"
+                    >
+                      {loading ? "Uploading..." : "Upload"}
+                    </button>
+                  </div>
+                </>
+              )}
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
+              >
+                Finish
+              </button>
+            </form>
+          </div>
         )}
 
         {step === 4 && <ProviderServices />}

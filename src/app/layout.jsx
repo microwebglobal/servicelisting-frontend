@@ -1,7 +1,6 @@
 import "@styles/globals.css";
-import { Poppins, Work_Sans } from "next/font/google";
+import { Work_Sans } from "next/font/google";
 
-const poppins = Poppins({ subsets: ["latin"], weight: ["400", "700"] });
 const workSans = Work_Sans({ subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata = {

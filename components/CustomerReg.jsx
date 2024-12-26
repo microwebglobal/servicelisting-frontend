@@ -9,7 +9,7 @@ const OTPVerification = ({ mobile, onVerify }) => {
   const handleVerify = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/otp/verify-otp",
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/otp/verify-otp`,
         {
           mobile: mobile,
           otp: otp,
@@ -18,10 +18,6 @@ const OTPVerification = ({ mobile, onVerify }) => {
       console.log(response.data.success);
 
       if (response.data.success == true) {
-        const { token } = response.data;
-        localStorage.setItem("authToken", token);
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        console.log("User Info:", payload);
         onVerify();
       } else {
         alert("Invalid OTP.");
@@ -33,7 +29,7 @@ const OTPVerification = ({ mobile, onVerify }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-center mb-4">Enter OTP</h2>
+      <h2 className="text-3xl font-semibold text-center mb-4">Enter OTP</h2>
       <p className="text-center mb-5">Enter 4 Digit Code Sent to Your Phone</p>
       <input
         type="text"

@@ -15,7 +15,7 @@ const Login = () => {
   const handleSendOtp = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/login/send-otp",
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/auth/login/send-otp`,
         { mobile }
       );
       if (response.data.success) {
@@ -34,7 +34,7 @@ const Login = () => {
   const handleVerifyOtp = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/login/verify-otp",
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/auth/login/verify-otp`,
         {
           mobile,
           otp,
@@ -64,7 +64,7 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white flex gap-14 p-8 rounded-lg shadow-md w-3/4">
+      <div className="bg-white flex gap-14 p-10 rounded-lg shadow-md pr-20">
         <Image
           src="/assets/images/reg_img.png"
           alt="John Doe"
@@ -72,10 +72,10 @@ const Login = () => {
           height={100}
           className="border-solid border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
         />
-        <div>
+        <div className="ml-14">
           {step === 1 ? (
             <>
-              <h2 className="text-2xl font-semibold text-center mb-2">
+              <h2 className="text-3xl font-semibold text-center mb-2">
                 Welcome Back
               </h2>
               <p className="text-center mb-14">
@@ -83,25 +83,30 @@ const Login = () => {
               </p>
               <input
                 type="text"
-                className="w-full p-3 mb-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 mb-10 text-gray-700 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your mobile number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
               />
               <button
-                className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition mb-5"
+                className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-blue-600 transition mb-5"
                 onClick={handleSendOtp}
               >
                 Send OTP
               </button>
-              <Link href="/login" className="text-center mx-auto">
-                Already have an account{" "}
-                <span className="text-indigo-700 ">sign in</span>
-              </Link>
+              <div className="flex justify-center items-center">
+                <Link
+                  href="/login"
+                  className="text-center mx-auto align-middle"
+                >
+                  Already have an account{" "}
+                  <span className="text-indigo-700">sign in</span>
+                </Link>
+              </div>
             </>
           ) : (
             <>
-              <h2 className="text-2xl font-semibold text-center mb-4">
+              <h2 className="text-3xl font-semibold text-center mb-4">
                 Enter OTP
               </h2>
               <p className="text-center mb-14">
@@ -109,21 +114,26 @@ const Login = () => {
               </p>
               <input
                 type="text"
-                className="w-full p-3 mb-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 mb-10 text-gray-700 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter the OTP"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
               />
               <button
-                className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition mb-5"
+                className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-blue-600 transition mb-5"
                 onClick={handleVerifyOtp}
               >
                 Verify OTP
               </button>
-              <Link href="/login" className="text-center mx-auto">
-                Already have an account{" "}
-                <span className="text-indigo-700 ">sign in</span>
-              </Link>
+              <div className="flex justify-center items-center">
+                <Link
+                  href="/login"
+                  className="text-center mx-auto align-middle"
+                >
+                  Already have an account{" "}
+                  <span className="text-indigo-700">sign in</span>
+                </Link>
+              </div>
             </>
           )}
           <div className="mt-10 flex items-center">

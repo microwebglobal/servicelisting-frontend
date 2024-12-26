@@ -62,7 +62,7 @@ const AddNewAdres = () => {
 
   const handleAdressSubmit = async () => {
     const requestBody = {
-      u_id: localStorage.getItem("uId"),
+      u_id: localStorage.getItem("userId"),
       address_type: addresType,
       street: addressDetails.street,
       city: addressDetails.city,
@@ -75,7 +75,7 @@ const AddNewAdres = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/adress/",
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/adress/`,
         requestBody
       );
       console.log("Response:", response.data);

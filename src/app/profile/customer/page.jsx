@@ -21,12 +21,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const uId = localStorage.getItem("uId");
+      const uId = localStorage.getItem("userId");
 
       console.log(process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY);
 
       const response = await axios.get(
-        `http://localhost:8080/api/users/${uId}`
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/users/${uId}`
       );
       setUserData(response.data);
       console.log(response.data);
@@ -35,10 +35,10 @@ export default function ProfilePage() {
   }, []);
 
   const fetchUserAddress = async () => {
-    const uId = localStorage.getItem("uId");
+    const uId = localStorage.getItem("userId");
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/adress//user/${uId}`
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/adress/user/${uId}`
       );
       setAllAdress(response.data);
     } catch (error) {
@@ -47,8 +47,8 @@ export default function ProfilePage() {
   };
 
   const displayAddres = () => {
-    openModal();
     fetchUserAddress();
+    openModal();
   };
 
   if (loadError) {
