@@ -14,10 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { serviceAPI } from "../../api/services";
 
 export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
   const [cities, setCities] = useState([]);
   const [formData, setFormData] = useState({
+    item_id: "",
     name: "",
     description: "",
     base_price: "",
@@ -25,31 +27,50 @@ export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
   });
   const [loading, setLoading] = useState(false);
 
+  // Fetch cities on mount only
   useEffect(() => {
+    let isMounted = true;
+
     const fetchCities = async () => {
       try {
-        const response = await fetch("/api/cities");
-        const data = await response.json();
-        setCities(data);
+        const response = await serviceAPI.getCities();
+        if (isMounted) {
+          setCities(response.data || []);
+        }
       } catch (error) {
         console.error("Failed to fetch cities:", error);
       }
     };
 
     fetchCities();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  // Initialize form data separately from cities fetch
   useEffect(() => {
     if (initialData) {
       setFormData({
+        item_id: initialData.item_id || "",
         name: initialData.name || "",
         description: initialData.description || "",
         base_price: initialData.base_price?.toString() || "",
-        cityPricing:
-          initialData.CitySpecificPricings?.map((pricing) => ({
-            city_id: pricing.city_id,
-            price: pricing.price.toString(),
-          })) || [],
+        cityPricing: initialData.CitySpecificPricings?.map((pricing) => ({
+          city_id: pricing.city_id,
+          price: pricing.price.toString(),
+          pricing_id: pricing.pricing_id || undefined,
+          key: `${pricing.city_id}-${pricing.pricing_id || Date.now()}` // Add unique key
+        })) || [],
+      });
+    } else {
+      setFormData({
+        item_id: "",
+        name: "",
+        description: "",
+        base_price: "",
+        cityPricing: [],
       });
     }
   }, [initialData]);
@@ -65,7 +86,14 @@ export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
   const handleAddCityPricing = () => {
     setFormData((prev) => ({
       ...prev,
-      cityPricing: [...prev.cityPricing, { city_id: "", price: "" }],
+      cityPricing: [
+        ...prev.cityPricing,
+        {
+          city_id: "",
+          price: "",
+          key: Date.now().toString() // Add unique key for new items
+        }
+      ],
     }));
   };
 
@@ -89,24 +117,42 @@ export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Convert string prices to numbers
       const processedData = {
         ...formData,
-        item_id: `ITM_${Date.now()}`,
+        item_id: initialData?.item_id,
         service_id: serviceId,
         base_price: parseFloat(formData.base_price),
-        cityPricing: formData.cityPricing.map((pricing) => ({
-          ...pricing,
-          price: parseFloat(pricing.price),
-        })),
+        cityPricing: formData.cityPricing
+          .map((pricing) => ({
+            city_id: pricing.city_id,
+            price: parseFloat(pricing.price),
+            ...(pricing.pricing_id && { pricing_id: pricing.pricing_id })
+          }))
+          .filter(pricing => pricing.city_id && pricing.price),
       };
 
-      await onSubmit(processedData);
+      if (initialData?.item_id) {
+        await serviceAPI.updateServiceItem(initialData.item_id, processedData);
+      } else {
+        await serviceAPI.createServiceItem(processedData);
+      }
+      
+      if (onSubmit) {
+        await onSubmit(processedData);
+      }
     } catch (error) {
       console.error("Form submission error:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const isValidForm = () => {
+    const hasValidBasicInfo = formData.name && formData.base_price;
+    const hasValidCityPricing = formData.cityPricing.every(
+      pricing => !pricing.city_id || (pricing.city_id && pricing.price)
+    );
+    return hasValidBasicInfo && hasValidCityPricing;
   };
 
   return (
@@ -162,7 +208,7 @@ export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
           </div>
 
           {formData.cityPricing.map((pricing, index) => (
-            <Card key={index}>
+            <Card key={pricing.key}>
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-[2fr,1fr,auto] gap-4">
                   <div>
@@ -195,7 +241,7 @@ export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
                       onChange={(e) =>
                         handleCityPricingChange(index, "price", e.target.value)
                       }
-                      required
+                      required={!!pricing.city_id}
                     />
                   </div>
 
@@ -217,7 +263,7 @@ export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
       </div>
 
       <div className="flex justify-end gap-4">
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading || !isValidForm()}>
           {loading ? "Saving..." : initialData ? "Update Item" : "Create Item"}
         </Button>
       </div>

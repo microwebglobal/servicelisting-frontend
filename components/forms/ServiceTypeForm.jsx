@@ -15,8 +15,7 @@ export const ServiceTypeForm = ({ onSubmit, subCategoryId }) => {
     e.preventDefault();
     console.log(formData);
     onSubmit({
-      ...formData,
-      type_id: `type_${Date.now()}`,
+      ...formData
     });
   };
 

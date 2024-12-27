@@ -1,4 +1,4 @@
-import ServiceManagement from "@components/services/ServiceManagement";
+import ServiceManagement from "@components/serviceManager/ServiceManagement";
 
 import React from "react";
 

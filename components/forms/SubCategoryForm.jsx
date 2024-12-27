@@ -13,8 +13,7 @@ export const SubCategoryForm = ({ onSubmit, categoryId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({
-      ...formData,
-      sub_category_id: `subcat_${Date.now()}`
+      ...formData
     });
   };
 

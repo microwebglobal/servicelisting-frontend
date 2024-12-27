@@ -22,7 +22,7 @@ export const serviceAPI = {
   deleteServiceType: (id) => api.delete(`/types/${id}`),
 
   // Services
-  getServices: (typeId) => api.get(`/services/itm/${typeId}`),
+  getServices: (typeId) => api.get(`/services/items/${typeId}`),
   createService: (data) => api.post("/services", data),
   updateService: (id, data) => api.put(`/services/${id}`, data),
   deleteService: (id) => api.delete(`/services/${id}`),
@@ -32,7 +32,30 @@ export const serviceAPI = {
   updateServiceItem: (id, data) => api.put(`/items/${id}`, data),
   deleteServiceItem: (id) => api.delete(`/items/${id}`),
   getServiceItems: (serviceId) => api.get(`/items/serv/${serviceId}`),
-  // createServiceItem: (data) => api.post("/api/services/items", data),
-  updateServiceItem: (itemId, data) =>
-    api.put(`/api/services/items/${itemId}`, data),
+  updateServiceItem: (itemId, data) => api.put(`/items/${itemId}`, data),
+
+  //cities
+  getCities: () => api.get("/cities"),
+  createCity: (data) => api.post("/cities", data),
+  updateCity: (id, data) => api.put(`/cities/${id}`, data),
+  deleteCity: (id) => api.delete(`/cities/${id}`),
+
+  //packages
+  createPackage: (data) => api.post("/packages", data),
+  updatePackage: (id, data) => api.put(`/packages/${id}`, data),
+  deletePackage: (id) => api.delete(`/packages/${id}`),
+  getPackages: (itemId) => api.get(`/packages/item/${itemId}`),
+  getPackagesByType: (typeId) => api.get(`/packages/types/${typeId}`),
+
+  //paclage items
+  createPackageItem: (data) => api.post("/package-items", data),
+  updatePackageItem: (id, data) => api.put(`/package-items/${id}`, data),
+  deletePackageItem: (id) => api.delete(`/package-items/${id}`),
+  getPackageItems: (packageId) => api.get(`/package-items/package/${packageId}`),
+
+  //city pricing
+  createCityPricing: (data) => api.post("/city-pricing", data),
+  updateCityPricing: (id, data) => api.put(`/city-pricing/${id}`, data),
+  deleteCityPricing: (id) => api.delete(`/city-pricing/${id}`),
+  getCityPricing: (itemId) => api.get(`/city-pricing/item/${itemId}`),
 };
