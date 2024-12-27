@@ -47,7 +47,7 @@ const Sidebar = () => {
     {
       name: "Services Management",
       subMenu: [
-        { name: "Services List", link: "/services-list" },
+        { name: "Services List", link: "admin/services" },
         { name: "Add Service", link: "/add-service" },
       ],
     },
@@ -78,13 +78,13 @@ const Sidebar = () => {
 
   return (
     <aside className="h-screen p-2 w-1/5">
-      <h1 className="text-2xl ml-2 font-bold mb-6">[App Name]</h1>
+      <h1 className="text-3xl ml-2 font-bold mb-10">[App Name]</h1>
       <nav>
         {menuItems.map((item, idx) => (
           <div key={idx} className="mb-4">
             <h2
               className="bg-background p-2 rounded-lg font-bold text-primary"
-              style={{ fontSize: "14px" }}
+              style={{ fontSize: "14px", backgroundColor: "#f6f7f9" }}
             >
               {item.name}
             </h2>

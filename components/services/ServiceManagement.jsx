@@ -1,32 +1,36 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { serviceAPI } from "../../api/services";
+import { Plus, Edit, Trash2, ChevronRight, List } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CategoryForm } from "@/components/forms/CategoryForm";
+import { SubCategoryForm } from "@/components/forms/SubCategoryForm";
+import { ServiceTypeForm } from "@/components/forms/ServiceTypeForm";
+import { ServiceForm } from "@/components/forms/ServiceForm";
+import { ServiceItemForm } from "@/components/forms/ServiceItemForm";
 
-'use client';
-import React, { useState, useEffect } from 'react';
-import { serviceAPI } from '../../api/services';
-import { Plus, Edit, Trash2, ChevronRight, List } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CategoryForm } from '@/components/forms/CategoryForm';
-import { SubCategoryForm } from '@/components/forms/SubCategoryForm';
-import { ServiceTypeForm } from '@/components/forms/ServiceTypeForm';
-import { ServiceForm } from '@/components/forms/ServiceForm';
-import { ServiceItemForm } from '@/components/forms/ServiceItemForm';
-
-const ServiceCard = ({ 
-  title, 
-  items, 
-  loading, 
-  selectedItem, 
-  onSelect, 
-  onDelete, 
-  onAdd, 
-  onEdit, 
-  FormComponent, 
+const ServiceCard = ({
+  title,
+  items,
+  loading,
+  selectedItem,
+  onSelect,
+  onDelete,
+  onAdd,
+  onEdit,
+  FormComponent,
   formProps = {},
   showItemsButton = false,
-  onManageItems
+  onManageItems,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -61,21 +65,25 @@ const ServiceCard = ({
       key={item.id || `${title}-${index}`}
       className={`
         flex items-center justify-between p-3 rounded-lg transition-all cursor-pointer
-        ${selectedItem?.id === item.id ? 'bg-primary/10 border-l-4 border-primary' : 'hover:bg-secondary/50'}
+        ${
+          selectedItem?.id === item.id
+            ? "bg-primary/10 border-l-4 border-primary"
+            : "hover:bg-secondary/50"
+        }
       `}
       onClick={() => onSelect(item)}
     >
       <div className="flex items-center gap-2">
-        <span className={selectedItem?.id === item.id ? 'font-semibold' : ''}>
+        <span className={selectedItem?.id === item.id ? "font-semibold" : ""}>
           {item.name}
         </span>
         {item.description && (
-          <span className="text-sm text-muted-foreground">
+          <span className="w-2/4 text-sm text-muted-foreground">
             - {item.description}
           </span>
         )}
       </div>
-      <div className="flex gap-2">
+      <div className="w-1/5 flex-col gap-2">
         {showItemsButton && (
           <Button
             variant="ghost"
@@ -135,15 +143,15 @@ const ServiceCard = ({
           <Plus className="h-4 w-4" />
         </Button>
       </CardHeader>
-      <CardContent className="space-y-2">
-        {renderContent()}
-      </CardContent>
+      <CardContent className="space-y-2">{renderContent()}</CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingItem ? `Edit ${title.slice(0, -1)}` : `Add New ${title.slice(0, -1)}`}
+              {editingItem
+                ? `Edit ${title.slice(0, -1)}`
+                : `Add New ${title.slice(0, -1)}`}
             </DialogTitle>
           </DialogHeader>
           <FormComponent
@@ -159,68 +167,80 @@ const ServiceCard = ({
 
 const ServiceItemsDialog = ({ service, onClose }) => {
   const { toast } = useToast();
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([{ name: "sahan" }]);
   const [loading, setLoading] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
   const fetchItems = async () => {
     setLoading(true);
+    console.log(service.service_id);
     try {
-      const { data } = await serviceAPI.getServiceItems(service.id);
+      const { data } = await serviceAPI.getServiceItems(service?.service_id);
+      console.log(data);
       setItems(data);
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
         description: "Failed to fetch service items",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    if (service?.service_id) {
+      fetchItems();
+    }
+  }, [service?.service_id]);
 
   const handleSubmit = async (formData) => {
     try {
       if (editingItem) {
         await serviceAPI.updateServiceItem(editingItem.id, formData);
       } else {
-        await serviceAPI.createServiceItem({ ...formData, serviceId: service.id });
+        await serviceAPI.createServiceItem({
+          ...formData,
+          serviceId: service.id,
+        });
       }
       await fetchItems();
       setIsFormOpen(false);
       setEditingItem(null);
       toast({
         title: "Success",
-        description: `Service item ${editingItem ? 'updated' : 'created'} successfully`
+        description: `Service item ${
+          editingItem ? "updated" : "created"
+        } successfully`,
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: `Failed to ${editingItem ? 'update' : 'create'} service item`,
-        variant: "destructive"
+        description: `Failed to ${
+          editingItem ? "update" : "create"
+        } service item`,
+        variant: "destructive",
       });
     }
   };
 
   const handleDelete = async (item) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
-    
+    if (!confirm("Are you sure you want to delete this item?")) return;
+
     try {
       await serviceAPI.deleteServiceItem(item.id);
       await fetchItems();
       toast({
         title: "Success",
-        description: "Service item deleted successfully"
+        description: "Service item deleted successfully",
       });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete service item",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -231,18 +251,23 @@ const ServiceItemsDialog = ({ service, onClose }) => {
         <DialogHeader>
           <DialogTitle>Service Items - {service.name}</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
-          <Button onClick={() => {
-            setEditingItem(null);
-            setIsFormOpen(true);
-          }}>
+          <Button
+            onClick={() => {
+              setEditingItem(null);
+              setIsFormOpen(true);
+            }}
+          >
             Add New Item
           </Button>
 
           {loading ? (
             Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={`item-skeleton-${index}`} className="h-12 w-full" />
+              <Skeleton
+                key={`item-skeleton-${index}`}
+                className="h-12 w-full"
+              />
             ))
           ) : (
             <div className="space-y-2">
@@ -251,9 +276,13 @@ const ServiceItemsDialog = ({ service, onClose }) => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-semibold">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">{item.description}</p>
-                      {item.price && (
-                        <p className="text-sm font-medium">Price: ${item.price}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                      {item.base_price && (
+                        <p className="text-sm font-medium">
+                          Price: ${item.base_price}
+                        </p>
                       )}
                     </div>
                     <div className="flex gap-2">
@@ -286,12 +315,13 @@ const ServiceItemsDialog = ({ service, onClose }) => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingItem ? 'Edit Service Item' : 'Add New Service Item'}
+                {editingItem ? "Edit Service Item" : "Add New Service Item"}
               </DialogTitle>
             </DialogHeader>
             <ServiceItemForm
               onSubmit={handleSubmit}
               initialData={editingItem}
+              serviceId={service.service_id}
             />
           </DialogContent>
         </Dialog>
@@ -307,51 +337,52 @@ const ServiceManager = () => {
       categories: false,
       subCategories: false,
       serviceTypes: false,
-      services: false
+      services: false,
     },
     data: {
       categories: [],
       subCategories: [],
       serviceTypes: [],
-      services: []
+      services: [],
     },
     selected: {
       category: null,
       subCategory: null,
       serviceType: null,
-      service: null
-    }
+      service: null,
+    },
   });
   const [showServiceItems, setShowServiceItems] = useState(false);
 
   // Initial load
   useEffect(() => {
-    fetchData('categories');
+    fetchData("categories");
   }, []);
 
   // Fetch sub-items when parent is selected
   useEffect(() => {
     if (state.selected.category) {
-      fetchData('subCategories', state.selected.category.id);
+      fetchData("subCategories", state.selected.category.category_id);
     }
   }, [state.selected.category]);
 
   useEffect(() => {
     if (state.selected.subCategory) {
-      fetchData('serviceTypes', state.selected.subCategory.id);
+      fetchData("serviceTypes", state.selected.subCategory.sub_category_id);
     }
   }, [state.selected.subCategory]);
 
   useEffect(() => {
+    console.log(state.selected.serviceType);
     if (state.selected.serviceType) {
-      fetchData('services', state.selected.serviceType.id);
+      fetchData("services", state.selected.serviceType.type_id);
     }
   }, [state.selected.serviceType]);
 
   const fetchData = async (type, parentId = null) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      loading: { ...prev.loading, [type]: true }
+      loading: { ...prev.loading, [type]: true },
     }));
 
     try {
@@ -359,32 +390,32 @@ const ServiceManager = () => {
         categories: () => serviceAPI.getCategories(),
         subCategories: () => serviceAPI.getSubCategories(parentId),
         serviceTypes: () => serviceAPI.getServiceTypes(parentId),
-        services: () => serviceAPI.getServices(parentId)
+        services: () => serviceAPI.getServices(parentId),
       };
 
       const { data } = await apiMethods[type]();
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         data: { ...prev.data, [type]: data },
-        loading: { ...prev.loading, [type]: false }
+        loading: { ...prev.loading, [type]: false },
       }));
     } catch (error) {
       toast({
         title: "Error",
         description: `Failed to fetch ${type}`,
-        variant: "destructive"
+        variant: "destructive",
       });
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        loading: { ...prev.loading, [type]: false }
+        loading: { ...prev.loading, [type]: false },
       }));
     }
   };
 
   const handleSelect = (type, item) => {
-    setState(prev => {
+    setState((prev) => {
       const newState = { ...prev };
-      const types = ['category', 'subCategory', 'serviceType', 'service'];
+      const types = ["category", "subCategory", "serviceType", "service"];
       const index = types.indexOf(type);
 
       // Clear subsequent selections
@@ -392,7 +423,7 @@ const ServiceManager = () => {
         if (i >= index) {
           newState.selected[t] = i === index ? item : null;
           if (i > index) {
-            newState.data[t + 's'] = [];
+            newState.data[t + "s"] = [];
           }
         }
       });
@@ -403,35 +434,37 @@ const ServiceManager = () => {
 
   const handleDelete = async (type, item) => {
     if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
-
+    console.log(item);
     try {
       const apiMethods = {
-        category: () => serviceAPI.deleteCategory(item.id),
+        category: () => serviceAPI.deleteCategory(item.category_id),
         subCategory: () => serviceAPI.deleteSubCategory(item.id),
         serviceType: () => serviceAPI.deleteServiceType(item.id),
-        service: () => serviceAPI.deleteService(item.id)
+        service: () => serviceAPI.deleteService(item.id),
       };
 
       await apiMethods[type]();
 
       // Refresh the appropriate data
       const parentMapping = {
-        category: () => fetchData('categories'),
-        subCategory: () => fetchData('subCategories', state.selected.category?.id),
-        serviceType: () => fetchData('serviceTypes', state.selected.subCategory?.id),
-        service: () => fetchData('services', state.selected.serviceType?.id)
+        category: () => fetchData("categories"),
+        subCategory: () =>
+          fetchData("subCategories", state.selected.category?.id),
+        serviceType: () =>
+          fetchData("serviceTypes", state.selected.subCategory?.id),
+        service: () => fetchData("services", state.selected.serviceType?.id),
       };
 
       await parentMapping[type]();
       toast({
         title: "Success",
-        description: `${type} deleted successfully`
+        description: `${type} deleted successfully`,
       });
     } catch (error) {
       toast({
         title: "Error",
         description: `Failed to delete ${type}`,
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -439,41 +472,54 @@ const ServiceManager = () => {
   const handleSubmit = async (type, formData, editItem = null) => {
     try {
       if (editItem) {
-        await serviceAPI[`update${type.charAt(0).toUpperCase() + type.slice(1)}`](
-          editItem.id,
-          formData
-        );
+        await serviceAPI[
+          `update${type.charAt(0).toUpperCase() + type.slice(1)}`
+        ](editItem.id, formData);
       } else {
         const parentIds = {
-          subCategory: { categoryId: state.selected.category?.id },
-          serviceType: { subCategoryId: state.selected.subCategory?.id },
-          service: { typeId: state.selected.serviceType?.id }
+          subCategory: { categoryId: state.selected.category?.category_id },
+          serviceType: {
+            subCategoryId: state.selected.subCategory?.sub_category_id,
+          },
+          service: { typeId: state.selected.serviceType?.type_id },
         };
-        
-        await serviceAPI[`create${type.charAt(0).toUpperCase() + type.slice(1)}`]({
+        await serviceAPI[
+          `create${type.charAt(0).toUpperCase() + type.slice(1)}`
+        ]({
           ...formData,
-          ...parentIds[type]
+          ...parentIds[type],
+        });
+
+        console.log({
+          ...formData,
+          ...parentIds[type],
         });
       }
 
       // Refresh data
       const refreshMapping = {
-        category: () => fetchData('categories'),
-        subCategory: () => fetchData('subCategories', state.selected.category?.id),
-        serviceType: () => fetchData('serviceTypes', state.selected.subCategory?.id),
-        service: () => fetchData('services', state.selected.serviceType?.id)
+        category: () => fetchData("categories"),
+        subCategory: () =>
+          fetchData("subCategories", state.selected.category?.category_id),
+        serviceType: () =>
+          fetchData(
+            "serviceTypes",
+            state.selected.subCategory?.sub_category_id
+          ),
+        service: () =>
+          fetchData("services", state.selected.serviceType?.type_id),
       };
 
       await refreshMapping[type]();
       toast({
         title: "Success",
-        description: `${type} ${editItem ? 'updated' : 'created'} successfully`
+        description: `${type} ${editItem ? "updated" : "created"} successfully`,
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: `Failed to ${editItem ? 'update' : 'create'} ${type}`,
-        variant: "destructive"
+        description: `Failed to ${editItem ? "update" : "create"} ${type}`,
+        variant: "destructive",
       });
     }
   };
@@ -486,10 +532,12 @@ const ServiceManager = () => {
           items={state.data.categories}
           loading={state.loading.categories}
           selectedItem={state.selected.category}
-          onSelect={(item) => handleSelect('category', item)}
-          onDelete={(item) => handleDelete('category', item)}
-          onAdd={(formData, editItem) => handleSubmit('category', formData, editItem)}
-          onEdit={(item) => handleSelect('category', item)}
+          onSelect={(item) => handleSelect("category", item)}
+          onDelete={(item) => handleDelete("category", item)}
+          onAdd={(formData, editItem) =>
+            handleSubmit("category", formData, editItem)
+          }
+          onEdit={(item) => handleSelect("category", item)}
           FormComponent={CategoryForm}
         />
 
@@ -499,13 +547,15 @@ const ServiceManager = () => {
             items={state.data.subCategories}
             loading={state.loading.subCategories}
             selectedItem={state.selected.subCategory}
-            onSelect={(item) => handleSelect('subCategory', item)}
-            onDelete={(item) => handleDelete('subCategory', item)}
-            onAdd={(formData, editItem) => handleSubmit('subCategory', formData, editItem)}
-            onEdit={(item) => handleSelect('subCategory', item)}
+            onSelect={(item) => handleSelect("subCategory", item)}
+            onDelete={(item) => handleDelete("subCategory", item)}
+            onAdd={(formData, editItem) =>
+              handleSubmit("subCategory", formData, editItem)
+            }
+            onEdit={(item) => handleSelect("subCategory", item)}
             FormComponent={SubCategoryForm}
             formProps={{
-              categoryId: state.selected.category?.id
+              categoryId: state.selected.category?.category_id,
             }}
           />
         )}
@@ -516,13 +566,15 @@ const ServiceManager = () => {
             items={state.data.serviceTypes}
             loading={state.loading.serviceTypes}
             selectedItem={state.selected.serviceType}
-            onSelect={(item) => handleSelect('serviceType', item)}
-            onDelete={(item) => handleDelete('serviceType', item)}
-            onAdd={(formData, editItem) => handleSubmit('serviceType', formData, editItem)}
-            onEdit={(item) => handleSelect('serviceType', item)}
+            onSelect={(item) => handleSelect("serviceType", item)}
+            onDelete={(item) => handleDelete("serviceType", item)}
+            onAdd={(formData, editItem) =>
+              handleSubmit("serviceType", formData, editItem)
+            }
+            onEdit={(item) => handleSelect("serviceType", item)}
             FormComponent={ServiceTypeForm}
             formProps={{
-              subCategoryId: state.selected.subCategory?.id
+              subCategoryId: state.selected.subCategory?.sub_category_id,
             }}
           />
         )}
@@ -533,19 +585,21 @@ const ServiceManager = () => {
             items={state.data.services}
             loading={state.loading.services}
             selectedItem={state.selected.service}
-            onSelect={(item) => handleSelect('service', item)}
-            onDelete={(item) => handleDelete('service', item)}
-            onAdd={(formData, editItem) => handleSubmit('service', formData, editItem)}
-            onEdit={(item) => handleSelect('service', item)}
+            onSelect={(item) => handleSelect("service", item)}
+            onDelete={(item) => handleDelete("service", item)}
+            onAdd={(formData, editItem) =>
+              handleSubmit("service", formData, editItem)
+            }
+            onEdit={(item) => handleSelect("service", item)}
             FormComponent={ServiceForm}
             formProps={{
-              typeId: state.selected.serviceType?.id
+              typeId: state.selected.serviceType?.type_id,
             }}
             showItemsButton={true}
             onManageItems={(service) => {
-              setState(prev => ({
+              setState((prev) => ({
                 ...prev,
-                selected: { ...prev.selected, service }
+                selected: { ...prev.selected, service },
               }));
               setShowServiceItems(true);
             }}
@@ -558,9 +612,9 @@ const ServiceManager = () => {
           service={state.selected.service}
           onClose={() => {
             setShowServiceItems(false);
-            setState(prev => ({
+            setState((prev) => ({
               ...prev,
-              selected: { ...prev.selected, service: null }
+              selected: { ...prev.selected, service: null },
             }));
           }}
         />

@@ -2,7 +2,10 @@ import React from "react";
 
 const Header = () => {
   return (
-    <header className="bg-primary text-white p-2 m-2 px-8 flex justify-between rounded-lg items-center">
+    <header
+      className="bg-primary text-white p-2 m-2 px-8 flex justify-between rounded-lg items-center"
+      style={{ backgroundColor: "#5f60b9" }}
+    >
       <input
         type="text"
         placeholder="Search"

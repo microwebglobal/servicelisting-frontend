@@ -8,6 +8,7 @@ const CustomerManagement = () => {
         Customer Management
       </h1>
       <hr />
+      <div></div>
     </div>
   );
 };

@@ -1,32 +1,38 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusCircle, MinusCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const ServiceItemForm = ({ onSubmit, initialData = null }) => {
+export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
   const [cities, setCities] = useState([]);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    base_price: '',
-    cityPricing: []
+    name: "",
+    description: "",
+    base_price: "",
+    cityPricing: [],
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCities = async () => {
       try {
-        const response = await fetch('/api/cities');
+        const response = await fetch("/api/cities");
         const data = await response.json();
         setCities(data);
       } catch (error) {
-        console.error('Failed to fetch cities:', error);
+        console.error("Failed to fetch cities:", error);
       }
     };
 
@@ -36,45 +42,46 @@ const ServiceItemForm = ({ onSubmit, initialData = null }) => {
   useEffect(() => {
     if (initialData) {
       setFormData({
-        name: initialData.name || '',
-        description: initialData.description || '',
-        base_price: initialData.base_price?.toString() || '',
-        cityPricing: initialData.CitySpecificPricings?.map(pricing => ({
-          city_id: pricing.city_id,
-          price: pricing.price.toString()
-        })) || []
+        name: initialData.name || "",
+        description: initialData.description || "",
+        base_price: initialData.base_price?.toString() || "",
+        cityPricing:
+          initialData.CitySpecificPricings?.map((pricing) => ({
+            city_id: pricing.city_id,
+            price: pricing.price.toString(),
+          })) || [],
       });
     }
   }, [initialData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleAddCityPricing = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      cityPricing: [...prev.cityPricing, { city_id: '', price: '' }]
+      cityPricing: [...prev.cityPricing, { city_id: "", price: "" }],
     }));
   };
 
   const handleRemoveCityPricing = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      cityPricing: prev.cityPricing.filter((_, i) => i !== index)
+      cityPricing: prev.cityPricing.filter((_, i) => i !== index),
     }));
   };
 
   const handleCityPricingChange = (index, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      cityPricing: prev.cityPricing.map((pricing, i) => 
+      cityPricing: prev.cityPricing.map((pricing, i) =>
         i === index ? { ...pricing, [field]: value } : pricing
-      )
+      ),
     }));
   };
 
@@ -85,16 +92,18 @@ const ServiceItemForm = ({ onSubmit, initialData = null }) => {
       // Convert string prices to numbers
       const processedData = {
         ...formData,
+        item_id: `ITM_${Date.now()}`,
+        service_id: serviceId,
         base_price: parseFloat(formData.base_price),
-        cityPricing: formData.cityPricing.map(pricing => ({
+        cityPricing: formData.cityPricing.map((pricing) => ({
           ...pricing,
-          price: parseFloat(pricing.price)
-        }))
+          price: parseFloat(pricing.price),
+        })),
       };
 
       await onSubmit(processedData);
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error("Form submission error:", error);
     } finally {
       setLoading(false);
     }
@@ -141,9 +150,9 @@ const ServiceItemForm = ({ onSubmit, initialData = null }) => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label>City-Specific Pricing</Label>
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               size="sm"
               onClick={handleAddCityPricing}
             >
@@ -160,13 +169,15 @@ const ServiceItemForm = ({ onSubmit, initialData = null }) => {
                     <Label>City</Label>
                     <Select
                       value={pricing.city_id}
-                      onValueChange={(value) => handleCityPricingChange(index, 'city_id', value)}
+                      onValueChange={(value) =>
+                        handleCityPricingChange(index, "city_id", value)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a city" />
                       </SelectTrigger>
                       <SelectContent>
-                        {cities.map(city => (
+                        {cities.map((city) => (
                           <SelectItem key={city.id} value={city.id}>
                             {city.name}
                           </SelectItem>
@@ -181,7 +192,9 @@ const ServiceItemForm = ({ onSubmit, initialData = null }) => {
                       type="number"
                       step="0.01"
                       value={pricing.price}
-                      onChange={(e) => handleCityPricingChange(index, 'price', e.target.value)}
+                      onChange={(e) =>
+                        handleCityPricingChange(index, "price", e.target.value)
+                      }
                       required
                     />
                   </div>
@@ -204,15 +217,10 @@ const ServiceItemForm = ({ onSubmit, initialData = null }) => {
       </div>
 
       <div className="flex justify-end gap-4">
-        <Button
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? 'Saving...' : initialData ? 'Update Item' : 'Create Item'}
+        <Button type="submit" disabled={loading}>
+          {loading ? "Saving..." : initialData ? "Update Item" : "Create Item"}
         </Button>
       </div>
     </form>
   );
 };
-
-export default ServiceItemForm;
