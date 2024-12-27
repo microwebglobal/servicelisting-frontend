@@ -9,7 +9,7 @@ const Sidebar = () => {
     },
     {
       name: "Customer Management",
-      subMenu: [{ name: "Customers", link: "/customers" }],
+      subMenu: [{ name: "Customers", link: "/admin/customer_management" }],
     },
     {
       name: "Service Provider Management",
@@ -77,7 +77,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="h-screen p-2" style={{ width: "500px" }}>
+    <aside className="h-screen p-2 w-1/5">
       <h1 className="text-2xl ml-2 font-bold mb-6">[App Name]</h1>
       <nav>
         {menuItems.map((item, idx) => (
@@ -96,7 +96,7 @@ const Sidebar = () => {
                   style={{ fontSize: "14px" }}
                 >
                   <Link href={subItem.link}>{subItem.name}</Link>
-                  <span>&gt;</span>
+                  <span className="mr-3">&gt;</span>
                 </li>
               ))}
             </ul>
