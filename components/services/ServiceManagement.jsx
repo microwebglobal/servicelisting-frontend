@@ -438,9 +438,9 @@ const ServiceManager = () => {
     try {
       const apiMethods = {
         category: () => serviceAPI.deleteCategory(item.category_id),
-        subCategory: () => serviceAPI.deleteSubCategory(item.id),
-        serviceType: () => serviceAPI.deleteServiceType(item.id),
-        service: () => serviceAPI.deleteService(item.id),
+        subCategory: () => serviceAPI.deleteSubCategory(item.sub_category_id),
+        serviceType: () => serviceAPI.deleteServiceType(item.type_id),
+        service: () => serviceAPI.deleteService(item.service_id),
       };
 
       await apiMethods[type]();
@@ -449,10 +449,14 @@ const ServiceManager = () => {
       const parentMapping = {
         category: () => fetchData("categories"),
         subCategory: () =>
-          fetchData("subCategories", state.selected.category?.id),
+          fetchData("subCategories", state.selected.category?.category_id),
         serviceType: () =>
-          fetchData("serviceTypes", state.selected.subCategory?.id),
-        service: () => fetchData("services", state.selected.serviceType?.id),
+          fetchData(
+            "serviceTypes",
+            state.selected.subCategory?.sub_category_id
+          ),
+        service: () =>
+          fetchData("services", state.selected.serviceType?.type_id),
       };
 
       await parentMapping[type]();
