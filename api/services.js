@@ -15,8 +15,7 @@ export const serviceAPI = {
   deleteSubCategory: (id) => api.delete(`/subcategories/${id}`),
 
   // Service Types
-  getServiceTypes: (subCategoryId) =>
-    api.get(`/subcategories/${subCategoryId}/types`),
+  getServiceTypes: (subCategoryId) =>api.get(`/subcategories/${subCategoryId}/types`),
   createServiceType: (data) => api.post("/types", data),
   updateServiceType: (id, data) => api.put(`/types/${id}`, data),
   deleteServiceType: (id) => api.delete(`/types/${id}`),
@@ -36,6 +35,7 @@ export const serviceAPI = {
 
   //cities
   getCities: () => api.get("/cities"),
+  getCity: (id) => api.get(`/cities/${id}`),
   createCity: (data) => api.post("/cities", data),
   updateCity: (id, data) => api.put(`/cities/${id}`, data),
   deleteCity: (id) => api.delete(`/cities/${id}`),
@@ -53,9 +53,11 @@ export const serviceAPI = {
   deletePackageItem: (id) => api.delete(`/package-items/${id}`),
   getPackageItems: (packageId) => api.get(`/package-items/package/${packageId}`),
 
+  getSectionsByPackage: (packageId) => api.get(`/sections/package/${packageId}`),
+
   //city pricing
   createCityPricing: (data) => api.post("/city-pricing", data),
-  updateCityPricing: (id, data) => api.put(`/city-pricing/${id}`, data),
-  deleteCityPricing: (id) => api.delete(`/city-pricing/${id}`),
+  updateCityPricing: (id, data) => api.put(`/city-pricing/item/${id}/city/${data.city_id}`, data), deleteCityPricing: (id) => api.delete(`/city-pricing/${id}`),
   getCityPricing: (itemId) => api.get(`/city-pricing/item/${itemId}`),
+  getCityPricingByCity: (cityId) => api.get(`/city-pricing/item/${id}/city/${cityId}`),
 };

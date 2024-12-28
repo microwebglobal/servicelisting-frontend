@@ -1,114 +1,115 @@
-// PackageItemForm.jsx
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
-export const PackageItemForm = ({ onSubmit, initialData, packageId }) => {
-  const [formData, setFormData] = useState({
-    package_id: packageId,
-    name: initialData?.name || '',
-    description: initialData?.description || '',
-    price: initialData?.price || '',
-    quantity: initialData?.quantity || '1'
-  });
+export const PackageItemForm = ({ onSubmit, packageId, sectionId, initialData }) => {
+  console.log('sectionID', sectionId);
+    const [formData, setFormData] = useState({
+        name: initialData?.name || '',
+        description: initialData?.description || '',
+        price: initialData?.price || '',
+        is_default: initialData?.is_default || false,
+        display_order: initialData?.display_order || 0,
+        package_id: packageId,
+        section_id: initialData?.section_id || sectionId // Initialize with either existing or provided sectionId
+    });
 
-  const [errors, setErrors] = useState({});
+    // Update form data when sectionId prop changes
+    useEffect(() => {
+        setFormData(prev => ({
+            ...prev,
+            section_id: sectionId
+        }));
+    }, [sectionId]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.price || Number(formData.price) < 0) {
-      newErrors.price = 'Price must be a positive number';
-    }
-    if (!formData.quantity || Number(formData.quantity) < 1) {
-      newErrors.quantity = 'Quantity must be at least 1';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Ensure all required fields are present and properly formatted
+        const submissionData = {
+            ...formData,
+            package_id: packageId,
+            section_id: sectionId, // Explicitly include the current sectionId
+            price: parseFloat(formData.price) || 0,
+            display_order: parseInt(formData.display_order) || 0
+        };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      onSubmit(formData);
-    }
-  };
+        // For edit mode, include the item_id
+        if (initialData?.item_id) {
+            submissionData.item_id = initialData.item_id;
+        }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+        // Validate that section_id is present
+        if (!submissionData.section_id) {
+            console.error('Section ID is required');
+            return;
+        }
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input type="hidden" name="package_id" value={packageId} />
-      
-      <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Enter item name"
-        />
-        {errors.name && (
-          <p className="text-sm text-red-500">{errors.name}</p>
-        )}
-      </div>
+        onSubmit(submissionData);
+    };
 
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Enter item description"
-          className="min-h-[100px]"
-        />
-      </div>
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="name">Name *</Label>
+                <Input
+                    id="name"
+                    placeholder="Item Name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                />
+            </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="price">Price</Label>
-        <Input
-          id="price"
-          name="price"
-          type="number"
-          step="0.01"
-          value={formData.price}
-          onChange={handleChange}
-          placeholder="Enter price"
-        />
-        {errors.price && (
-          <p className="text-sm text-red-500">{errors.price}</p>
-        )}
-      </div>
+            <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                    id="description"
+                    placeholder="Description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+            </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="quantity">Quantity</Label>
-        <Input
-          id="quantity"
-          name="quantity"
-          type="number"
-          value={formData.quantity}
-          onChange={handleChange}
-          placeholder="Enter quantity"
-        />
-        {errors.quantity && (
-          <p className="text-sm text-red-500">{errors.quantity}</p>
-        )}
-      </div>
+            <div className="space-y-2">
+                <Label htmlFor="price">Price *</Label>
+                <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    placeholder="Price"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    required
+                />
+            </div>
 
-      <div className="flex justify-end space-x-2">
-        <Button type="submit">
-          {initialData ? 'Update Item' : 'Create Item'}
-        </Button>
-      </div>
-    </form>
-  );
+            <div className="flex items-center space-x-2">
+                <Checkbox
+                    id="is_default"
+                    checked={formData.is_default}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_default: checked })}
+                />
+                <Label htmlFor="is_default">Default Selection</Label>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="display_order">Display Order</Label>
+                <Input
+                    id="display_order"
+                    type="number"
+                    placeholder="Display Order"
+                    value={formData.display_order}
+                    onChange={(e) => setFormData({ ...formData, display_order: e.target.value })}
+                />
+            </div>
+
+            <Button type="submit" className="w-full">Submit</Button>
+        </form>
+    );
 };
 
 export default PackageItemForm;

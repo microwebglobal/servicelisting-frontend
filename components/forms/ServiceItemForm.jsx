@@ -1,272 +1,200 @@
-"use client";
+import { useState, useEffect } from 'react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Plus, Trash2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { serviceAPI } from '../../api/services';
 
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { PlusCircle, MinusCircle } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { serviceAPI } from "../../api/services";
+export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
+    const [cities, setCities] = useState([]);
+    const [formData, setFormData] = useState({
+        name: data?.name || '',
+        description: data?.description || '',
+        base_price: data?.base_price || '',
+        service_id: selectedData?.serviceId || data?.service_id,
+        cityPricing: data?.CitySpecificPricings?.map(pricing => ({
+            city_id: pricing.city_id,
+            price: pricing.price,
+        })) || []
+    });
 
-export const ServiceItemForm = ({ onSubmit, initialData, serviceId }) => {
-  const [cities, setCities] = useState([]);
-  const [formData, setFormData] = useState({
-    item_id: "",
-    name: "",
-    description: "",
-    base_price: "",
-    cityPricing: [],
-  });
-  const [loading, setLoading] = useState(false);
-
-  // Fetch cities on mount only
-  useEffect(() => {
-    let isMounted = true;
+    useEffect(() => {
+        fetchCities();
+    }, []);
 
     const fetchCities = async () => {
-      try {
-        const response = await serviceAPI.getCities();
-        if (isMounted) {
-          setCities(response.data || []);
+        try {
+            const response = await serviceAPI.getCities();
+            setCities(response.data || []);
+        } catch (error) {
+            console.error('Error fetching cities:', error);
         }
-      } catch (error) {
-        console.error("Failed to fetch cities:", error);
-      }
     };
 
-    fetchCities();
-
-    return () => {
-      isMounted = false;
+    const addCityPricing = () => {
+        setFormData(prev => ({
+            ...prev,
+            cityPricing: [
+                ...prev.cityPricing,
+                { city_id: '', price: '' }
+            ]
+        }));
     };
-  }, []);
 
-  // Initialize form data separately from cities fetch
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        item_id: initialData.item_id || "",
-        name: initialData.name || "",
-        description: initialData.description || "",
-        base_price: initialData.base_price?.toString() || "",
-        cityPricing: initialData.CitySpecificPricings?.map((pricing) => ({
-          city_id: pricing.city_id,
-          price: pricing.price.toString(),
-          pricing_id: pricing.pricing_id || undefined,
-          key: `${pricing.city_id}-${pricing.pricing_id || Date.now()}` // Add unique key
-        })) || [],
-      });
-    } else {
-      setFormData({
-        item_id: "",
-        name: "",
-        description: "",
-        base_price: "",
-        cityPricing: [],
-      });
-    }
-  }, [initialData]);
+    const removeCityPricing = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            cityPricing: prev.cityPricing.filter((_, i) => i !== index)
+        }));
+    };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+    const updateCityPricing = (index, field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            cityPricing: prev.cityPricing.map((pricing, i) => 
+                i === index 
+                    ? { ...pricing, [field]: value }
+                    : pricing
+            )
+        }));
+    };
 
-  const handleAddCityPricing = () => {
-    setFormData((prev) => ({
-      ...prev,
-      cityPricing: [
-        ...prev.cityPricing,
-        {
-          city_id: "",
-          price: "",
-          key: Date.now().toString() // Add unique key for new items
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+                ...formData,
+                base_price: parseFloat(formData.base_price),
+                cityPricing: formData.cityPricing.map(pricing => ({
+                    ...pricing,
+                    price: parseFloat(pricing.price)
+                })).filter(pricing => pricing.city_id && pricing.price)
+            };
+
+            if (mode === 'edit' && data?.item_id) {
+                await serviceAPI.updateServiceItem(data.item_id, payload);
+            } else {
+                await serviceAPI.createServiceItem(payload);
+            }
+            onClose();
+        } catch (error) {
+            console.error('Error submitting service item:', error);
         }
-      ],
-    }));
-  };
+    };
 
-  const handleRemoveCityPricing = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      cityPricing: prev.cityPricing.filter((_, i) => i !== index),
-    }));
-  };
+    // Helper function to check if a city is already selected
+    const isCitySelected = (cityId) => {
+        return formData.cityPricing.some(pricing => pricing.city_id === cityId);
+    };
 
-  const handleCityPricingChange = (index, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      cityPricing: prev.cityPricing.map((pricing, i) =>
-        i === index ? { ...pricing, [field]: value } : pricing
-      ),
-    }));
-  };
+    return (
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                    id="name"
+                    placeholder="Item Name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                />
+            </div>
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const processedData = {
-        ...formData,
-        item_id: initialData?.item_id,
-        service_id: serviceId,
-        base_price: parseFloat(formData.base_price),
-        cityPricing: formData.cityPricing
-          .map((pricing) => ({
-            city_id: pricing.city_id,
-            price: parseFloat(pricing.price),
-            ...(pricing.pricing_id && { pricing_id: pricing.pricing_id })
-          }))
-          .filter(pricing => pricing.city_id && pricing.price),
-      };
+            <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                    id="description"
+                    placeholder="Item Description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={3}
+                />
+            </div>
 
-      if (initialData?.item_id) {
-        await serviceAPI.updateServiceItem(initialData.item_id, processedData);
-      } else {
-        await serviceAPI.createServiceItem(processedData);
-      }
-      
-      if (onSubmit) {
-        await onSubmit(processedData);
-      }
-    } catch (error) {
-      console.error("Form submission error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+            <div className="space-y-2">
+                <Label htmlFor="base_price">Base Price</Label>
+                <Input
+                    id="base_price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="Base Price"
+                    value={formData.base_price}
+                    onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
+                    required
+                />
+            </div>
 
-  const isValidForm = () => {
-    const hasValidBasicInfo = formData.name && formData.base_price;
-    const hasValidCityPricing = formData.cityPricing.every(
-      pricing => !pricing.city_id || (pricing.city_id && pricing.price)
-    );
-    return hasValidBasicInfo && hasValidCityPricing;
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows={3}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="base_price">Base Price</Label>
-          <Input
-            id="base_price"
-            name="base_price"
-            type="number"
-            step="0.01"
-            value={formData.base_price}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>City-Specific Pricing</Label>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleAddCityPricing}
-            >
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add City Price
-            </Button>
-          </div>
-
-          {formData.cityPricing.map((pricing, index) => (
-            <Card key={pricing.key}>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-[2fr,1fr,auto] gap-4">
-                  <div>
-                    <Label>City</Label>
-                    <Select
-                      value={pricing.city_id}
-                      onValueChange={(value) =>
-                        handleCityPricingChange(index, "city_id", value)
-                      }
+            <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                    <Label>City-Specific Pricing</Label>
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={addCityPricing}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a city" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities.map((city) => (
-                          <SelectItem key={city.id} value={city.id}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label>Price</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={pricing.price}
-                      onChange={(e) =>
-                        handleCityPricingChange(index, "price", e.target.value)
-                      }
-                      required={!!pricing.city_id}
-                    />
-                  </div>
-
-                  <div className="flex items-end">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveCityPricing(index)}
-                    >
-                      <MinusCircle className="h-4 w-4" />
+                        <Plus size={16} className="mr-2" />
+                        Add City Pricing
                     </Button>
-                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
 
-      <div className="flex justify-end gap-4">
-        <Button type="submit" disabled={loading || !isValidForm()}>
-          {loading ? "Saving..." : initialData ? "Update Item" : "Create Item"}
-        </Button>
-      </div>
-    </form>
-  );
+                {formData.cityPricing.map((pricing, index) => (
+                    <div key={index} className="flex gap-4 items-start">
+                        <div className="flex-1">
+                            <Select
+                                value={pricing.city_id}
+                                onValueChange={(value) => updateCityPricing(index, 'city_id', value)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select City" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {cities.map((city) => (
+                                        !isCitySelected(city.city_id) || pricing.city_id === city.city_id ? (
+                                            <SelectItem 
+                                                key={city.city_id} 
+                                                value={city.city_id}
+                                            >
+                                                {city.name}
+                                            </SelectItem>
+                                        ) : null
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex-1">
+                            <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="Price"
+                                value={pricing.price}
+                                onChange={(e) => updateCityPricing(index, 'price', e.target.value)}
+                            />
+                        </div>
+                        <Button 
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeCityPricing(index)}
+                        >
+                            <Trash2 size={16} className="text-gray-500 hover:text-red-500" />
+                        </Button>
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex space-x-4">
+                <Button type="submit" className="flex-1">
+                    {mode === 'edit' ? 'Update' : 'Create'} Service Item
+                </Button>
+                <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
+                    Cancel
+                </Button>
+            </div>
+        </form>
+    );
 };
