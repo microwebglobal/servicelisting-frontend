@@ -54,7 +54,9 @@ export const serviceAPI = {
   getPackageItems: (packageId) => api.get(`/package-items/package/${packageId}`),
 
   getSectionsByPackage: (packageId) => api.get(`/sections/package/${packageId}`),
-
+  getItemsbySection: (sectionId) => api.get(`/package-items/section/${sectionId}`),
+  createPackageSection: (data) => api.post("/sections", data),
+  updatePackageSection: (id, data) => api.put(`/sections/${id}`, data),
   //city pricing
   createCityPricing: (data) => api.post("/city-pricing", data),
   updateCityPricing: (id, data) => api.put(`/city-pricing/item/${id}/city/${data.city_id}`, data), deleteCityPricing: (id) => api.delete(`/city-pricing/${id}`),

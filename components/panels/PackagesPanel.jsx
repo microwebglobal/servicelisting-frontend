@@ -1,10 +1,18 @@
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { Plus, MoreHorizontal } from 'lucide-react';
 
-export const PackagesPanel = ({ selectedType, packages = [], onAction }) => {
+// Package listing component
+export const PackagesPanel = ({ selectedType, packages = [], selectedPackage, onSelect, onAction, isLoading }) => {
   if (!selectedType) {
     return (
-      <div className="text-center text-sm text-gray-500">
+      <div className="text-center p-4 text-sm text-gray-500">
         Select a service type to view packages
       </div>
     );
@@ -12,29 +20,54 @@ export const PackagesPanel = ({ selectedType, packages = [], onAction }) => {
 
   return (
     <div className="space-y-4">
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full"
-        onClick={() => onAction('package', 'add')}
-      >
-        <Plus className="h-4 w-4 mr-2" />
-        Add Package
-      </Button>
+      <div className="flex justify-between items-center">
+        <h3 className="font-medium">Packages</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onAction('package', 'add', { typeId: selectedType.type_id })}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Package
+        </Button>
+      </div>
       
       <div className="space-y-2">
         {packages.map((pkg) => (
-          <Button
+          <div
             key={pkg.package_id}
-            variant="ghost"
-            className="w-full justify-between"
-            onClick={() => onAction('package', 'edit', pkg)}
+            className={`flex items-center justify-between p-3 rounded-lg border ${
+              selectedPackage?.package_id === pkg.package_id ? 'bg-gray-100' : 'bg-white'
+            }`}
           >
-            <span>{pkg.name}</span>
-            <span className="text-sm text-gray-500">
-              ${pkg.price}
-            </span>
-          </Button>
+            <div 
+              className="flex-1 cursor-pointer"
+              onClick={() => onSelect(pkg)}
+            >
+              <p className="font-medium">{pkg.name}</p>
+              <p className="text-sm text-gray-500">
+                Duration: {pkg.duration_hours}h {pkg.duration_minutes}m
+              </p>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onAction('package', 'edit', pkg)}>
+                  Edit Package
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => onAction('package', 'delete', pkg)}
+                  className="text-red-600"
+                >
+                  Delete Package
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         ))}
       </div>
     </div>

@@ -16,39 +16,80 @@ export const useServiceManagement = () => {
   const [packageSections, setPackageSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
   const [sectionItems, setSectionItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchFunctions = {
     categories: async () => {
-      const response = await serviceAPI.getCategories();
-      setCategories(response.data);
+      setIsLoading(true);
+      try {
+        const response = await serviceAPI.getCategories();
+        setCategories(response.data);
+      } finally {
+        setIsLoading(false);
+      }
     },
     subCategories: async (categoryId) => {
-      const response = await serviceAPI.getSubCategories(categoryId);
-      setSubCategories(response.data);
+      setIsLoading(true);
+      try {
+        const response = await serviceAPI.getSubCategories(categoryId);
+        setSubCategories(response.data);
+      } finally {
+        setIsLoading(false);
+      }
     },
     serviceTypes: async (subCategoryId) => {
-      const response = await serviceAPI.getServiceTypes(subCategoryId);
-      setServiceTypes(response.data);
+      setIsLoading(true);
+      try {
+        const response = await serviceAPI.getServiceTypes(subCategoryId);
+        setServiceTypes(response.data);
+      } finally {
+        setIsLoading(false);
+      }
     },
     services: async (typeId) => {
-      const response = await serviceAPI.getServices(typeId);
-      setServices(response.data);
+      setIsLoading(true);
+      try {
+        const response = await serviceAPI.getServices(typeId);
+        setServices(response.data);
+      } finally {
+        setIsLoading(false);
+      }
     },
     packages: async (typeId) => {
-      const response = await serviceAPI.getPackagesByType(typeId);
-      setPackages(response.data);
+      setIsLoading(true);
+      try {
+        const response = await serviceAPI.getPackagesByType(typeId);
+        setPackages(response.data);
+      } finally {
+        setIsLoading(false);
+      }
     },
     serviceItems: async (serviceId) => {
-      const response = await serviceAPI.getServiceItems(serviceId);
-      setServiceItems(response.data);
+      setIsLoading(true);
+      try {
+        const response = await serviceAPI.getServiceItems(serviceId);
+        setServiceItems(response.data);
+      } finally {
+        setIsLoading(false);
+      }
     },
     packageSections: async (packageId) => {
-      const response = await serviceAPI.getPackageSections(packageId);
-      setPackageSections(response.data);
+      setIsLoading(true);
+      try {
+        const response = await serviceAPI.getSectionsByPackage(packageId);
+        setPackageSections(response.data);
+      } finally {
+        setIsLoading(false);
+      }
     },
     sectionItems: async (sectionId) => {
-      const response = await serviceAPI.getSectionItems(sectionId);
-      setSectionItems(response.data);
+      setIsLoading(true);
+      try {
+        const response = await serviceAPI.getItemsbySection(sectionId);
+        setSectionItems(response.data);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -57,8 +98,13 @@ export const useServiceManagement = () => {
       setSelectedCategory(category);
       setSelectedSubCategory(null);
       setSelectedType(null);
+      setSelectedService(null);
+      setSelectedPackage(null);
       setServices([]);
       setPackages([]);
+      setServiceItems([]);
+      setPackageSections([]);
+      setSectionItems([]);
       if (category) {
         await fetchFunctions.subCategories(category.category_id);
       }
@@ -66,16 +112,26 @@ export const useServiceManagement = () => {
     subCategory: async (subCategory) => {
       setSelectedSubCategory(subCategory);
       setSelectedType(null);
+      setSelectedService(null);
+      setSelectedPackage(null);
       setServices([]);
       setPackages([]);
+      setServiceItems([]);
+      setPackageSections([]);
+      setSectionItems([]);
       if (subCategory) {
         await fetchFunctions.serviceTypes(subCategory.sub_category_id);
       }
     },
     type: async (type) => {
       setSelectedType(type);
+      setSelectedService(null);
+      setSelectedPackage(null);
       setServices([]);
       setPackages([]);
+      setServiceItems([]);
+      setPackageSections([]);
+      setSectionItems([]);
       if (type) {
         await Promise.all([
           fetchFunctions.services(type.type_id),
@@ -83,7 +139,6 @@ export const useServiceManagement = () => {
         ]);
       }
     },
-
     service: async (service) => {
       setSelectedService(service);
       setServiceItems([]);
@@ -120,11 +175,18 @@ export const useServiceManagement = () => {
       serviceTypes,
       services,
       packages,
+      serviceItems,
+      packageSections,
+      sectionItems,
       selectedCategory,
       selectedSubCategory,
-      selectedType
+      selectedType,
+      selectedService,
+      selectedPackage,
+      selectedSection
     },
     handlers: handleSelect,
-    fetchFunctions
+    fetchFunctions,
+    isLoading
   };
 };

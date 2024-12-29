@@ -10,6 +10,8 @@ import { ServiceTypeForm } from './forms/ServiceTypeForm';
 import { ServiceForm } from './forms/ServiceForm';
 import { PackageForm } from './forms/PackageForm';
 import { ServiceItemForm } from './forms/ServiceItemForm';
+import { PackageSectionForm } from './forms/PackageSectionForm';
+import { PackageItemForm } from './forms/PackageItemForm';
 
 export const FormDialog = ({
     dialogState,
@@ -18,13 +20,15 @@ export const FormDialog = ({
     onAction
 }) => {
     const { type, mode, item } = dialogState;
-    
+
     const DIALOG_COMPONENTS = {
         category: CategoryForm,
         subCategory: SubCategoryForm,
         serviceType: ServiceTypeForm,
         service: ServiceForm,
         package: PackageForm,
+        packageSection: PackageSectionForm,
+        packageItem: PackageItemForm,
         serviceItem: ServiceItemForm,
     };
 
@@ -34,12 +38,64 @@ export const FormDialog = ({
         serviceType: 'Service Type',
         service: 'Service',
         package: 'Package',
-        serviceItem: 'Service Item', 
+        packageSection: 'Package Section',
+        packageItem: 'Package Item',
+        serviceItem: 'Service Item',
     };
 
     const FormComponent = DIALOG_COMPONENTS[type];
 
     if (!type || !mode) return null;
+
+    const getFormProps = () => {
+        const baseProps = {
+            mode,
+            onClose, // Changed from onSubmit to onClose to match PackageItemForm
+            data: item
+        };
+
+        // Ensure selectedData exists and has required properties
+        const safeSelectedData = {
+            packageId: selectedData?.packageId,
+            sectionId: selectedData?.sectionId,
+            serviceId: selectedData?.serviceId,
+            categoryId: selectedData?.categoryId,
+        };
+
+        switch (type) {
+            case 'packageItem':
+                return {
+                    ...baseProps,
+                    selectedData: {
+                        packageId: safeSelectedData.packageId,
+                        sectionId: item?.section_id || safeSelectedData.sectionId
+                    }
+                };
+            case 'serviceItem':
+                return {
+                    ...baseProps,
+                    selectedData: {
+                        serviceId: safeSelectedData.serviceId
+                    }
+                };
+            case 'packageSection':
+                return {
+                    ...baseProps,
+                    selectedData: {
+                        packageId: safeSelectedData.packageId
+                    }
+                };
+            case 'subCategory':
+                return {
+                    ...baseProps,
+                    selectedData: {
+                        categoryId: safeSelectedData.categoryId
+                    }
+                };
+            default:
+                return baseProps;
+        }
+    };
 
     return (
         <Dialog open={!!type} onOpenChange={onClose}>
@@ -51,13 +107,11 @@ export const FormDialog = ({
                 </DialogHeader>
                 {FormComponent && (
                     <FormComponent
-                        mode={mode}
-                        data={item}
-                        selectedData={selectedData}
-                        onClose={onClose}
+                        {...getFormProps()}
                     />
                 )}
             </DialogContent>
         </Dialog>
     );
 };
+
