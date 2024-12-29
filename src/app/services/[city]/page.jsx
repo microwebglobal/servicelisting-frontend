@@ -1,11 +1,11 @@
 "use client";
 
 import { use } from 'react';
-import CityServicesPage from '@/components/CityServicesPage'; 
+import { CityServiceCategories } from '@/components/services/CityServiceCategories';
 
 export default function ServicePage({ params }) {
   const resolvedParams = use(params);
   const cityName = resolvedParams.city;
 
-  return <CityServicesPage cityName={cityName} />;
+  return <CityServiceCategories cityName={cityName} />;
 }

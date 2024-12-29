@@ -1,3 +1,4 @@
+import { get } from "react-hook-form";
 import { api } from "../utils/api";
 
 export const serviceAPI = {
@@ -6,6 +7,8 @@ export const serviceAPI = {
   createCategory: (data) => api.post("/categories", data),
   updateCategory: (id, data) => api.put(`/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/categories/${id}`),
+  getCategoryBySlug: (slug) => api.get(`/categories/slugs/${slug}`),
+  getSubCategoryBySlug : (slug) => api.get(`/subcategories/slugs/${slug}`),
 
   // SubCategories
   getSubCategories: (categoryId) =>
