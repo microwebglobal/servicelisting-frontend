@@ -15,7 +15,7 @@ export const serviceAPI = {
   deleteSubCategory: (id) => api.delete(`/subcategories/${id}`),
 
   // Service Types
-  getServiceTypes: (subCategoryId) =>api.get(`/subcategories/${subCategoryId}/types`),
+  getServiceTypes: (subCategoryId) => api.get(`/subcategories/${subCategoryId}/types`),
   createServiceType: (data) => api.post("/types", data),
   updateServiceType: (id, data) => api.put(`/types/${id}`, data),
   deleteServiceType: (id) => api.delete(`/types/${id}`),
