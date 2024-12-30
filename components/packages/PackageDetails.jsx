@@ -1,5 +1,3 @@
-//componetns/packages/PackageDetails.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,20 +25,32 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
       const response = await serviceAPI.getSectionsByPackage(pkg.package_id);
       const sectionsData = response.data || [];
       
+      // Initialize variables for tracking default selections and total
       let defaultItemsTotal = 0;
       const initialSelectedItems = {};
       
-      // Fetch city-specific pricing for each item
+      // Fetch city-specific pricing and special pricing for each item
       const sectionsWithPricing = await Promise.all(
         sectionsData.map(async (section) => {
           const itemsWithPricing = await Promise.all(
             (section.PackageItems || []).map(async (item) => {
               try {
-                const pricingResponse = await serviceAPI.getCityPricing(item.item_id);
+                const [pricingResponse, specialPricingResponse] = await Promise.all([
+                  serviceAPI.getCityPricing(item.item_id),
+                  serviceAPI.getActiveSpecialPricing({ 
+                    item_id: item.item_id, 
+                    item_type: 'package_item',
+                    city_id: cityId 
+                  })
+                ]);
+  
                 const cityPrice = pricingResponse.data.city_prices?.[cityId];
+                const specialPrice = specialPricingResponse.data[0]?.special_price;
+  
                 return {
                   ...item,
-                  price: cityPrice || item.price
+                  originalPrice: cityPrice || item.price,
+                  price: specialPrice || cityPrice || item.price
                 };
               } catch (error) {
                 console.error(`Error fetching pricing for item ${item.item_id}:`, error);
@@ -48,7 +58,7 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
               }
             })
           );
-
+  
           return {
             ...section,
             items: itemsWithPricing.sort((a, b) => a.display_order - b.display_order)

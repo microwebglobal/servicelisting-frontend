@@ -63,4 +63,7 @@ export const serviceAPI = {
   updateCityPricing: (id, data) => api.put(`/city-pricing/item/${id}/city/${data.city_id}`, data), deleteCityPricing: (id) => api.delete(`/city-pricing/${id}`),
   getCityPricing: (itemId) => api.get(`/city-pricing/item/${itemId}`),
   getCityPricingByCity: (cityId) => api.get(`/city-pricing/item/${id}/city/${cityId}`),
+
+  //special pricing
+  getActiveSpecialPricing: (data) => api.get(`/special-pricing/active`, data),
 };

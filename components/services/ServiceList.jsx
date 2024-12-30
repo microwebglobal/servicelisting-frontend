@@ -41,19 +41,29 @@ export function ServiceList({ typeId, cityId, addToCart }) {
       const itemsWithPricing = await Promise.all(
         items.map(async (item) => {
           try {
-            const pricingResponse = await serviceAPI.getCityPricing(item.item_id);
+            const [pricingResponse, specialPricingResponse] = await Promise.all([
+              serviceAPI.getCityPricing(item.item_id),
+              serviceAPI.getActiveSpecialPricing({ 
+                item_id: item.item_id, 
+                item_type: 'service_item',
+                city_id: cityId 
+              })
+            ]);
+  
             const cityPrice = pricingResponse.data.city_prices?.[cityId];
+            const specialPrice = specialPricingResponse.data[0]?.special_price;
+  
             return {
               ...item,
-              finalPrice: cityPrice || item.base_price,
-              base_price: item.base_price
+              originalPrice: cityPrice || item.base_price,
+              finalPrice: specialPrice || cityPrice || item.base_price
             };
           } catch (error) {
             console.error(`Error fetching pricing for item ${item.item_id}:`, error);
             return {
               ...item,
-              finalPrice: item.base_price,
-              base_price: item.base_price
+              originalPrice: item.base_price,
+              finalPrice: item.base_price
             };
           }
         })
