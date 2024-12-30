@@ -1,13 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Navbar from "@components/Navbar";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { FaLocationCrosshairs } from "react-icons/fa6";
 import Footer from "@components/Footer";
+import CitySelector from "@components/home/CitySelector";
 
 const Home = () => {
-  const router = useRouter();
   const services = [
     "Plumbing",
     "Carpentry",
@@ -21,31 +19,6 @@ const Home = () => {
     "Service6",
     "Service7",
   ];
-
-  const cities = ["Chennai", "Madurai", "Bangalore", "Mumbai", "Hyderabad"];
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredCities, setFilteredCities] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    if (value) {
-      setFilteredCities(
-        cities.filter((city) =>
-          city.toLowerCase().includes(value.toLowerCase())
-        )
-      );
-    } else {
-      setFilteredCities([]);
-    }
-  };
-
-  const handleCitySelect = (city) => {
-    setSelectedCity(city);
-    setSearchTerm(city);
-    router.push(`/services/${city.toLowerCase()}`);
-  };
 
   return (
     <div className="">
@@ -67,31 +40,7 @@ const Home = () => {
             start your hassle-free booking journey today!
           </p>
           <div className="relative">
-            <input
-              type="text"
-              className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
-              placeholder="Search for a location"
-              style={{ width: "500px" }}
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-            <button className="px-4 py-4 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition ml-4">
-              <FaLocationCrosshairs />
-            </button>
-
-            {filteredCities.length > 0 && (
-              <ul className="absolute bg-white border border-gray-300 mt-2 w-full rounded-md shadow-lg">
-                {filteredCities.map((city, index) => (
-                  <li
-                    key={index}
-                    className="px-4 py-2 hover:bg-indigo-100 cursor-pointer"
-                    onClick={() => handleCitySelect(city)}
-                  >
-                    {city}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <CitySelector />
           </div>
         </div>
         {/* India map */}

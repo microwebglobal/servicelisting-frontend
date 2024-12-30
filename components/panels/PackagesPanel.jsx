@@ -1,15 +1,22 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Plus, MoreHorizontal } from 'lucide-react';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Plus, MoreHorizontal } from "lucide-react";
 
 // Package listing component
-export const PackagesPanel = ({ selectedType, packages = [], selectedPackage, onSelect, onAction, isLoading }) => {
+export const PackagesPanel = ({
+  selectedType,
+  packages = [],
+  selectedPackage,
+  onSelect,
+  onAction,
+  isLoading,
+}) => {
   if (!selectedType) {
     return (
       <div className="text-center p-4 text-sm text-gray-500">
@@ -20,27 +27,32 @@ export const PackagesPanel = ({ selectedType, packages = [], selectedPackage, on
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="rounded-lg items-center">
         <h3 className="font-medium">Packages</h3>
         <Button
+          className=" w-32 mt-2"
           variant="outline"
           size="sm"
-          onClick={() => onAction('package', 'add', { typeId: selectedType.type_id })}
+          onClick={() =>
+            onAction("package", "add", { typeId: selectedType.type_id })
+          }
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-2 w-2" />
           Add Package
         </Button>
       </div>
-      
+
       <div className="space-y-2">
         {packages.map((pkg) => (
           <div
             key={pkg.package_id}
-            className={`flex items-center justify-between p-3 rounded-lg border ${
-              selectedPackage?.package_id === pkg.package_id ? 'bg-gray-100' : 'bg-white'
+            className={`flex items-center justify-between p-3 rounded-lg border w-32 ${
+              selectedPackage?.package_id === pkg.package_id
+                ? "bg-gray-100"
+                : "bg-white"
             }`}
           >
-            <div 
+            <div
               className="flex-1 cursor-pointer"
               onClick={() => onSelect(pkg)}
             >
@@ -56,11 +68,13 @@ export const PackagesPanel = ({ selectedType, packages = [], selectedPackage, on
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onAction('package', 'edit', pkg)}>
+                <DropdownMenuItem
+                  onClick={() => onAction("package", "edit", pkg)}
+                >
                   Edit Package
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => onAction('package', 'delete', pkg)}
+                <DropdownMenuItem
+                  onClick={() => onAction("package", "delete", pkg)}
                   className="text-red-600"
                 >
                   Delete Package

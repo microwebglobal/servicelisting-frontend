@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { serviceAPI } from '../../api/services';
+import { useState, useEffect } from "react";
+import { serviceAPI } from "../../api/services";
 
 export const useServiceManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -90,7 +90,7 @@ export const useServiceManagement = () => {
       } finally {
         setIsLoading(false);
       }
-    }
+    },
   };
 
   const handleSelect = {
@@ -135,7 +135,7 @@ export const useServiceManagement = () => {
       if (type) {
         await Promise.all([
           fetchFunctions.services(type.type_id),
-          fetchFunctions.packages(type.type_id)
+          fetchFunctions.packages(type.type_id),
         ]);
       }
     },
@@ -161,7 +161,7 @@ export const useServiceManagement = () => {
       if (section) {
         await fetchFunctions.sectionItems(section.section_id);
       }
-    }
+    },
   };
 
   useEffect(() => {
@@ -183,10 +183,10 @@ export const useServiceManagement = () => {
       selectedType,
       selectedService,
       selectedPackage,
-      selectedSection
+      selectedSection,
     },
     handlers: handleSelect,
     fetchFunctions,
-    isLoading
+    isLoading,
   };
 };

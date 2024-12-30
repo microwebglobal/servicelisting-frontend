@@ -1,5 +1,5 @@
-import { BasePanel } from './BasePanel';
-import { Button } from '@/components/ui/button';
+import { BasePanel } from "./BasePanel";
+import { Button } from "@/components/ui/button";
 
 export const ServiceTypePanel = ({
   serviceTypes,
@@ -7,19 +7,22 @@ export const ServiceTypePanel = ({
   selectedSubCategory,
   onSelect,
   onAction,
-  fetchData
+  fetchData,
 }) => {
+  console.log(selectedSubCategory); //logger for debugging
   return (
     <BasePanel
       title="Service Types"
-      onAdd={() => onAction('serviceType', 'add')}
+      onAdd={() => onAction("serviceType", "add")}
       disabled={!selectedSubCategory}
     >
       <div className="space-y-2">
         {serviceTypes.map((type) => (
           <Button
             key={type.type_id}
-            variant={selectedType?.type_id === type.type_id ? "secondary" : "ghost"}
+            variant={
+              selectedType?.type_id === type.type_id ? "secondary" : "ghost"
+            }
             className="w-full justify-start"
             onClick={() => onSelect(type)}
           >

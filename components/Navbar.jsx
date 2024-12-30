@@ -7,7 +7,7 @@ const Navbar = () => {
   return (
     <nav
       className="bg-primary py-3 px-8 flex justify-between items-center pr-20"
-      style={{ height: "80px" }}
+      style={{ height: "80px", backgroundColor: "#5f60b9" }}
     >
       <div className="font-bold text-lg text-white ml-20">[App Logo]</div>
       <div className="flex gap-6">
