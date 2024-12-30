@@ -39,6 +39,10 @@ const ServiceManagement = () => {
       fetchFunctions.categories();
     } else if (dialogState.type === "serviceType" && data.selectedSubCategory) {
       fetchFunctions.serviceTypes(data.selectedSubCategory.sub_category_id);
+    } else if (dialogState.type === "packageSection" && data.selectedPackage) {
+      fetchFunctions.packageSections(data.selectedPackage.package_id);
+    } else if (dialogState.type === "packageItem" && data.selectedSection) {
+      fetchFunctions.sectionItems(data.selectedSection.section_id);
     }
   };
 

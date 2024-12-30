@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Plus, MoreHorizontal } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Plus, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,12 +7,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const ServicesPanel = ({ 
-  selectedType, 
-  services = [], 
+export const ServicesPanel = ({
+  selectedType,
+  services = [],
   selectedService,
   onSelect,
-  onAction 
+  onAction,
 }) => {
   if (!selectedType) {
     return (
@@ -28,23 +28,25 @@ export const ServicesPanel = ({
         variant="outline"
         size="sm"
         className="w-full"
-        onClick={() => onAction('service', 'add')}
+        onClick={() => onAction("service", "add")}
       >
         <Plus className="h-4 w-4 mr-2" />
         Add Service
       </Button>
-      
+
       <div className="space-y-2">
         {services.map((service) => (
           <div
             key={service.service_id}
             className={`flex items-center justify-between p-2 rounded-lg border ${
-              selectedService?.service_id === service.service_id ? 'bg-secondary' : ''
+              selectedService?.service_id === service.service_id
+                ? "bg-secondary"
+                : ""
             }`}
           >
             <Button
               variant="ghost"
-              className="flex-1 justify-start"
+              className="justify-start w-40"
               onClick={() => onSelect(service)}
             >
               <span>{service.name}</span>
@@ -59,10 +61,14 @@ export const ServicesPanel = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onAction('service', 'edit', service)}>
+                <DropdownMenuItem
+                  onClick={() => onAction("service", "edit", service)}
+                >
                   Edit Service
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onAction('serviceItem', 'add', service)}>
+                <DropdownMenuItem
+                  onClick={() => onAction("serviceItem", "add", service)}
+                >
                   Add Item
                 </DropdownMenuItem>
               </DropdownMenuContent>
