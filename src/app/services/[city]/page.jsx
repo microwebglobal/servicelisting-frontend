@@ -5,8 +5,9 @@ import { CityServiceCategories } from '@/components/services/CityServiceCategori
 
 export default function ServicePage({ params, searchParams }) {
   const resolvedParams = use(params);
+  const resolvedSearchParams = use(searchParams);
   const cityName = resolvedParams.city;
-  const cityId = searchParams?.city_id;
+  const cityId = resolvedSearchParams?.city_id;
 
   return <CityServiceCategories cityName={cityName} cityId={cityId} />;
 }
