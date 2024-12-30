@@ -23,6 +23,21 @@ const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
 ));
 CardHeader.displayName = "CardHeader";
 
+const CardImage = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5", className)}
+    {...props}
+  >
+    <img
+      className="w-full h-auto object-cover"
+      alt={props.alt || "Card Image"}
+      {...props}
+    />
+  </div>
+));
+CardImage.displayName = "CardImage";
+
 const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -61,6 +76,7 @@ CardFooter.displayName = "CardFooter";
 export {
   Card,
   CardHeader,
+  CardImage,
   CardFooter,
   CardTitle,
   CardDescription,

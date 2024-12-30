@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useServiceManagement } from "../../src/hooks/useServiceManagement";
 import { useDialog } from "../../src/hooks/useDialog";
 import { CategoryPanel } from "@/components/panels/CategoryPanel";

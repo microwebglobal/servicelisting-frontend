@@ -107,6 +107,7 @@ export const useServiceManagement = () => {
       setSectionItems([]);
       if (category) {
         await fetchFunctions.subCategories(category.category_id);
+        setServiceTypes([]); //set selected service type empty when click category again
       }
     },
     subCategory: async (subCategory) => {

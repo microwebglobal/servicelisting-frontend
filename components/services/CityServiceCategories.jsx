@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { serviceAPI } from '@/api/services';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardImage, CardTitle } from "@/components/ui/card";
+import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
+import Navbar from "@components/Navbar";
 
 export function CityServiceCategories({ cityName }) {
   const [categories, setCategories] = useState([]);
@@ -20,11 +22,11 @@ export function CityServiceCategories({ cityName }) {
       const response = await serviceAPI.getCategories();
       setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
       toast({
         title: "Error",
         description: "Failed to load categories. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -36,31 +38,49 @@ export function CityServiceCategories({ cityName }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 capitalize">
-          Services in {cityName}
-        </h1>
+    <div>
+      <Navbar />
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="mx-auto flex justify-between gap-20">
+          <div className="w-2/5">
+            <h1 className="text-4xl font-bold mb-2 capitalize">
+              Services in {cityName}, India
+            </h1>
+            <hr className="mb-10" />
 
-        {loading ? (
-          <div className="text-center py-8">Loading services...</div>
-        ) : (
-          <div className="grid gap-6">
-            {categories.map((category) => (
-              <Card 
-                key={category.category_id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => handleCategoryClick(category.slug)}
-              >
-                <CardHeader>
-                  <CardTitle className="text-2xl hover:text-indigo-600">
-                    {category.name}
-                  </CardTitle>
-                </CardHeader>
-              </Card>
-            ))}
+            {loading ? (
+              <div className="text-center py-8">Loading services...</div>
+            ) : (
+              <div className="grid grid-cols-2 gap-6">
+                {categories.map((category) => (
+                  <Card
+                    key={category.category_id}
+                    className="cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => handleCategoryClick(category.slug)}
+                  >
+                    <CardImage src="/assets/images/plumbing_icon.png" />
+                    <CardHeader>
+                      <CardTitle className="text-2xl hover:text-indigo-600">
+                        {category.name}
+                      </CardTitle>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+          <div>
+            <Image
+              src="/assets/images/hair_clean.png"
+              alt="Professional"
+              width={800}
+              height={700}
+              className="rounded-xl mb-10"
+            />
+            <hr />
+            <h2 className="text-2xl mt-5">Featured</h2>
+          </div>
+        </div>
       </div>
     </div>
   );
