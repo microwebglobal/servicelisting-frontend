@@ -3,19 +3,17 @@ import { api } from "../utils/api";
 
 export const serviceAPI = {
   // Categories
-  getCategories: () => api.get("/categories"),
-  createCategory: (data) => api.post("/categories", data),
+  getCategories: (cityId) => api.get(`/categories?city_id=${cityId}`),
+  getCategoryBySlug: (slug, cityName) => api.get(`/categories/slugs/${slug}?city=${cityName}`), createCategory: (data) => api.post("/categories", data),
   updateCategory: (id, data) => api.put(`/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/categories/${id}`),
-  getCategoryBySlug: (slug) => api.get(`/categories/slugs/${slug}`),
-  getSubCategoryBySlug : (slug) => api.get(`/subcategories/slugs/${slug}`),
 
   // SubCategories
-  getSubCategories: (categoryId) =>
-    api.get(`/categories/${categoryId}/subcategories`),
+  getSubCategories: (categoryId) => api.get(`/categories/${categoryId}/subcategories`),
   createSubCategory: (data) => api.post("/subcategories", data),
   updateSubCategory: (id, data) => api.put(`/subcategories/${id}`, data),
   deleteSubCategory: (id) => api.delete(`/subcategories/${id}`),
+  getSubCategoryBySlug: (slug) => api.get(`/subcategories/slugs/${slug}`),
 
   // Service Types
   getServiceTypes: (subCategoryId) => api.get(`/subcategories/${subCategoryId}/types`),

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { serviceAPI } from "../../api/services";
 
-export const useServiceManagement = () => {
+export const useServiceManagement = (cityId) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [subCategories, setSubCategories] = useState([]);
@@ -22,7 +22,7 @@ export const useServiceManagement = () => {
     categories: async () => {
       setIsLoading(true);
       try {
-        const response = await serviceAPI.getCategories();
+        const response = await serviceAPI.getCategories(cityId);
         setCategories(response.data);
       } finally {
         setIsLoading(false);
@@ -107,9 +107,10 @@ export const useServiceManagement = () => {
       setSectionItems([]);
       if (category) {
         await fetchFunctions.subCategories(category.category_id);
-        setServiceTypes([]); //set selected service type empty when click category again
+        setServiceTypes([]); // Reset service types when selecting a new category
       }
     },
+    // Rest of the handlers remain the same
     subCategory: async (subCategory) => {
       setSelectedSubCategory(subCategory);
       setSelectedType(null);
@@ -166,8 +167,10 @@ export const useServiceManagement = () => {
   };
 
   useEffect(() => {
-    fetchFunctions.categories();
-  }, []);
+    if (cityId) {
+      fetchFunctions.categories();
+    }
+  }, [cityId]);
 
   return {
     data: {

@@ -4,65 +4,126 @@ import { Card, CardHeader, CardImage, CardTitle } from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import Rating from "@mui/material/Rating";
 import Navbar from "@components/Navbar";
 import FeaturedCard from "@components/ui/featuredCard";
 
-export function CityServiceCategories({ cityName }) {
+export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [city, setCity] = useState(null);
   const router = useRouter();
   const { toast } = useToast();
 
+  // Fetch city and categories in a single useEffect
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    const fetchData = async () => {
+      if (!cityName) {
+        setLoading(false);
+        return;
+      }
 
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
-      const response = await serviceAPI.getCategories();
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load categories. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        setLoading(true);
+        setError(null);
+
+        // First get city
+        const citiesResponse = await serviceAPI.getCities();
+        const matchedCity = citiesResponse.data.find(
+          city => city.name.toLowerCase() === cityName.toLowerCase()
+        );
+
+        if (!matchedCity) {
+          setError("City not found");
+          toast({
+            title: "Error",
+            description: "City not found in our database",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setCity(matchedCity);
+
+        // Then get categories for this city
+        const categoriesResponse = await serviceAPI.getCategories(matchedCity.city_id);
+        setCategories(categoriesResponse.data);
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("Failed to load data");
+        toast({
+          title: "Error",
+          description: "Failed to load data. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [cityName, toast]);
 
   const handleCategoryClick = (categorySlug) => {
     router.push(`/services/${cityName}/${categorySlug}`);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="text-center py-8">
+          <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="text-center py-8 text-red-600">
+          <h2 className="text-xl">{error}</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (!city) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="text-center py-8">
+          <h2 className="text-xl text-gray-600">Please select a valid city to view available services</h2>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <Navbar />
       <div className="min-h-screen bg-gray-50 p-10">
-        <div className="mx-auto flex justify-between gap-20">
-          <div className="w-2/5">
+        <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20">
+          <div className="w-full lg:w-2/5">
             <h1 className="text-4xl font-bold mb-2 capitalize">
               Services in {cityName}, India
             </h1>
             <hr className="mb-10" />
 
-            {loading ? (
-              <div className="text-center py-8">Loading services...</div>
+            {categories.length === 0 ? (
+              <div className="text-center py-8">No services available in this city</div>
             ) : (
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {categories.map((category) => (
                   <Card
                     key={category.category_id}
-                    className="cursor-pointer hover:shadow-md transition-shadow"
+                    className="cursor-pointer hover:shadow-md transition-shadow duration-300"
                     onClick={() => handleCategoryClick(category.slug)}
                   >
-                    <CardImage src="/assets/images/plumbing_icon.png" />
+                    <CardImage src={category.icon_url || "/assets/images/plumbing_icon.png"} />
                     <CardHeader>
-                      <CardTitle className="text-2xl hover:text-indigo-600">
+                      <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
                         {category.name}
                       </CardTitle>
                     </CardHeader>
@@ -71,45 +132,29 @@ export function CityServiceCategories({ cityName }) {
               </div>
             )}
           </div>
-          <div className="w-3/5">
+          
+          <div className="w-full lg:w-3/5">
             <Image
-              src="/assets/images/hair_clean.png"
-              alt="Professional"
+              src="/api/placeholder/800/700"
+              alt="Professional Services"
               width={800}
               height={700}
               className="rounded-xl mb-10"
+              priority
             />
             <hr />
             <h2 className="text-2xl mt-5 mb-10">Featured</h2>
-            <div className="flex gap-5 overflow-x-auto scrollbar-hide">
-              <FeaturedCard
-                imageSrc="/assets/images/home_repair.webp"
-                badgeText="123"
-                price="5000"
-                title="Home Repair Service"
-                rating={4.5}
-              />
-              <FeaturedCard
-                imageSrc="/assets/images/home_repair.webp"
-                badgeText="123"
-                price="5000"
-                title="Home Repair Service"
-                rating={4.5}
-              />
-              <FeaturedCard
-                imageSrc="/assets/images/home_repair.webp"
-                badgeText="123"
-                price="5000"
-                title="Home Repair Service"
-                rating={4.5}
-              />
-              <FeaturedCard
-                imageSrc="/assets/images/home_repair.webp"
-                badgeText="123"
-                price="5000"
-                title="Home Repair Service"
-                rating={4.5}
-              />
+            <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
+              {[1, 2, 3, 4].map((index) => (
+                <FeaturedCard
+                  key={index}
+                  imageSrc="/api/placeholder/400/300"
+                  badgeText="123"
+                  price="5000"
+                  title="Home Repair Service"
+                  rating={4.5}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -117,3 +162,5 @@ export function CityServiceCategories({ cityName }) {
     </div>
   );
 }
+
+export default CityServiceCategories;
