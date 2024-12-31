@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { serviceAPI } from '../../api/services';
+import Select from 'react-select';
 
 export const CategoryForm = ({ mode, data, onClose }) => {
     const [formData, setFormData] = useState({
@@ -12,14 +13,54 @@ export const CategoryForm = ({ mode, data, onClose }) => {
         display_order: data?.display_order || 0
     });
 
+    const [selectedCities, setSelectedCities] = useState(data?.cities || []);
+    const [image, setImage] = useState();
+    const [cities, setCities] = useState([]);
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const response = await serviceAPI.getCities();
+                const cityOptions = response.data.map((city) => ({
+                    value: city.city_id,
+                    label: city.name,
+                }));
+                setCities(cityOptions);
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+            }
+        };
+
+        fetchCities();
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            let categoryId;
             if (mode === 'edit' && data?.category_id) {
                 await serviceAPI.updateCategory(data.category_id, formData);
+                categoryId = data.category_id;
             } else {
-                await serviceAPI.createCategory(formData);
+                console.log(formData.icon_url)
+                const response = await serviceAPI.createCategory(formData);
+                categoryId = response.data.category_id; 
             }
+
+            if (selectedCities.length > 0) {
+                const categoryCityData = selectedCities.map((city) => ({
+                    category_id: categoryId,
+                    city_id: city.value
+                }));
+
+                const requestBody = {
+                    mappings: categoryCityData
+                };
+
+                console.log(requestBody);
+
+                await serviceAPI.createCategoryCities(requestBody);
+            }
+
             onClose();
         } catch (error) {
             console.error('Error submitting category:', error);
@@ -27,7 +68,7 @@ export const CategoryForm = ({ mode, data, onClose }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
             <div className="space-y-2">
                 <Label htmlFor="name">Category Name</Label>
                 <Input
@@ -51,24 +92,36 @@ export const CategoryForm = ({ mode, data, onClose }) => {
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="icon_url">Icon URL</Label>
-                <Input
-                    id="icon_url"
-                    placeholder="Icon URL"
-                    value={formData.icon_url}
-                    onChange={(e) => setFormData({ ...formData, icon_url: e.target.value })}
-                />
-            </div>
-
-            <div className="space-y-2">
                 <Label htmlFor="display_order">Display Order</Label>
                 <Input
                     id="display_order"
                     type="number"
                     placeholder="Display Order"
                     value={formData.display_order}
-                    onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0})}
+                    onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
                     required
+                />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="cities">Select Cities</Label>
+                <Select
+                    id="cities"
+                    options={cities}
+                    isMulti
+                    value={selectedCities}
+                    onChange={setSelectedCities}  
+                    required
+                />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="image">Upload Image</Label>
+                <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])} 
                 />
             </div>
 

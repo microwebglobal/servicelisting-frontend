@@ -22,7 +22,7 @@ export const useServiceManagement = (cityId) => {
     categories: async () => {
       setIsLoading(true);
       try {
-        const response = await serviceAPI.getCategories(cityId);
+        const response = await serviceAPI.getAllCategories();
         setCategories(response.data);
       } finally {
         setIsLoading(false);
@@ -167,10 +167,10 @@ export const useServiceManagement = (cityId) => {
   };
 
   useEffect(() => {
-    if (cityId) {
+    
       fetchFunctions.categories();
-    }
-  }, [cityId]);
+    
+  }, []);
 
   return {
     data: {

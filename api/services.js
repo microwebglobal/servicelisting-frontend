@@ -4,19 +4,24 @@ import { api } from "../utils/api";
 export const serviceAPI = {
   // Categories
   getCategories: (cityId) => api.get(`/categories?city_id=${cityId}`),
-  getCategoryBySlug: (slug, cityName) => api.get(`/categories/slugs/${slug}?city=${cityName}`), createCategory: (data) => api.post("/categories", data),
+  getAllCategories: () => api.get("/categories/all"),
+  getCategoryBySlug: (slug, cityName) =>
+    api.get(`/categories/slugs/${slug}?city=${cityName}`),
+  createCategory: (data) => api.post("/categories", data),
   updateCategory: (id, data) => api.put(`/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/categories/${id}`),
 
   // SubCategories
-  getSubCategories: (categoryId) => api.get(`/categories/${categoryId}/subcategories`),
+  getSubCategories: (categoryId) =>
+    api.get(`/categories/${categoryId}/subcategories`),
   createSubCategory: (data) => api.post("/subcategories", data),
   updateSubCategory: (id, data) => api.put(`/subcategories/${id}`, data),
   deleteSubCategory: (id) => api.delete(`/subcategories/${id}`),
   getSubCategoryBySlug: (slug) => api.get(`/subcategories/slugs/${slug}`),
 
   // Service Types
-  getServiceTypes: (subCategoryId) => api.get(`/subcategories/${subCategoryId}/types`),
+  getServiceTypes: (subCategoryId) =>
+    api.get(`/subcategories/${subCategoryId}/types`),
   createServiceType: (data) => api.post("/types", data),
   updateServiceType: (id, data) => api.put(`/types/${id}`, data),
   deleteServiceType: (id) => api.delete(`/types/${id}`),
@@ -52,18 +57,27 @@ export const serviceAPI = {
   createPackageItem: (data) => api.post("/package-items", data),
   updatePackageItem: (id, data) => api.put(`/package-items/${id}`, data),
   deletePackageItem: (id) => api.delete(`/package-items/${id}`),
-  getPackageItems: (packageId) => api.get(`/package-items/package/${packageId}`),
+  getPackageItems: (packageId) =>
+    api.get(`/package-items/package/${packageId}`),
 
-  getSectionsByPackage: (packageId) => api.get(`/sections/package/${packageId}`),
-  getItemsbySection: (sectionId) => api.get(`/package-items/section/${sectionId}`),
+  getSectionsByPackage: (packageId) =>
+    api.get(`/sections/package/${packageId}`),
+  getItemsbySection: (sectionId) =>
+    api.get(`/package-items/section/${sectionId}`),
   createPackageSection: (data) => api.post("/sections", data),
   updatePackageSection: (id, data) => api.put(`/sections/${id}`, data),
   //city pricing
   createCityPricing: (data) => api.post("/city-pricing", data),
-  updateCityPricing: (id, data) => api.put(`/city-pricing/item/${id}/city/${data.city_id}`, data), deleteCityPricing: (id) => api.delete(`/city-pricing/${id}`),
+  updateCityPricing: (id, data) =>
+    api.put(`/city-pricing/item/${id}/city/${data.city_id}`, data),
+  deleteCityPricing: (id) => api.delete(`/city-pricing/${id}`),
   getCityPricing: (itemId) => api.get(`/city-pricing/item/${itemId}`),
-  getCityPricingByCity: (cityId) => api.get(`/city-pricing/item/${id}/city/${cityId}`),
+  getCityPricingByCity: (cityId) =>
+    api.get(`/city-pricing/item/${id}/city/${cityId}`),
 
   //special pricing
   getActiveSpecialPricing: (data) => api.get(`/special-pricing/active`, data),
+
+  //service category city
+  createCategoryCities:(data) => api.post(`/category-cities/bulk`, data),
 };

@@ -145,7 +145,7 @@ export function CityServiceCategories({ cityName = "" }) {
 
           <div className="w-full lg:w-3/5">
             <Image
-              src="/assets/images/hair_clean.png"
+              src="/api/placeholder/800/700"
               alt="Professional Services"
               width={800}
               height={700}
