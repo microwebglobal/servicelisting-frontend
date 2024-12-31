@@ -8,7 +8,10 @@ import { IoMdMail } from "react-icons/io";
 const Footer = () => {
   return (
     <div>
-      <footer className="bg-primary text-white py-10 px-12">
+      <footer
+        className="bg-primary text-white py-10 px-12"
+        style={{ backgroundColor: "#5f60b9" }}
+      >
         <div className="flex justify-between items-start py-10 px-20">
           <div className="w-1/4">
             <h4 className="font-bold text-lg mb-2">[App Logo]</h4>

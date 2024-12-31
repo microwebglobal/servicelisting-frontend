@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import Navbar from "@components/Navbar";
 import FeaturedCard from "@components/ui/featuredCard";
+import Footer from "@components/Footer";
 
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
@@ -30,7 +31,7 @@ export function CityServiceCategories({ cityName = "" }) {
         // First get city
         const citiesResponse = await serviceAPI.getCities();
         const matchedCity = citiesResponse.data.find(
-          city => city.name.toLowerCase() === cityName.toLowerCase()
+          (city) => city.name.toLowerCase() === cityName.toLowerCase()
         );
 
         if (!matchedCity) {
@@ -46,9 +47,10 @@ export function CityServiceCategories({ cityName = "" }) {
         setCity(matchedCity);
 
         // Then get categories for this city
-        const categoriesResponse = await serviceAPI.getCategories(matchedCity.city_id);
+        const categoriesResponse = await serviceAPI.getCategories(
+          matchedCity.city_id
+        );
         setCategories(categoriesResponse.data);
-
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Failed to load data");
@@ -94,7 +96,9 @@ export function CityServiceCategories({ cityName = "" }) {
     return (
       <div className="min-h-screen bg-gray-50 p-10">
         <div className="text-center py-8">
-          <h2 className="text-xl text-gray-600">Please select a valid city to view available services</h2>
+          <h2 className="text-xl text-gray-600">
+            Please select a valid city to view available services
+          </h2>
         </div>
       </div>
     );
@@ -112,7 +116,9 @@ export function CityServiceCategories({ cityName = "" }) {
             <hr className="mb-10" />
 
             {categories.length === 0 ? (
-              <div className="text-center py-8">No services available in this city</div>
+              <div className="text-center py-8">
+                No services available in this city
+              </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {categories.map((category) => (
@@ -121,7 +127,11 @@ export function CityServiceCategories({ cityName = "" }) {
                     className="cursor-pointer hover:shadow-md transition-shadow duration-300"
                     onClick={() => handleCategoryClick(category.slug)}
                   >
-                    <CardImage src={category.icon_url || "/assets/images/plumbing_icon.png"} />
+                    <CardImage
+                      src={
+                        category.icon_url || "/assets/images/plumbing_icon.png"
+                      }
+                    />
                     <CardHeader>
                       <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
                         {category.name}
@@ -132,10 +142,10 @@ export function CityServiceCategories({ cityName = "" }) {
               </div>
             )}
           </div>
-          
+
           <div className="w-full lg:w-3/5">
             <Image
-              src="/api/placeholder/800/700"
+              src="/assets/images/hair_clean.png"
               alt="Professional Services"
               width={800}
               height={700}
@@ -143,7 +153,7 @@ export function CityServiceCategories({ cityName = "" }) {
               priority
             />
             <hr />
-            <h2 className="text-2xl mt-5 mb-10">Featured</h2>
+            <h2 className="text-2xl mt-5 mb-10">Featured Services</h2>
             <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
               {[1, 2, 3, 4].map((index) => (
                 <FeaturedCard
@@ -159,6 +169,7 @@ export function CityServiceCategories({ cityName = "" }) {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
