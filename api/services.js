@@ -7,14 +7,22 @@ export const serviceAPI = {
   getAllCategories: () => api.get("/categories/all"),
   getCategoryBySlug: (slug, cityName) =>
     api.get(`/categories/slugs/${slug}?city=${cityName}`),
-  createCategory: (data) => api.post("/categories", data),
+  createCategory: (data) => api.post("/categories", data, {
+    headers: {
+        'Content-Type': 'multipart/form-data', 
+    },
+}),
   updateCategory: (id, data) => api.put(`/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/categories/${id}`),
 
   // SubCategories
   getSubCategories: (categoryId) =>
     api.get(`/categories/${categoryId}/subcategories`),
-  createSubCategory: (data) => api.post("/subcategories", data),
+  createSubCategory: (data) => api.post("/subcategories", data, {
+    headers: {
+        'Content-Type': 'multipart/form-data', 
+    },
+}),
   updateSubCategory: (id, data) => api.put(`/subcategories/${id}`, data),
   deleteSubCategory: (id) => api.delete(`/subcategories/${id}`),
   getSubCategoryBySlug: (slug) => api.get(`/subcategories/slugs/${slug}`),

@@ -129,9 +129,10 @@ export function CityServiceCategories({ cityName = "" }) {
                   >
                     <CardImage
                       src={
-                        category.icon_url || "/assets/images/plumbing_icon.png"
+                        process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url 
                       }
                     />
+
                     <CardHeader>
                       <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
                         {category.name}

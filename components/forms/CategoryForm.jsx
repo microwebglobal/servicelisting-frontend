@@ -9,13 +9,13 @@ export const CategoryForm = ({ mode, data, onClose }) => {
     const [formData, setFormData] = useState({
         name: data?.name || '',
         slug: data?.slug || '',
-        icon_url: data?.icon_url || '',
         display_order: data?.display_order || 0
     });
 
     const [selectedCities, setSelectedCities] = useState(data?.cities || []);
-    const [image, setImage] = useState();
+    const [image, setImage] = useState(); 
     const [cities, setCities] = useState([]);
+    
     useEffect(() => {
         const fetchCities = async () => {
             try {
@@ -35,15 +35,29 @@ export const CategoryForm = ({ mode, data, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+       
+        const formDataToSend = new FormData();
+        formDataToSend.append('name', formData.name);
+        formDataToSend.append('slug', formData.slug);
+        formDataToSend.append('display_order', formData.display_order);
+        
+        
+        if (image) {
+            console.log(image)
+            formDataToSend.append('image', image); 
+        }
+
+    
+
         try {
             let categoryId;
             if (mode === 'edit' && data?.category_id) {
-                await serviceAPI.updateCategory(data.category_id, formData);
+                await serviceAPI.updateCategory(data.category_id, formDataToSend); 
                 categoryId = data.category_id;
             } else {
-                console.log(formData.icon_url)
-                const response = await serviceAPI.createCategory(formData);
-                categoryId = response.data.category_id; 
+                const response = await serviceAPI.createCategory(formDataToSend); 
+                categoryId = response.data.category_id;
             }
 
             if (selectedCities.length > 0) {
@@ -55,8 +69,6 @@ export const CategoryForm = ({ mode, data, onClose }) => {
                 const requestBody = {
                     mappings: categoryCityData
                 };
-
-                console.log(requestBody);
 
                 await serviceAPI.createCategoryCities(requestBody);
             }
@@ -110,18 +122,18 @@ export const CategoryForm = ({ mode, data, onClose }) => {
                     options={cities}
                     isMulti
                     value={selectedCities}
-                    onChange={setSelectedCities}  
+                    onChange={setSelectedCities}
                     required
                 />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="image">Upload Image</Label>
+                <Label htmlFor="image">Category Icon</Label>
                 <Input
                     id="image"
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setImage(e.target.files[0])} 
+                    onChange={(e) => setImage(e.target.files[0])}
                 />
             </div>
 

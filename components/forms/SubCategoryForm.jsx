@@ -23,9 +23,22 @@ export const SubCategoryForm = ({ mode = 'create', data, onClose, selectedData }
     display_order: data?.display_order || 0,
     category_id: categoryId // Use the validated categoryId
   });
+  const [image, setImage] = useState();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formDataToSend = new FormData();
+
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('slug', formData.slug);
+    formDataToSend.append('display_order', formData.display_order);
+    formDataToSend.append('category_id', formData.category_id);
+
+    if (image) {
+      console.log(image)
+      formDataToSend.append('image', image); 
+  }
     
     // Additional validation before submission
     if (!formData.category_id) {
@@ -37,7 +50,7 @@ export const SubCategoryForm = ({ mode = 'create', data, onClose, selectedData }
       if (mode === 'edit' && data?.subcategory_id) {
         await serviceAPI.updateSubCategory(data.subcategory_id, formData);
       } else {
-        await serviceAPI.createSubCategory(formData);
+        await serviceAPI.createSubCategory(formDataToSend);
       }
       onClose();
     } catch (error) {
@@ -80,6 +93,16 @@ export const SubCategoryForm = ({ mode = 'create', data, onClose, selectedData }
           required
         />
       </div>
+
+      <div className="space-y-2">
+                <Label htmlFor="image">Sub Category Icon</Label>
+                <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])}
+                />
+            </div>
 
       <div className="flex space-x-4">
         <Button type="submit" className="flex-1">
