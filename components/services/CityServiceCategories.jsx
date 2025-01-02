@@ -107,7 +107,7 @@ export function CityServiceCategories({ cityName = "" }) {
   return (
     <div>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 p-10">
+      <div className="min-h-screen bg-gray-50 p-20">
         <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20">
           <div className="w-full lg:w-2/5">
             <h1 className="text-4xl font-bold mb-2 capitalize">
@@ -129,8 +129,10 @@ export function CityServiceCategories({ cityName = "" }) {
                   >
                     <CardImage
                       src={
-                        process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url 
+                        process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url
                       }
+                      crossOrigin="anonymous"
+                      alt="card_image"
                     />
 
                     <CardHeader>
@@ -146,7 +148,7 @@ export function CityServiceCategories({ cityName = "" }) {
 
           <div className="w-full lg:w-3/5">
             <Image
-              src="/api/placeholder/800/700"
+              src="/assets/images/hair_clean.png"
               alt="Professional Services"
               width={800}
               height={700}
@@ -159,7 +161,7 @@ export function CityServiceCategories({ cityName = "" }) {
               {[1, 2, 3, 4].map((index) => (
                 <FeaturedCard
                   key={index}
-                  imageSrc="/api/placeholder/400/300"
+                  imageSrc="/assets/images/hair_clean.png"
                   badgeText="123"
                   price="5000"
                   title="Home Repair Service"

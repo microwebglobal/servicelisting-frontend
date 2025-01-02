@@ -7,22 +7,24 @@ export const serviceAPI = {
   getAllCategories: () => api.get("/categories/all"),
   getCategoryBySlug: (slug, cityName) =>
     api.get(`/categories/slugs/${slug}?city=${cityName}`),
-  createCategory: (data) => api.post("/categories", data, {
-    headers: {
-        'Content-Type': 'multipart/form-data', 
-    },
-}),
+  createCategory: (data) =>
+    api.post("/categories", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   updateCategory: (id, data) => api.put(`/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/categories/${id}`),
 
   // SubCategories
   getSubCategories: (categoryId) =>
     api.get(`/categories/${categoryId}/subcategories`),
-  createSubCategory: (data) => api.post("/subcategories", data, {
-    headers: {
-        'Content-Type': 'multipart/form-data', 
-    },
-}),
+  createSubCategory: (data) =>
+    api.post("/subcategories", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   updateSubCategory: (id, data) => api.put(`/subcategories/${id}`, data),
   deleteSubCategory: (id) => api.delete(`/subcategories/${id}`),
   getSubCategoryBySlug: (slug) => api.get(`/subcategories/slugs/${slug}`),
@@ -30,7 +32,12 @@ export const serviceAPI = {
   // Service Types
   getServiceTypes: (subCategoryId) =>
     api.get(`/subcategories/${subCategoryId}/types`),
-  createServiceType: (data) => api.post("/types", data),
+  createServiceType: (data) =>
+    api.post("/types", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   updateServiceType: (id, data) => api.put(`/types/${id}`, data),
   deleteServiceType: (id) => api.delete(`/types/${id}`),
 
@@ -87,5 +94,5 @@ export const serviceAPI = {
   getActiveSpecialPricing: (data) => api.get(`/special-pricing/active`, data),
 
   //service category city
-  createCategoryCities:(data) => api.post(`/category-cities/bulk`, data),
+  createCategoryCities: (data) => api.post(`/category-cities/bulk`, data),
 };

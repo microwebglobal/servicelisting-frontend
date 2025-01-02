@@ -1,7 +1,7 @@
 "use client";
 
-import { use } from 'react';
-import { CityServiceCategories } from '@/components/services/CityServiceCategories';
+import { use } from "react";
+import { CityServiceCategories } from "@/components/services/CityServiceCategories";
 
 export default function ServicePage({ params, searchParams }) {
   const resolvedParams = use(params);

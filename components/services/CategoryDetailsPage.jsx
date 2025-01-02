@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardImage,
+  CardContent,
+} from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Navbar from "@components/Navbar";
-import Footer from "@components/Footer";
 import OfferCard from "@components/ui/offerCard";
 
 export function CategoryDetailsPage({ cityName, categorySlug }) {
@@ -103,7 +107,6 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
 
   return (
     <div>
-      <Navbar />
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-6xl mx-auto">
           <Button variant="ghost" className="mb-4" onClick={handleBack}>
@@ -111,11 +114,35 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
             Back to Categories
           </Button>
 
-          <h1 className="text-4xl font-bold mb-8">
+          <h1 className="text-4xl font-bold mb-4">
             {category?.name} in {cityName}
           </h1>
 
-          <div className="grid gap-6">
+          <img
+            src={process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url}
+            crossOrigin="anonymous"
+            alt="card_image"
+            className="w-full h-64 object-cover rounded-lg shadow-lg mb-8"
+          />
+
+          <h2 className="text-3xl font-semibold mb-4 text-center">
+            What is {category?.name}?
+          </h2>
+          <div className="text-lg text-gray-700 text-center mb-8">
+            <p>
+              {category?.name} is an essential part of daily life in {cityName}.
+              Whether you're looking for professional services, products, or
+              local offers, this category encompasses everything you need. From
+              reliable service providers to unique offerings, we’ve gathered all
+              the top choices for you.
+            </p>
+            <p className="mt-4">
+              Explore each subcategory below and dive into the available
+              services designed to suit your specific needs.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-4 gap-6">
             {subCategories.length === 0 ? (
               <div className="text-center py-8 text-gray-600">
                 No subcategories available for this category
@@ -127,6 +154,14 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
                   className="cursor-pointer hover:shadow-md transition-shadow duration-300"
                   onClick={() => handleSubCategoryClick(subCategory.slug)}
                 >
+                  <CardImage
+                    src={
+                      process.env.NEXT_PUBLIC_API_ENDPOINT +
+                      subCategory.icon_url
+                    }
+                    crossOrigin="anonymous"
+                    alt="card_image"
+                  />
                   <CardHeader>
                     <CardTitle className="text-xl hover:text-indigo-600 transition-colors">
                       {subCategory.name}
@@ -145,7 +180,6 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

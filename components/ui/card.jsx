@@ -26,11 +26,11 @@ CardHeader.displayName = "CardHeader";
 const CardImage = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5", className)}
+    className={cn("flex flex-col space-y-1.5 rounded-t-lg", className)}
     {...props}
   >
     <img
-      className="w-full h-auto object-cover"
+      className="w-full h-auto object-cover rounded-t-lg"
       alt={props.alt || "Card Image"}
       {...props}
     />

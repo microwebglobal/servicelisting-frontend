@@ -10,6 +10,8 @@ import { CartPreview } from "./CartPreview";
 import { PackageList } from "./PackageList";
 import Navbar from "@components/Navbar";
 import Footer from "@components/Footer";
+import DOMPurify from "dompurify";
+import Modal from "react-modal";
 
 export function SubCategoryDetailsPage({
   cityName,
@@ -23,6 +25,18 @@ export function SubCategoryDetailsPage({
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
+  const [modalDescription, setModelDescription] = useState(null);
+
+  const openModal = (description) => {
+    setModelDescription(description);
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setModelDescription(null);
+  };
 
   useEffect(() => {
     fetchCityId();
@@ -117,9 +131,18 @@ export function SubCategoryDetailsPage({
           <div className="space-y-8">
             {serviceTypes.map((type) => (
               <Card key={type.type_id}>
-                <CardHeader>
-                  <CardTitle>{type.name}</CardTitle>
-                </CardHeader>
+                <div className="flex justify-between">
+                  <CardHeader>
+                    <CardTitle>{type.name}</CardTitle>
+                  </CardHeader>
+                  <Button
+                    onClick={() => openModal(type.description)}
+                    className="mt-5 mr-5"
+                  >
+                    View Details
+                  </Button>
+                </div>
+
                 <CardContent>
                   <ServiceList
                     typeId={type.type_id}
@@ -138,6 +161,21 @@ export function SubCategoryDetailsPage({
         </div>
         <CartPreview cart={cart} removeFromCart={removeFromCart} />
       </div>
+      <Modal
+        isOpen={isOpen}
+        onRequestClose={closeModal}
+        ariaHideApp={false}
+        contentLabel="Service Description"
+        className="m-10 bg-white p-8 rounded-md shadow-xl transform transition-all duration-300 ease-in-out w-2/4 overflow-y-auto max-h-[80vh]"
+        overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
+      >
+        <div
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(modalDescription),
+          }}
+        />
+      </Modal>
+
       <Footer />
     </div>
   );

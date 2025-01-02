@@ -12,12 +12,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { serviceAPI } from "../../api/services";
+import TextEditor from "@components/ui/textEditor";
 
 export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
   const [cities, setCities] = useState([]);
   const [formData, setFormData] = useState({
     name: data?.name || "",
     description: data?.description || "",
+    overview: data?.overview || "",
     base_price: data?.base_price || "",
     service_id: selectedData?.serviceId || data?.service_id,
     cityPricing:
@@ -132,6 +134,15 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
             setFormData({ ...formData, base_price: e.target.value })
           }
           required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="description">Service Overview</Label>
+        <TextEditor
+          value={formData.overview}
+          onChange={(value) => setFormData({ ...formData, overview: value })}
+          className="my-custom-class"
         />
       </div>
 

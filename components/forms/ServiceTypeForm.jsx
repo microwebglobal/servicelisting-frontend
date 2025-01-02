@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { serviceAPI } from "../../api/services";
+import TextEditor from "@components/ui/textEditor";
 
 export const ServiceTypeForm = ({
   mode = "create",
@@ -29,9 +29,22 @@ export const ServiceTypeForm = ({
     display_order: data?.display_order || 0,
     sub_category_id: subCategoryId,
   });
+  const [image, setImage] = useState();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formDataToSend = new FormData();
+
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("display_order", formData.display_order);
+    formDataToSend.append("sub_category_id", formData.sub_category_id);
+
+    if (image) {
+      console.log(image);
+      formDataToSend.append("image", image);
+    }
 
     // Additional validation before submission
     if (!formData.sub_category_id) {
@@ -43,7 +56,7 @@ export const ServiceTypeForm = ({
       if (mode === "edit" && data?.service_type_id) {
         await serviceAPI.updateServiceType(data.service_type_id, formData);
       } else {
-        await serviceAPI.createServiceType(formData);
+        await serviceAPI.createServiceType(formDataToSend);
       }
       onClose();
     } catch (error) {
@@ -52,7 +65,11 @@ export const ServiceTypeForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+      encType="multipart/form-data"
+    >
       <div className="space-y-2">
         <Label htmlFor="name">Service Type Name</Label>
         <Input
@@ -66,14 +83,10 @@ export const ServiceTypeForm = ({
 
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          placeholder="Description"
+        <TextEditor
           value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          required
+          onChange={(value) => setFormData({ ...formData, description: value })}
+          className="my-custom-class"
         />
       </div>
 
@@ -91,6 +104,16 @@ export const ServiceTypeForm = ({
             })
           }
           required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="image">Service Type Icon</Label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
         />
       </div>
 
