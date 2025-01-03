@@ -27,6 +27,13 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
         city_id: pricing.city_id,
         price: pricing.price,
       })) || [],
+    specialPricing:
+      data?.SpecialPricing?.map((pricing) => ({
+        city_id: pricing.city_id,
+        special_price: pricing.special_price,
+        start_date: pricing.start_date,
+        end_date: pricing.end_date,
+      })) || [],
   });
 
   useEffect(() => {
@@ -46,6 +53,37 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
     setFormData((prev) => ({
       ...prev,
       cityPricing: [...prev.cityPricing, { city_id: "", price: "" }],
+    }));
+  };
+
+  const addSpecialPricing = () => {
+    setFormData((prev) => ({
+      ...prev,
+      specialPricing: [
+        ...prev.specialPricing,
+        {
+          city_id: "",
+          special_price: "",
+          start_date: "2025-01-05",
+          end_date: "2025-01-08",
+        },
+      ],
+    }));
+  };
+
+  const updateSpecialPricing = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      specialPricing: prev.specialPricing.map((pricing, i) =>
+        i === index ? { ...pricing, [field]: value } : pricing
+      ),
+    }));
+  };
+
+  const removeSpecialPricing = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      specialPricing: prev.specialPricing.filter((_, i) => i !== index),
     }));
   };
 
@@ -77,11 +115,16 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
             price: parseFloat(pricing.price),
           }))
           .filter((pricing) => pricing.city_id && pricing.price),
+        specialPricing: formData.specialPricing.map((pricing) => ({
+          ...pricing,
+          special_price: parseFloat(pricing.special_price),
+        })),
       };
 
       if (mode === "edit" && data?.item_id) {
         await serviceAPI.updateServiceItem(data.item_id, payload);
       } else {
+        console.log(payload);
         await serviceAPI.createServiceItem(payload);
       }
       onClose();
@@ -93,6 +136,12 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
   // Helper function to check if a city is already selected
   const isCitySelected = (cityId) => {
     return formData.cityPricing.some((pricing) => pricing.city_id === cityId);
+  };
+
+  const isCitySelectedSp = (cityId) => {
+    return formData.specialPricing.some(
+      (pricing) => pricing.city_id === cityId
+    );
   };
 
   return (
@@ -131,7 +180,7 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
           placeholder="Base Price"
           value={formData.base_price}
           onChange={(e) =>
-            setFormData({ ...formData, base_price: e.target.value })
+            setFormData({ ...formData, base_price: parseFloat(e.target.value) })
           }
           required
         />
@@ -196,11 +245,94 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
                 }
               />
             </div>
+
             <Button
               type="button"
               variant="ghost"
               size="icon"
               onClick={() => removeCityPricing(index)}
+            >
+              <Trash2 size={16} className="text-gray-500 hover:text-red-500" />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <Label>Special Pricing</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addSpecialPricing}
+          >
+            <Plus size={16} className="mr-2" />
+            Add Special Pricing
+          </Button>
+        </div>
+
+        {formData.specialPricing.map((pricing, index) => (
+          <div key={index} className="flex gap-4 items-start">
+            <div className="flex-1 w-64">
+              <Select
+                value={pricing.city_id}
+                onValueChange={(value) =>
+                  updateSpecialPricing(index, "city_id", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select City" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((city) =>
+                    !isCitySelectedSp(city.city_id) ||
+                    pricing.city_id === city.city_id ? (
+                      <SelectItem key={city.city_id} value={city.city_id}>
+                        {city.name}
+                      </SelectItem>
+                    ) : null
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Price"
+                value={pricing.special_price}
+                onChange={(e) =>
+                  updateSpecialPricing(index, "special_price", e.target.value)
+                }
+              />
+            </div>
+            <div className="flex-1">
+              <Input
+                type="date"
+                placeholder="Start Date"
+                value={pricing.start_date}
+                onChange={(e) =>
+                  updateCityPricing(index, "start_date", e.target.value)
+                }
+              />
+            </div>
+            <div className="flex-1">
+              <Input
+                type="date"
+                placeholder="End Date"
+                value={pricing.end_date}
+                onChange={(e) =>
+                  updateCityPricing(index, "end_date", e.target.value)
+                }
+              />
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => removeSpecialPricing(index)}
             >
               <Trash2 size={16} className="text-gray-500 hover:text-red-500" />
             </Button>

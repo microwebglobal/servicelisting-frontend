@@ -51,7 +51,8 @@ export const serviceAPI = {
   createServiceItem: (data) => api.post("/items", data),
   updateServiceItem: (id, data) => api.put(`/items/${id}`, data),
   deleteServiceItem: (id) => api.delete(`/items/${id}`),
-  getServiceItems: (serviceId) => api.get(`/items/serv/${serviceId}`),
+  getServiceItems: (serviceId, cityId) =>
+    api.get(`/items/serv/${serviceId}?cityId=${cityId}`),
   updateServiceItem: (itemId, data) => api.put(`/items/${itemId}`, data),
 
   //cities

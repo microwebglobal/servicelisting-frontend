@@ -49,49 +49,13 @@ export function ServiceList({ typeId, cityId, addToCart }) {
     if (!serviceId || !cityId) return;
 
     try {
-      const response = await serviceAPI.getServiceItems(serviceId);
+      const response = await serviceAPI.getServiceItems(serviceId, cityId);
       console.log(response.data);
       const items = response.data;
 
-      const itemsWithPricing = await Promise.all(
-        items.map(async (item) => {
-          try {
-            const [pricingResponse, specialPricingResponse] = await Promise.all(
-              [
-                serviceAPI.getCityPricing(item.item_id),
-                serviceAPI.getActiveSpecialPricing({
-                  item_id: item.item_id,
-                  item_type: "service_item",
-                  city_id: cityId,
-                }),
-              ]
-            );
-
-            const cityPrice = pricingResponse.data.city_prices?.[cityId];
-            const specialPrice = specialPricingResponse.data[0]?.special_price;
-
-            return {
-              ...item,
-              originalPrice: cityPrice || item.base_price,
-              finalPrice: specialPrice || cityPrice || item.base_price,
-            };
-          } catch (error) {
-            console.error(
-              `Error fetching pricing for item ${item.item_id}:`,
-              error
-            );
-            return {
-              ...item,
-              originalPrice: item.base_price,
-              finalPrice: item.base_price,
-            };
-          }
-        })
-      );
-
       setServiceItems((prev) => ({
         ...prev,
-        [serviceId]: itemsWithPricing,
+        [serviceId]: items,
       }));
     } catch (error) {
       console.error("Error fetching service items:", error);
@@ -142,11 +106,17 @@ export function ServiceList({ typeId, cityId, addToCart }) {
                     </div>
                     <div className="text-right">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold">
-                          ₹{item.finalPrice}
-                        </span>
-                        {item.finalPrice !== item.base_price && (
-                          <span className="text-sm text-gray-500 line-through">
+                        {item.SpecialPricings[0] ? (
+                          <>
+                            <span className="text-lg font-bold">
+                              ₹{item.SpecialPricings[0].special_price}
+                            </span>
+                            <span className="text-sm text-gray-500 line-through">
+                              ₹{item.base_price}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-lg font-bold">
                             ₹{item.base_price}
                           </span>
                         )}
