@@ -50,6 +50,7 @@ export function ServiceList({ typeId, cityId, addToCart }) {
 
     try {
       const response = await serviceAPI.getServiceItems(serviceId);
+      console.log(response.data);
       const items = response.data;
 
       const itemsWithPricing = await Promise.all(

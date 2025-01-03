@@ -132,6 +132,11 @@ export function CityServiceCategories({ cityName = "" }) {
                         process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url
                       }
                       crossOrigin="anonymous"
+                      style={{
+                        height: "150px",
+                        objectFit: "cover",
+                        width: "100%",
+                      }}
                       alt="card_image"
                     />
 

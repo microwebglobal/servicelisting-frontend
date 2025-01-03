@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import OfferCard from "@components/ui/offerCard";
+import { Height } from "@mui/icons-material";
 
 export function CategoryDetailsPage({ cityName, categorySlug }) {
   const [category, setCategory] = useState(null);
@@ -114,7 +115,7 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
             Back to Categories
           </Button>
 
-          <h1 className="text-4xl font-bold mb-4">
+          <h1 className="text-4xl font-bold mb-10">
             {category?.name} in {cityName}
           </h1>
 
@@ -128,7 +129,7 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
           <h2 className="text-3xl font-semibold mb-4 text-center">
             What is {category?.name}?
           </h2>
-          <div className="text-lg text-gray-700 text-center mb-8">
+          <div className="text-lg text-gray-700 text-center mb-20">
             <p>
               {category?.name} is an essential part of daily life in {cityName}.
               Whether you're looking for professional services, products, or
@@ -161,7 +162,13 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
                     }
                     crossOrigin="anonymous"
                     alt="card_image"
+                    style={{
+                      height: "200px",
+                      objectFit: "cover",
+                      width: "100%",
+                    }}
                   />
+
                   <CardHeader>
                     <CardTitle className="text-xl hover:text-indigo-600 transition-colors">
                       {subCategory.name}
