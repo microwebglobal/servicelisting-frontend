@@ -50,7 +50,11 @@ export function CityServiceCategories({ cityName = "" }) {
         const categoriesResponse = await serviceAPI.getCategories(
           matchedCity.city_id
         );
-        setCategories(categoriesResponse.data);
+        const sortedCategories = [...categoriesResponse.data].sort(
+          (a, b) => a.display_order - b.display_order
+        );
+
+        setCategories(sortedCategories);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Failed to load data");

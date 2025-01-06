@@ -13,6 +13,7 @@ export const ServiceItemsPanel = ({
   items = [],
   onAction,
   isLoading = false,
+  onClick,
 }) => {
   if (!service) {
     return (
@@ -60,9 +61,8 @@ export const ServiceItemsPanel = ({
               key={item.item_id}
               className="flex items-center justify-between p-3 rounded-lg border bg-white"
             >
-              <div className="flex-1">
+              <div className="flex-1" onClick={() => onClick(item)}>
                 <p className="font-medium">{item.name}</p>
-                <p className="text-sm text-gray-500">{item.description}</p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

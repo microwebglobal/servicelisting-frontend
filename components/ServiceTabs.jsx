@@ -1,9 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ServicesPanel } from '@/components/panels/ServicesPanel';
-import { PackagesPanel } from '@/components/panels/PackagesPanel';
-import { ServiceItemsPanel } from '@/components/panels/ServiceItemsPanel';
-import { PackageSectionsPanel } from '@/components/panels/PackageSectionsPanel';
-import { SectionItemsPanel } from '@/components/panels/SectionItemsPanel';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ServicesPanel } from "@/components/panels/ServicesPanel";
+import { PackagesPanel } from "@/components/panels/PackagesPanel";
+import { ServiceItemsPanel } from "@/components/panels/ServiceItemsPanel";
+import { PackageSectionsPanel } from "@/components/panels/PackageSectionsPanel";
+import { SectionItemsPanel } from "@/components/panels/SectionItemsPanel";
 export const ServiceTabs = ({
   activeTab,
   setActiveTab,
@@ -19,13 +19,18 @@ export const ServiceTabs = ({
   onSelectService,
   onSelectPackage,
   onSelectSection,
-  onAction
+  onAction,
+  onClick,
 }) => (
   <div className="w-1/2 border rounded-lg p-4">
     <Tabs value={activeTab} onValueChange={setActiveTab}>
       <TabsList className="w-full mb-4">
-        <TabsTrigger value="services" className="flex-1">Services</TabsTrigger>
-        <TabsTrigger value="packages" className="flex-1">Packages</TabsTrigger>
+        <TabsTrigger value="services" className="flex-1">
+          Services
+        </TabsTrigger>
+        <TabsTrigger value="packages" className="flex-1">
+          Packages
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="services" className="space-y-4">
@@ -41,6 +46,7 @@ export const ServiceTabs = ({
             service={selectedService}
             items={serviceItems}
             onAction={onAction}
+            onClick={onClick}
           />
         </div>
       </TabsContent>

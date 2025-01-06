@@ -56,7 +56,12 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
         const subCategoriesResponse = await serviceAPI.getSubCategories(
           category.category_id
         );
-        setSubCategories(subCategoriesResponse.data);
+
+        const sortedSubCategories = [...subCategoriesResponse.data].sort(
+          (a, b) => a.display_order - b.display_order
+        );
+
+        setSubCategories(sortedSubCategories);
       } catch (error) {
         console.error("Error fetching category details:", error);
         setError("Failed to load data");

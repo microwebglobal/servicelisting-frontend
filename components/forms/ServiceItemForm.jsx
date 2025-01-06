@@ -64,8 +64,8 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
         {
           city_id: "",
           special_price: "",
-          start_date: "2025-01-05",
-          end_date: "2025-01-08",
+          start_date: "",
+          end_date: "",
         },
       ],
     }));
@@ -274,7 +274,7 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
 
         {formData.specialPricing.map((pricing, index) => (
           <div key={index} className="flex gap-4 items-start">
-            <div className="flex-1 w-64">
+            <div className="flex-1 w-64 mt-5">
               <Select
                 value={pricing.city_id}
                 onValueChange={(value) =>
@@ -296,7 +296,7 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 mt-5">
               <Input
                 type="number"
                 step="0.01"
@@ -309,22 +309,30 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
               />
             </div>
             <div className="flex-1">
+              <label className="block ml-2 text-sm font-medium text-gray-700">
+                Start Date
+              </label>
               <Input
                 type="date"
                 placeholder="Start Date"
                 value={pricing.start_date}
+                min={new Date().toISOString().split("T")[0]}
                 onChange={(e) =>
-                  updateCityPricing(index, "start_date", e.target.value)
+                  updateSpecialPricing(index, "start_date", e.target.value)
                 }
               />
             </div>
             <div className="flex-1">
+              <label className="block ml-2 text-sm font-medium text-gray-700">
+                End Date
+              </label>
               <Input
                 type="date"
                 placeholder="End Date"
                 value={pricing.end_date}
+                min={new Date().toISOString().split("T")[0]}
                 onChange={(e) =>
-                  updateCityPricing(index, "end_date", e.target.value)
+                  updateSpecialPricing(index, "end_date", e.target.value)
                 }
               />
             </div>
@@ -332,6 +340,7 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
               type="button"
               variant="ghost"
               size="icon"
+              className="mt-5"
               onClick={() => removeSpecialPricing(index)}
             >
               <Trash2 size={16} className="text-gray-500 hover:text-red-500" />

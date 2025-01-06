@@ -7,16 +7,31 @@ import { SubCategoryPanel } from "@/components/panels/SubCategoryPanel";
 import { ServiceTypePanel } from "@/components/panels/ServiceTypePanel";
 import { ServiceTabs } from "@/components/ServiceTabs";
 import { FormDialog } from "@/components/FormDialog";
+import DetailsDialog from "@components/DetailsDialog";
 
 const ServiceManagement = () => {
   const [activeTab, setActiveTab] = useState("services");
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState({});
   const { data, handlers, fetchFunctions, isLoading } = useServiceManagement();
 
   const { dialogState, handleDialog } = useDialog();
 
   // Handle dialog actions
   const handleDialogAction = (type, mode, item = null) => {
+    console.log(type, mode, item);
+
     handleDialog.open(type, mode, item);
+  };
+
+  const handleOpenModal = (item = null) => {
+    setIsOpen(true);
+    setSelectedItem(item);
+    console.log(item);
+  };
+
+  const handleCloseModal = () => {
+    setIsOpen(false);
   };
 
   // Handle dialog close and refresh data
@@ -110,6 +125,7 @@ const ServiceManagement = () => {
           onSelectPackage={handlers.package}
           onSelectSection={handlers.section}
           onAction={handleDialogAction}
+          onClick={handleOpenModal}
           isLoading={isLoading}
         />
       </div>
@@ -119,6 +135,12 @@ const ServiceManagement = () => {
         onClose={handleDialogClose}
         selectedData={selectedData}
         onAction={handleDialogAction}
+      />
+
+      <DetailsDialog
+        isOpen={isOpen}
+        handleCloseModal={handleCloseModal}
+        selectedItem={selectedItem}
       />
     </div>
   );
