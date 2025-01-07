@@ -28,7 +28,7 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
         price: pricing.price,
       })) || [],
     specialPricing:
-      data?.SpecialPricing?.map((pricing) => ({
+      data?.SpecialPricings?.map((pricing) => ({
         city_id: pricing.city_id,
         special_price: pricing.special_price,
         start_date: pricing.start_date,
