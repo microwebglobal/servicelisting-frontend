@@ -11,7 +11,7 @@ const center = {
   lng: 79.8612,
 };
 
-const SetLocation = () => {
+const SetLocation = ({ location, setLocation }) => {
   const router = useRouter();
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
@@ -33,11 +33,11 @@ const SetLocation = () => {
   const handlePlaceChanged = () => {
     const place = autocompleteRef.current.getPlace();
     if (place?.geometry?.location) {
-      const location = {
+      const newLocation = {
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
       };
-      setSelectedLocation(location);
+      setLocation(newLocation);
       setSearchInput(place.formatted_address || "");
 
       // Extract address components
@@ -65,6 +65,11 @@ const SetLocation = () => {
         async (position) => {
           const { latitude, longitude } = position.coords;
           setSelectedLocation({ lat: latitude, lng: longitude });
+          const newLocation = {
+            lat: selectedLocation.lat,
+            lng: selectedLocation.lng,
+          };
+          setLocation(newLocation);
 
           try {
             const response = await axios.get(
@@ -101,47 +106,12 @@ const SetLocation = () => {
     }
   };
 
-  const handleAdressSubmit = async () => {
-    const requestBody = {
-      u_id: localStorage.getItem("userId"),
-      address_type: "primary",
-      street: addressDetails.street,
-      city: addressDetails.city,
-      state: addressDetails.state,
-      postal_code: addressDetails.postalCode,
-      country: addressDetails.country,
-      long: selectedLocation.lng,
-      lat: selectedLocation.lat,
-    };
-
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/adress/`,
-        requestBody
-      );
-      console.log("Response:", response.data);
-      console.log(requestBody);
-      router.push("/profile/customer");
-    } catch (error) {
-      console.error("Error:", error);
-      console.log(requestBody);
-    }
-  };
-
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <>
       <div>
-        <h2 className="text-3xl text-center font-bold mb-1">
-          Select Your Location
-        </h2>
-        <p className="text-center mb-14">Add your primary location</p>
-
-        <div
-          className="flex gap-3"
-          style={{ marginBottom: "100px", marginTop: "100px" }}
-        >
+        <div className="flex gap-3 mb-4">
           <Autocomplete
             onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
             onPlaceChanged={handlePlaceChanged}
@@ -151,9 +121,9 @@ const SetLocation = () => {
           >
             <input
               type="text"
-              className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
+              className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Search for a location"
-              style={{ width: "400px" }}
+              style={{ width: "350px" }}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
@@ -166,13 +136,6 @@ const SetLocation = () => {
             <FaLocationCrosshairs />
           </button>
         </div>
-
-        <button
-          className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-blue-600 transition mb-5 "
-          onClick={handleAdressSubmit}
-        >
-          Finish
-        </button>
       </div>
     </>
   );

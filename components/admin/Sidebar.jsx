@@ -16,8 +16,8 @@ const Sidebar = () => {
       subMenu: [
         { name: "Service Providers", link: "/service-providers" },
         {
-          name: "Lead Capture Applications",
-          link: "/lead-capture-applications",
+          name: "Inquiry Applications",
+          link: "/admin/inquiry",
         },
         {
           name: "Accepted Returned Applications",

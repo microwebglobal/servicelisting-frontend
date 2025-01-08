@@ -1,6 +1,7 @@
 import Modal from "react-modal";
 import ServiceItemPopup from "./popups/ServiceItemPopup";
 import CategoryPopup from "./popups/CategoryPopup";
+import InquiryPopup from "./popups/InquiryPopup";
 
 const DetailsDialog = ({ isOpen, handleCloseModal, modalState }) => {
   const { type, selectedItem } = modalState;
@@ -18,7 +19,8 @@ const DetailsDialog = ({ isOpen, handleCloseModal, modalState }) => {
       {type == "category" ? (
         <CategoryPopup selectedItem={selectedItem} />
       ) : (
-        <ServiceItemPopup selectedItem={selectedItem} />
+        // <ServiceItemPopup selectedItem={selectedItem} />
+        <InquiryPopup inquiry={selectedItem} />
       )}
     </Modal>
   );
