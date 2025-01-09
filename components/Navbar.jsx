@@ -12,7 +12,7 @@ const Navbar = () => {
       <div className="font-bold text-lg text-white ml-20">[App Logo]</div>
       <div className="flex gap-6">
         <a
-          href="/registration/provider/business"
+          href="/registration/provider"
           className="hover:underline text-white py-1 font-semibold"
         >
           Register as a Professional
