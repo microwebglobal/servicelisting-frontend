@@ -1,48 +1,41 @@
-"use client";
 import React, { useEffect, useState } from "react";
-import { serviceAPI } from "@/api/services";
 import Select from "react-select";
-import { providerAPI } from "@api/provider";
-import SetLocation from "@components/SetLocation";
+import { serviceAPI } from "@/api/services";
+import { providerAPI } from "@/api/provider";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const BusinessProviderInquiryForm = () => {
-  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    mobile: "",
-    gender: "",
-    business_type: "business",
+    type: "business",
     business_name: "",
-    years_experience: 0,
+    name: "", // Authorized Person Name
+    mobile: "", // Authorized Person Contact
+    email: "",
+    business_type: "sole_proprietorship",
+    website: "",
+    location: {
+      type: "Point",
+      coordinates: [0, 0]
+    },
+    address: "", // New field for full address
     categories: [],
-    cities: [],
-    location: "",
-    skills: "",
-    no_of_employee: 0,
+    no_of_employee: "",
   });
 
-  const [citiesOptions, setCitiesOpions] = useState([]);
-  const [selectedCities, setSelectedCities] = useState([]);
   const [serviceCategoriesOptions, setServiceCategoriesOptions] = useState([]);
-  const [selectedServiceCategories, setSelectedServiceCategories] = useState(
-    []
-  );
+  const [selectedServiceCategories, setSelectedServiceCategories] = useState([]);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const businessTypes = [
+    { value: "sole_proprietorship", label: "Sole Proprietorship" },
+    { value: "llc", label: "LLC" },
+    { value: "corporation", label: "Corporation" },
+    { value: "partnership", label: "Partnership" }
+  ];
 
   useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const response = await serviceAPI.getCities();
-        const cityOptions = response.data.map((city) => ({
-          value: city.city_id,
-          label: city.name,
-        }));
-        setCitiesOpions(cityOptions);
-      } catch (error) {
-        console.error("Error fetching cities:", error);
-      }
-    };
-
     const fetchServices = async () => {
       try {
         const response = await serviceAPI.getAllCategories();
@@ -53,174 +46,241 @@ const BusinessProviderInquiryForm = () => {
         setServiceCategoriesOptions(categoryOptions);
       } catch (error) {
         console.error("Error fetching services:", error);
+        setError("Failed to load service categories");
       }
     };
 
-    fetchCities();
     fetchServices();
   }, []);
 
-  // Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Go to Next Step
-  const nextStep = () => setStep((prev) => prev + 1);
+  const handleCategoryChange = (selectedOptions) => {
+    setSelectedServiceCategories(selectedOptions);
+    setFormData(prev => ({
+      ...prev,
+      categories: selectedOptions ? selectedOptions.map(option => option.value) : []
+    }));
+  };
 
-  // Go to Previous Step
-  const prevStep = () => setStep((prev) => prev - 1);
+  const validateForm = () => {
+    if (!formData.business_name || !formData.name || !formData.email || 
+        !formData.mobile || !formData.address || !formData.no_of_employee) {
+      setError("Please fill in all required fields");
+      return false;
+    }
+    
+    if (!formData.categories || formData.categories.length === 0) {
+      setError("Please select at least one service category");
+      return false;
+    }
 
-  // Handle Submit
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return false;
+    }
+
+    const phoneRegex = /^\d{10,}$/;
+    if (!phoneRegex.test(formData.mobile.replace(/[^0-9]/g, ''))) {
+      setError("Please enter a valid phone number");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formDataToSend = {
-      ...formData,
-      cities: selectedCities.map((city) => city.value),
-      categories: selectedServiceCategories.map((cat) => cat.value),
-      years_experience: 4,
-      location: {
-        type: "Point",
-        coordinates: [79.8612, 6.9271],
-      },
-    };
-
-    try {
-      await providerAPI.createEnquiry(formDataToSend);
-    } catch (error) {
-      console.error(error);
+    setError("");
+    setIsSubmitting(true);
+  
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
     }
-    console.log("Final Form Data:", formDataToSend);
-    alert("Form submitted successfully!");
+  
+    const formDataToSend = {
+      type: formData.type,
+      business_name: formData.business_name,
+      authorized_person_name: formData.name,
+      authorized_person_contact: formData.mobile, 
+      business_type: formData.business_type,
+      business_website: formData.website,
+      service_location: {
+        type: "Point",
+        coordinates: formData.location.coordinates,
+        address: formData.address
+      },
+      categories: formData.categories,
+      number_of_employees: parseInt(formData.no_of_employee), 
+      email: formData.email 
+    };
+  
+    try {
+      const response = await providerAPI.createEnquiry(formDataToSend);
+      alert("Business inquiry submitted successfully!");
+      // Reset form
+      setFormData({
+        type:"business",
+        business_name: "",
+        name: "",
+        mobile: "",
+        email: "",
+        business_type: "sole_proprietorship",
+        website: "",
+        location: { type: "Point", coordinates: [0, 0] },
+        address: "",
+        categories: [],
+        no_of_employee: "",
+      });
+      setSelectedServiceCategories([]);
+    } catch (error) {
+      console.error("Submission error:", error);
+      if (error.response?.data?.error === "Duplicate entry") {
+        setError("An account with this email already exists");
+      } else {
+        setError(error.response?.data?.error || "Failed to submit inquiry");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   return (
-    <div className="max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit}>
-        {/* Step 1: General Information */}
-        {step === 1 && (
-          <div>
-            <label className="block mb-2">Authorized Person Name</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
+    <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-6">Business Provider Registration</h2>
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium mb-2">Business Name *</label>
+          <input
+            type="text"
+            name="business_name"
+            value={formData.business_name}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <label className="block mb-2">Business Name</label>
-            <input
-              type="text"
-              name="business_name"
-              value={formData.business_name}
-              onChange={handleChange}
-              required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
+        <div>
+          <label className="block text-sm font-medium mb-2">Business Type *</label>
+          <select
+            name="business_type"
+            value={formData.business_type}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {businessTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-            <label className="block mb-2">Authorized Person Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
+        <div>
+          <label className="block text-sm font-medium mb-2">Authorized Person Name *</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <label className="block mb-2">Authorized Person Contact No</label>
-            <input
-              type="text"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
+        <div>
+          <label className="block text-sm font-medium mb-2">Business Email *</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <button
-              type="button"
-              onClick={nextStep}
-              className="w-full bg-indigo-500 text-white p-2 rounded mt-4"
-            >
-              Next
-            </button>
-          </div>
-        )}
+        <div>
+          <label className="block text-sm font-medium mb-2">Authorized Person Contact *</label>
+          <input
+            type="tel"
+            name="mobile"
+            value={formData.mobile}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-        {/* Step 2: Service Details */}
-        {step === 2 && (
-          <div>
-            <label className="block mb-2">Cities/Regions of Service</label>
-            <div className="mb-4">
-              <Select
-                id="cities"
-                options={citiesOptions}
-                isMulti
-                value={selectedCities}
-                onChange={setSelectedCities}
-                required
-              />
-            </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Business Website</label>
+          <input
+            type="url"
+            name="website"
+            value={formData.website}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <label className="block mb-2">Exact Location</label>
-            <SetLocation
-              location={formData.location}
-              setLocation={(newLocation) =>
-                setFormData({ ...formData, location: newLocation })
-              }
-              required
-            />
+        <div>
+          <label className="block text-sm font-medium mb-2">Business Address *</label>
+          <textarea
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows={3}
+          />
+        </div>
 
-            <label className="block mb-2">Service Categories</label>
-            <div className="mb-4">
-              <Select
-                id="categories"
-                options={serviceCategoriesOptions}
-                isMulti
-                value={selectedServiceCategories}
-                onChange={setSelectedServiceCategories}
-                required
-              />
-            </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Number of Employees *</label>
+          <input
+            type="number"
+            name="no_of_employee"
+            value={formData.no_of_employee}
+            onChange={handleChange}
+            required
+            min="1"
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <label className="block mb-2">Years Experiance</label>
-            <input
-              type="number"
-              name="years_experience"
-              value={formData.years_experience}
-              onChange={handleChange}
-              required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
+        <div>
+          <label className="block text-sm font-medium mb-2">Service Categories *</label>
+          <Select
+            isMulti
+            options={serviceCategoriesOptions}
+            value={selectedServiceCategories}
+            onChange={handleCategoryChange}
+            className="basic-multi-select"
+            classNamePrefix="select"
+          />
+        </div>
 
-            <label className="block mb-2">No Of Employees</label>
-            <input
-              type="number"
-              name="no_of_employee"
-              value={formData.no_of_employee}
-              onChange={handleChange}
-              required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
-
-            <button
-              type="button"
-              onClick={prevStep}
-              className="bg-gray-400 text-white p-2 rounded mr-2"
-            >
-              Back
-            </button>
-            <button
-              type="submit"
-              className="bg-green-500 text-white p-2 rounded"
-            >
-              Submit
-            </button>
-          </div>
-        )}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors disabled:bg-blue-300"
+        >
+          {isSubmitting ? "Submitting..." : "Submit Registration"}
+        </button>
       </form>
     </div>
   );

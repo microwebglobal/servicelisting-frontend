@@ -9,6 +9,7 @@ import SetLocation from "@components/SetLocation";
 const IndividualProviderInquiryForm = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
+    type: "individual",
     name: "",
     email: "",
     mobile: "",

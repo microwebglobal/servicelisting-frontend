@@ -1,387 +1,472 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { providerAPI } from '@/api/provider';
 
 const IndividualRegistrationForm = ({ previousData }) => {
-  console.log(previousData);
-
   const [formData, setFormData] = useState({
-    name: previousData?.User.name || "",
-    email: previousData?.User.email || "",
-    mobile: previousData?.User.mobile || "",
-    gender: previousData?.User.gender || "",
-    business_type: "individual",
-    dob: previousData?.User.dob || "",
-    skills: "",
-    primary_location: "",
-    service_radius: "",
-    availability_type: "", //fulltime or part time
-    availability_hours: "",
-    years_experience: "",
-    specializations: "",
-    qualification: "",
-    profile_bio: "",
-    serviceCities: "",
-    languages_spoken: "", //json
-    social_media_links: "", //json
-    social_media_links: "", //json
-    photo: "",
-    payment_method: "", //upi or bank
-    payment_details: "", //json
-    documents: "",
+    enquiry_id: previousData?.enquiry_id || '',
+    name: previousData?.User?.name || '',
+    dob: previousData?.User?.dob || '',
+    nationality: '',
+    gender: previousData?.User?.gender || '',
+    qualification: '',
+    email: previousData?.User?.email || '',
+    phone: previousData?.User?.mobile || '',
+    whatsapp_number: '',
+    alternate_number: previousData?.alternate_number || '',
+    address: '',
+    emergency_contact_name: '',
+    reference_number: '',
+    reference_name: '',
+    aadhar_number: '',
+    pan_number: '',
+    languages_spoken: [],
+    service_radius: '',
+    availability_type: 'full_time',
+    availability_hours: {
+      start: '08:00',
+      end: '22:00'
+    },
+    years_experience: previousData?.years_experience || '',
+    specializations: previousData?.skills || [],
+    profile_bio: '',
+    certificates_awards: '',
+    profile_picture: null,
+    id_proof: null,
+    aadhar_card: null,
+    pan_card: null,
+    address_proof: null,
+    qualification_proof: null,
+    service_certificates: null,
+    insurance_documents: null,
+    signed_agreement: null,
+    signed_terms: null,
+    portfolio_images: [],
+    social_media_links: {
+      facebook: '',
+      instagram: '',
+      linkedin: ''
+    },
+    payment_method: 'upi',
+    payment_details: {
+      upi: {
+        id: '',
+        display_name: '',
+        phone: ''
+      },
+      bank: {
+        name: '',
+        branch: '',
+        ifsc: '',
+        account_number: ''
+      }
+    },
+    categories: (previousData?.ServiceCategories || []).map(cat => ({
+      id: cat.category_id || '',
+      experience_years: 0,
+      is_primary: false
+    })),
+    cities: (previousData?.Cities || []).map(city => ({
+      id: city.city_id || '',
+      service_radius: 0,
+      is_primary: false
+    })),
+    primary_location: previousData?.primary_location || ''
   });
 
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (previousData?.enquiry_id) {
+      setFormData(prev => ({
+        ...prev,
+        enquiry_id: previousData.enquiry_id
+      }));
+    }
+  }, [previousData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "languages") {
-      const updatedLanguages = Array.from(
-        e.target.selectedOptions,
-        (option) => option.value
-      );
-      setFormData({ ...formData, [name]: updatedLanguages });
-    } else if (name.includes("upiDetails") || name.includes("bankDetails")) {
-      const [section, field] = name.split(".");
-      setFormData({
-        ...formData,
-        [section]: { ...formData[section], [field]: value },
+    const { name, value, type, files } = e.target;
+
+    if (type === 'file') {
+      if (name === 'portfolio_images' || name === 'service_certificates') {
+        setFormData(prev => ({
+          ...prev,
+          [name]: Array.from(files)
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: files[0]
+        }));
+      }
+      return;
+    }
+
+    if (name.includes('.')) {
+      const [parent, child, grandchild] = name.split('.');
+      if (grandchild) {
+        setFormData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: {
+              ...prev[parent][child],
+              [grandchild]: value
+            }
+          }
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: value
+          }
+        }));
+      }
+      return;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const validateStep = (stepNumber) => {
+    const newErrors = {};
+
+    switch (stepNumber) {
+      case 1:
+        if (!formData.nationality) newErrors.nationality = 'Required';
+        if (!formData.aadhar_number) newErrors.aadhar_number = 'Required';
+        if (!formData.pan_number) newErrors.pan_number = 'Required';
+        if (!formData.address) newErrors.address = 'Required';
+        break;
+      case 2:
+        if (!formData.service_radius) newErrors.service_radius = 'Required';
+        if (!formData.profile_bio) newErrors.profile_bio = 'Required';
+        break;
+      case 3:
+        if (!formData.profile_picture) newErrors.profile_picture = 'Required';
+        if (!formData.id_proof) newErrors.id_proof = 'Required';
+        if (!formData.aadhar_card) newErrors.aadhar_card = 'Required';
+        if (!formData.pan_card) newErrors.pan_card = 'Required';
+        if (!formData.address_proof) newErrors.address_proof = 'Required';
+        if (!formData.signed_agreement) newErrors.signed_agreement = 'Required';
+        if (!formData.signed_terms) newErrors.signed_terms = 'Required';
+        break;
+      case 4:
+        if (formData.payment_method === 'upi') {
+          if (!formData.payment_details.upi.id) newErrors['payment_details.upi.id'] = 'Required';
+          if (!formData.payment_details.upi.display_name) newErrors['payment_details.upi.display_name'] = 'Required';
+          if (!formData.payment_details.upi.phone) newErrors['payment_details.upi.phone'] = 'Required';
+        } else {
+          if (!formData.payment_details.bank.name) newErrors['payment_details.bank.name'] = 'Required';
+          if (!formData.payment_details.bank.branch) newErrors['payment_details.bank.branch'] = 'Required';
+          if (!formData.payment_details.bank.ifsc) newErrors['payment_details.bank.ifsc'] = 'Required';
+          if (!formData.payment_details.bank.account_number) newErrors['payment_details.bank.account_number'] = 'Required';
+        }
+        break;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateStep(step)) {
+      return;
+    }
+  
+    setLoading(true);
+  
+    try {
+      const formDataObj = new FormData();
+  
+      Object.keys(formData).forEach(key => {
+        if (!['portfolio_images', 'profile_picture', 'id_proof', 'aadhar_card', 'pan_card', 
+            'address_proof', 'qualification_proof', 'service_certificates', 'insurance_documents', 
+            'signed_agreement', 'signed_terms'].includes(key)) {
+          formDataObj.append(key, typeof formData[key] === 'object' ? 
+            JSON.stringify(formData[key]) : formData[key]);
+        }
       });
-    } else {
-      setFormData({ ...formData, [name]: value });
+  
+      const singleFiles = ['profile_picture', 'id_proof', 'aadhar_card', 'pan_card', 
+                          'address_proof', 'qualification_proof', 'insurance_documents', 
+                          'signed_agreement', 'signed_terms'];
+      
+      singleFiles.forEach(file => {
+        if (formData[file]) formDataObj.append(file, formData[file]);
+      });
+  
+      if (formData.portfolio_images?.length) {
+        Array.from(formData.portfolio_images).forEach(image => {
+          formDataObj.append('portfolio_images', image);
+        });
+      }
+  
+      if (formData.service_certificates?.length) {
+        Array.from(formData.service_certificates).forEach(cert => {
+          formDataObj.append('service_certificates', cert);
+        });
+      }
+  
+      const response = await providerAPI.registerProvider(formDataObj);
+      
+      const providerId = response?.provider_id || response?.data?.provider_id;
+      
+      if (providerId) {
+        alert('Registration successful!');
+      } else if (response?.message === "Provider registered successfully") {
+        alert('Registration successful!');
+      } else {
+        throw new Error('Registration failed: Invalid response format');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed. Please try again.';
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const nextStep = () => {
-    setStep(step + 1);
-  };
+  const renderInputField = (name, placeholder, type = "text", disabled = false) => (
+    <input
+      type={type}
+      name={name}
+      value={formData[name]}
+      onChange={handleChange}
+      placeholder={placeholder}
+      className={`p-2 border rounded w-full ${errors[name] ? 'border-red-500' : ''}`}
+      disabled={disabled}
+    />
+  );
 
-  const prevStep = () => {
-    setStep(step - 1);
-  };
+  const renderFileInput = (name, label, required = false) => (
+    <div className="space-y-2">
+      <label className="block">{label}{required && '*'}</label>
+      <input
+        type="file"
+        name={name}
+        onChange={handleChange}
+        className={`w-full ${errors[name] ? 'border-red-500' : ''}`}
+        multiple={name === 'portfolio_images' || name === 'service_certificates'}
+      />
+      {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
+    </div>
+  );
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-    alert("Form submitted!");
+  const renderPersonalDetails = () => (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Personal Information</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {renderInputField("name", "Full Name", "text", true)}
+        <input type="date" name="dob" value={formData.dob} onChange={handleChange} 
+               className="p-2 border rounded w-full" disabled />
+        {renderInputField("nationality", "Nationality")}
+        <select name="gender" value={formData.gender} onChange={handleChange} 
+                className="p-2 border rounded w-full" disabled>
+          <option value="">Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        {renderInputField("aadhar_number", "Aadhar Number")}
+        {renderInputField("pan_number", "PAN Number")}
+        {renderInputField("email", "Email", "email", true)}
+        {renderInputField("phone", "Phone Number", "tel", true)}
+        {renderInputField("whatsapp_number", "WhatsApp Number", "tel")}
+        {renderInputField("alternate_number", "Alternate Number", "tel")}
+      </div>
+      <textarea
+        name="address"
+        value={formData.address}
+        onChange={handleChange}
+        placeholder="Address"
+        className={`w-full p-2 border rounded ${errors.address ? 'border-red-500' : ''}`}
+        rows="3"
+      />
+      <div className="grid grid-cols-2 gap-4">
+        {renderInputField("emergency_contact_name", "Emergency Contact Name")}
+        {renderInputField("reference_name", "Reference Name")}
+        {renderInputField("reference_number", "Reference Number")}
+      </div>
+    </div>
+  );
+
+  const renderServiceDetails = () => (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Service Details</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {renderInputField("service_radius", "Service Radius (km)", "number")}
+        <select name="availability_type" value={formData.availability_type} 
+                onChange={handleChange} className="p-2 border rounded w-full">
+          <option value="full_time">Full Time</option>
+          <option value="part_time">Part Time</option>
+        </select>
+      </div>
+      {formData.availability_type === 'part_time' && (
+        <div className="grid grid-cols-2 gap-4">
+          <input type="time" name="availability_hours.start" 
+                 value={formData.availability_hours.start} onChange={handleChange} 
+                 className="p-2 border rounded w-full" />
+          <input type="time" name="availability_hours.end" 
+                 value={formData.availability_hours.end} onChange={handleChange} 
+                 className="p-2 border rounded w-full" />
+        </div>
+      )}
+      <textarea name="specializations" value={formData.specializations} 
+                onChange={handleChange} placeholder="Specializations/Skills" 
+                className="w-full p-2 border rounded" rows="3" />
+      <textarea name="profile_bio" value={formData.profile_bio} 
+                onChange={handleChange} placeholder="Profile Bio" 
+                className={`w-full p-2 border rounded ${errors.profile_bio ? 'border-red-500' : ''}`} 
+                rows="3" />
+      <textarea name="certificates_awards" value={formData.certificates_awards} 
+                onChange={handleChange} placeholder="Certificates/Awards" 
+                className="w-full p-2 border rounded" rows="3" />
+    </div>
+  );
+
+  const renderDocumentUploads = () => (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Document Uploads</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {renderFileInput("profile_picture", "Profile Picture", true)}
+        {renderFileInput("id_proof", "ID Proof", true)}
+        {renderFileInput("aadhar_card", "Aadhar Card", true)}
+        {renderFileInput("pan_card", "PAN Card", true)}
+        {renderFileInput("address_proof", "Address Proof", true)}
+        {renderFileInput("qualification_proof", "Qualification Proof")}
+        {renderFileInput("service_certificates", "Service Certificates")}
+        {renderFileInput("insurance_documents", "Insurance Documents")}
+        {renderFileInput("portfolio_images", "Portfolio Images")}
+      </div>
+      {renderFileInput("signed_agreement", "Signed Agreement", true)}
+      {renderFileInput("signed_terms", "Signed Terms & Conditions", true)}
+    </div>
+  );
+
+  const renderPaymentDetails = () => (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Payment Details</h2>
+      <select name="payment_method" value={formData.payment_method} 
+              onChange={handleChange} className="w-full p-2 border rounded">
+        <option value="upi">UPI</option>
+        <option value="bank_transfer">Bank Transfer</option>
+      </select>
+      {formData.payment_method === 'upi' ? (
+        <div className="space-y-2">
+          <input type="text" name="payment_details.upi.id" 
+                 value={formData.payment_details.upi.id} onChange={handleChange} 
+                 placeholder="UPI ID" 
+                 className={`w-full p-2 border rounded ${errors['payment_details.upi.id'] ? 'border-red-500' : ''}`}
+          />
+          {errors['payment_details.upi.id'] && 
+            <p className="text-red-500 text-sm">{errors['payment_details.upi.id']}</p>}
+          <input type="text" name="payment_details.upi.display_name" 
+                 value={formData.payment_details.upi.display_name} 
+                 onChange={handleChange} placeholder="Display Name" 
+                 className={`w-full p-2 border rounded ${errors['payment_details.upi.display_name'] ? 'border-red-500' : ''}`}
+          />
+          {errors['payment_details.upi.display_name'] && 
+            <p className="text-red-500 text-sm">{errors['payment_details.upi.display_name']}</p>}
+          <input type="tel" name="payment_details.upi.phone" 
+                 value={formData.payment_details.upi.phone} 
+                 onChange={handleChange} placeholder="UPI Phone Number" 
+                 className={`w-full p-2 border rounded ${errors['payment_details.upi.phone'] ? 'border-red-500' : ''}`}
+          />
+          {errors['payment_details.upi.phone'] && 
+            <p className="text-red-500 text-sm">{errors['payment_details.upi.phone']}</p>}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <input type="text" name="payment_details.bank.name" 
+                 value={formData.payment_details.bank.name} 
+                 onChange={handleChange} placeholder="Bank Name" 
+                 className={`w-full p-2 border rounded ${errors['payment_details.bank.name'] ? 'border-red-500' : ''}`}
+          />
+          {errors['payment_details.bank.name'] && 
+            <p className="text-red-500 text-sm">{errors['payment_details.bank.name']}</p>}
+          <input type="text" name="payment_details.bank.branch" 
+                 value={formData.payment_details.bank.branch} 
+                 onChange={handleChange} placeholder="Branch" 
+                 className={`w-full p-2 border rounded ${errors['payment_details.bank.branch'] ? 'border-red-500' : ''}`}
+          />
+          {errors['payment_details.bank.branch'] && 
+            <p className="text-red-500 text-sm">{errors['payment_details.bank.branch']}</p>}
+          <input type="text" name="payment_details.bank.ifsc" 
+                 value={formData.payment_details.bank.ifsc} 
+                 onChange={handleChange} placeholder="IFSC Code" 
+                 className={`w-full p-2 border rounded ${errors['payment_details.bank.ifsc'] ? 'border-red-500' : ''}`}
+          />
+          {errors['payment_details.bank.ifsc'] && 
+            <p className="text-red-500 text-sm">{errors['payment_details.bank.ifsc']}</p>}
+          <input type="text" name="payment_details.bank.account_number" 
+                 value={formData.payment_details.bank.account_number} 
+                 onChange={handleChange} placeholder="Account Number" 
+                 className={`w-full p-2 border rounded ${errors['payment_details.bank.account_number'] ? 'border-red-500' : ''}`}
+          />
+          {errors['payment_details.bank.account_number'] && 
+            <p className="text-red-500 text-sm">{errors['payment_details.bank.account_number']}</p>}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderStep = () => {
+    switch (step) {
+      case 1: return renderPersonalDetails();
+      case 2: return renderServiceDetails();
+      case 3: return renderDocumentUploads();
+      case 4: return renderPaymentDetails();
+      default: return null;
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {step === 1 && (
-        <>
-          <h3 className="text-xl font-semibold">General Information</h3>
-          <input
-            type="text"
-            name="fullName"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-            readOnly={formData.name !== ""}
-          />
-          <input
-            type="text"
-            name="business_type"
-            value={formData.business_type}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-            readOnly={formData.business_type !== ""}
-          />
-          <input
-            type="date"
-            name="dob"
-            value={formData.dob}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-            readOnly={formData.dob !== ""}
-          />
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            required
-            className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            readOnly={formData.gender !== ""}
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-          <input
-            type="text"
-            name="qualification"
-            value={formData.qualification}
-            onChange={handleChange}
-            placeholder="Qualification"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email Address"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-            readOnly={formData.email !== ""}
-          />
-          <input
-            type="text"
-            name="phone"
-            value={formData.mobile}
-            onChange={handleChange}
-            placeholder="Primary Phone Number (For OTP login)"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-            readOnly={formData.mobile !== ""}
-          />
-
-          <select
-            name="languages"
-            value={formData.languages}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          >
-            <option value="">Select Language</option>
-            <option value="English">English</option>
-            <option value="Hindi">Hindi</option>
-            <option value="Tamil">Tamil</option>
-          </select>
-          <button
-            type="button"
-            onClick={nextStep}
-            className="bg-blue-500 text-white py-2 px-4 rounded-md"
-          >
-            Next
-          </button>
-        </>
-      )}
-
-      {step === 2 && (
-        <>
-          <h3 className="text-xl font-semibold">Service Details</h3>
-          <input
-            type="text"
-            name="serviceCities"
-            value={formData.serviceCities}
-            onChange={handleChange}
-            placeholder="Cities/Regions of Service"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-          <input
-            type="text"
-            name="serviceLocation"
-            value={formData.primary_location}
-            onChange={handleChange}
-            placeholder="Exact Location of Service"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-          <input
-            type="number"
-            name="experience"
-            value={formData.years_experience}
-            onChange={handleChange}
-            placeholder="Years of Experience"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-          <input
-            type="text"
-            name="skills"
-            value={formData.skills}
-            onChange={handleChange}
-            placeholder="Specializations/Skills"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-
-          <input
-            type="text"
-            name="certificates"
-            value={formData.documents}
-            onChange={handleChange}
-            placeholder="Certificate/Awards"
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-          <button
-            type="button"
-            onClick={prevStep}
-            className="bg-gray-500 text-white py-2 px-4 rounded-md"
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            onClick={nextStep}
-            className="bg-blue-500 text-white py-2 px-4 rounded-md"
-          >
-            Next
-          </button>
-        </>
-      )}
-
-      {step === 3 && (
-        <>
-          <h3 className="text-xl font-semibold">OTPVerification</h3>
-          <button
-            type="button"
-            onClick={prevStep}
-            className="bg-gray-500 text-white py-2 px-4 rounded-md"
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            onClick={nextStep}
-            className="bg-blue-500 text-white py-2 px-4 rounded-md"
-          >
-            Next
-          </button>
-        </>
-      )}
-
-      {step === 4 && (
-        <>
-          <h3 className="text-xl font-semibold">Profile Details</h3>
-          <textarea
-            name="bio"
-            value={formData.profile_bio}
-            onChange={handleChange}
-            placeholder="Profile Bio"
-            className="w-full p-2 border border-gray-300 rounded-md"
-          ></textarea>
-          <input
-            type="text"
-            name="socialLinks"
-            value={formData.social_media_links}
-            onChange={handleChange}
-            placeholder="Social Media Links"
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-          <input
-            type="text"
-            name="portfolioPics"
-            value={formData.photo}
-            onChange={handleChange}
-            placeholder="Portfolio Pictures"
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-
-          <input
-            type="number"
-            name="operationRadius"
-            value={formData.service_radius}
-            onChange={handleChange}
-            placeholder="Operation Radius (in km)"
-            className="w-full p-2 border border-gray-300 rounded-md"
-          />
-          <select
-            name="paymentMethod"
-            value={formData.availability_type}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            required
-          >
-            <option value="full_time">Full Time</option>
-            <option value="part_time">Part Time</option>
-          </select>
-          <div>
-            <label>Preferred Payment Method</label>
-            <select
-              name="paymentMethod"
-              value={formData.payment_method}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              required
-            >
-              <option value="UPI">UPI</option>
-              <option value="Bank">Bank Transfer</option>
-            </select>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle>Service Provider Registration</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex justify-between mb-8">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={`w-1/4 h-2 mx-1 rounded ${step >= i ? 'bg-blue-500' : 'bg-gray-200'}`} />
+          ))}
+        </div>
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
+          {renderStep()}
+          <div className="flex justify-between mt-4">
+            {step > 1 && (
+              <button type="button" onClick={() => setStep(prev => prev - 1)}
+                      className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                Previous
+              </button>
+            )}
+            {step < 4 ? (
+              <button type="button" onClick={() => validateStep(step) && setStep(prev => prev + 1)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Next
+              </button>
+            ) : (
+              <button type="submit" disabled={loading}
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-green-300">
+                {loading ? 'Submitting...' : 'Complete Registration'}
+              </button>
+            )}
           </div>
-          {formData.payment_method === "UPI" && (
-            <>
-              <h3>UPI Details</h3>
-              <input
-                type="text"
-                name="upiDetails.upiNo"
-                value={formData.upiDetails.upiNo}
-                onChange={handleChange}
-                placeholder="UPI No."
-                className="w-full p-2 border border-gray-300 rounded-md"
-                required
-              />
-              <input
-                type="text"
-                name="upiDetails.upiDisplayName"
-                value={formData.upiDetails.upiDisplayName}
-                onChange={handleChange}
-                placeholder="UPI Display Name"
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-              <input
-                type="text"
-                name="upiDetails.upiPhoneNo"
-                value={formData.upiDetails.upiPhoneNo}
-                onChange={handleChange}
-                placeholder="UPI Phone No."
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </>
-          )}
-          {formData.payment_method === "Bank" && (
-            <>
-              <h3>Bank Details</h3>
-              <input
-                type="text"
-                name="bankDetails.bankName"
-                value={formData.bankDetails.bankName}
-                onChange={handleChange}
-                placeholder="Bank Name"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                required
-              />
-              <input
-                type="text"
-                name="bankDetails.branch"
-                value={formData.bankDetails.branch}
-                onChange={handleChange}
-                placeholder="Branch"
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-              <input
-                type="text"
-                name="bankDetails.ifscCode"
-                value={formData.bankDetails.ifscCode}
-                onChange={handleChange}
-                placeholder="IFSC Code"
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-              <input
-                type="text"
-                name="bankDetails.accountNo"
-                value={formData.bankDetails.accountNo}
-                onChange={handleChange}
-                placeholder="Account No."
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </>
-          )}
-          <button
-            type="submit"
-            className="bg-green-500 text-white py-2 px-4 rounded-md"
-          >
-            Submit
-          </button>
-        </>
-      )}
-    </form>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 

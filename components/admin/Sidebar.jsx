@@ -14,7 +14,7 @@ const Sidebar = () => {
     {
       name: "Service Provider Management",
       subMenu: [
-        { name: "Service Providers", link: "/service-providers" },
+        { name: "Service Providers", link: "/admin/service-providers" },
         {
           name: "Inquiry Applications",
           link: "/admin/inquiry",
