@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Table,
@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
-import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -37,21 +37,22 @@ const ProviderManager = () => {
   const fetchProviders = async () => {
     try {
       const response = await providerAPI.getProviders();
-      const formattedProviders = response.data.map(provider => ({
+      const formattedProviders = response.data.map((provider) => ({
         ...provider,
-        primary_location: typeof provider.primary_location === 'object' 
-          ? JSON.stringify(provider.primary_location)
-          : provider.primary_location,
+        primary_location:
+          typeof provider.primary_location === "object"
+            ? JSON.stringify(provider.primary_location)
+            : provider.primary_location,
         languages_spoken: Array.isArray(provider.languages_spoken)
           ? provider.languages_spoken
           : [],
         specializations: Array.isArray(provider.specializations)
           ? provider.specializations
           : [],
-        business_name: String(provider.business_name || ''),
-        business_type: String(provider.business_type || ''),
+        business_name: String(provider.business_name || ""),
+        business_type: String(provider.business_type || ""),
         years_experience: Number(provider.years_experience || 0),
-        status: String(provider.status || 'pending_approval')
+        status: String(provider.status || "pending_approval"),
       }));
       setProviders(formattedProviders);
       setFilteredProviders(formattedProviders);
@@ -61,9 +62,10 @@ const ProviderManager = () => {
   };
 
   const handleStatusUpdate = async (providerId, newStatus) => {
+    setIsDialogOpen(true);
     try {
       await providerAPI.updateProvider(providerId, { status: newStatus });
-      const updatedProviders = providers.map(provider =>
+      const updatedProviders = providers.map((provider) =>
         provider.provider_id === providerId
           ? { ...provider, status: newStatus }
           : provider
@@ -79,19 +81,19 @@ const ProviderManager = () => {
     let filtered = providers;
 
     // Filter by status tab
-    filtered = filtered.filter(provider => provider.status === tabValue);
+    filtered = filtered.filter((provider) => provider.status === tabValue);
 
     // Filter by business type
     if (businessTypeFilter) {
       filtered = filtered.filter(
-        provider => provider.business_type === businessTypeFilter
+        (provider) => provider.business_type === businessTypeFilter
       );
     }
 
     // Filter by date
     if (selectedDate) {
       filtered = filtered.filter(
-        provider =>
+        (provider) =>
           new Date(provider.created_at).toLocaleDateString() ===
           new Date(selectedDate).toLocaleDateString()
       );
@@ -114,10 +116,10 @@ const ProviderManager = () => {
   }, [tabValue, businessTypeFilter, sortDate, selectedDate, providers]);
 
   const formatLocation = (location) => {
-    if (typeof location === 'object') {
-      return location?.coordinates?.join(', ') || 'No location data';
+    if (typeof location === "object") {
+      return location?.coordinates?.join(", ") || "No location data";
     }
-    return location || 'No location data';
+    return location || "No location data";
   };
 
   const ProviderDetails = ({ provider }) => (
@@ -125,27 +127,32 @@ const ProviderManager = () => {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <h3 className="font-semibold">Business Details</h3>
-          <p>Name: {provider.business_name || 'N/A'}</p>
-          <p>Type: {provider.business_type || 'N/A'}</p>
-          <p>Registration: {provider.business_registration_number || 'N/A'}</p>
+          <p>Name: {provider.business_name || "N/A"}</p>
+          <p>Type: {provider.business_type || "N/A"}</p>
+          <p>Registration: {provider.business_registration_number || "N/A"}</p>
         </div>
         <div>
           <h3 className="font-semibold">Contact Details</h3>
           <p>Location: {formatLocation(provider.primary_location)}</p>
           <p>Service Radius: {provider.service_radius || 0}km</p>
-          <p>Languages: {(provider.languages_spoken || []).join(", ") || 'N/A'}</p>
+          <p>
+            Languages: {(provider.languages_spoken || []).join(", ") || "N/A"}
+          </p>
         </div>
       </div>
       <div>
         <h3 className="font-semibold">Professional Info</h3>
         <p>Experience: {provider.years_experience || 0} years</p>
-        <p>Specializations: {(provider.specializations || []).join(", ") || 'N/A'}</p>
-        <p>Qualification: {provider.qualification || 'N/A'}</p>
+        <p>
+          Specializations:{" "}
+          {(provider.specializations || []).join(", ") || "N/A"}
+        </p>
+        <p>Qualification: {provider.qualification || "N/A"}</p>
       </div>
       <div>
         <h3 className="font-semibold">Service Details</h3>
-        <p>Availability: {provider.availability_type || 'N/A'}</p>
-        <p>Payment Method: {provider.payment_method || 'N/A'}</p>
+        <p>Availability: {provider.availability_type || "N/A"}</p>
+        <p>Payment Method: {provider.payment_method || "N/A"}</p>
       </div>
     </div>
   );
@@ -169,7 +176,7 @@ const ProviderManager = () => {
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        
+
         <div className="flex gap-4">
           <select
             value={businessTypeFilter}
@@ -213,9 +220,11 @@ const ProviderManager = () => {
             <TableBody>
               {filteredProviders.map((provider) => (
                 <TableRow key={provider.provider_id}>
-                  <TableCell>{provider.business_name || 'N/A'}</TableCell>
-                  <TableCell>{provider.business_type || 'N/A'}</TableCell>
-                  <TableCell>{formatLocation(provider.primary_location)}</TableCell>
+                  <TableCell>{provider.business_name || "N/A"}</TableCell>
+                  <TableCell>{provider.business_type || "N/A"}</TableCell>
+                  <TableCell>
+                    {formatLocation(provider.primary_location)}
+                  </TableCell>
                   <TableCell>{provider.years_experience || 0} years</TableCell>
                   <TableCell>
                     <span
@@ -245,13 +254,23 @@ const ProviderManager = () => {
                         <>
                           <Button
                             variant="default"
-                            onClick={() => handleStatusUpdate(provider.provider_id, "approved")}
+                            onClick={() =>
+                              handleStatusUpdate(
+                                provider.provider_id,
+                                "approved"
+                              )
+                            }
                           >
                             Approve
                           </Button>
                           <Button
                             variant="destructive"
-                            onClick={() => handleStatusUpdate(provider.provider_id, "rejected")}
+                            onClick={() =>
+                              handleStatusUpdate(
+                                provider.provider_id,
+                                "rejected"
+                              )
+                            }
                           >
                             Reject
                           </Button>

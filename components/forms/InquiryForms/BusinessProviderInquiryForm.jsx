@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { serviceAPI } from "@/api/services";
@@ -12,11 +13,12 @@ const BusinessProviderInquiryForm = () => {
     name: "", // Authorized Person Name
     mobile: "", // Authorized Person Contact
     email: "",
+    gender: "", // Authorized Person Gender
     business_type: "sole_proprietorship",
     website: "",
     location: {
       type: "Point",
-      coordinates: [0, 0]
+      coordinates: [0, 0],
     },
     address: "", // New field for full address
     categories: [],
@@ -24,7 +26,9 @@ const BusinessProviderInquiryForm = () => {
   });
 
   const [serviceCategoriesOptions, setServiceCategoriesOptions] = useState([]);
-  const [selectedServiceCategories, setSelectedServiceCategories] = useState([]);
+  const [selectedServiceCategories, setSelectedServiceCategories] = useState(
+    []
+  );
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,7 +36,7 @@ const BusinessProviderInquiryForm = () => {
     { value: "sole_proprietorship", label: "Sole Proprietorship" },
     { value: "llc", label: "LLC" },
     { value: "corporation", label: "Corporation" },
-    { value: "partnership", label: "Partnership" }
+    { value: "partnership", label: "Partnership" },
   ];
 
   useEffect(() => {
@@ -60,19 +64,27 @@ const BusinessProviderInquiryForm = () => {
 
   const handleCategoryChange = (selectedOptions) => {
     setSelectedServiceCategories(selectedOptions);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      categories: selectedOptions ? selectedOptions.map(option => option.value) : []
+      categories: selectedOptions
+        ? selectedOptions.map((option) => option.value)
+        : [],
     }));
   };
 
   const validateForm = () => {
-    if (!formData.business_name || !formData.name || !formData.email || 
-        !formData.mobile || !formData.address || !formData.no_of_employee) {
+    if (
+      !formData.business_name ||
+      !formData.name ||
+      !formData.email ||
+      !formData.mobile ||
+      !formData.address ||
+      !formData.no_of_employee
+    ) {
       setError("Please fill in all required fields");
       return false;
     }
-    
+
     if (!formData.categories || formData.categories.length === 0) {
       setError("Please select at least one service category");
       return false;
@@ -85,7 +97,7 @@ const BusinessProviderInquiryForm = () => {
     }
 
     const phoneRegex = /^\d{10,}$/;
-    if (!phoneRegex.test(formData.mobile.replace(/[^0-9]/g, ''))) {
+    if (!phoneRegex.test(formData.mobile.replace(/[^0-9]/g, ""))) {
       setError("Please enter a valid phone number");
       return false;
     }
@@ -97,39 +109,41 @@ const BusinessProviderInquiryForm = () => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
-  
+
     if (!validateForm()) {
       setIsSubmitting(false);
       return;
     }
-  
+
     const formDataToSend = {
       type: formData.type,
       business_name: formData.business_name,
       authorized_person_name: formData.name,
-      authorized_person_contact: formData.mobile, 
+      authorized_person_contact: formData.mobile,
       business_type: formData.business_type,
       business_website: formData.website,
       service_location: {
         type: "Point",
         coordinates: formData.location.coordinates,
-        address: formData.address
+        address: formData.address,
       },
       categories: formData.categories,
-      number_of_employees: parseInt(formData.no_of_employee), 
-      email: formData.email 
+      number_of_employees: parseInt(formData.no_of_employee),
+      email: formData.email,
+      gender: formData.gender,
     };
-  
+
     try {
       const response = await providerAPI.createEnquiry(formDataToSend);
       alert("Business inquiry submitted successfully!");
       // Reset form
       setFormData({
-        type:"business",
+        type: "business",
         business_name: "",
         name: "",
         mobile: "",
         email: "",
+        gender: "",
         business_type: "sole_proprietorship",
         website: "",
         location: { type: "Point", coordinates: [0, 0] },
@@ -152,7 +166,9 @@ const BusinessProviderInquiryForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">Business Provider Registration</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        Business Provider Registration
+      </h2>
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
@@ -162,7 +178,9 @@ const BusinessProviderInquiryForm = () => {
       )}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-2">Business Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            Business Name *
+          </label>
           <input
             type="text"
             name="business_name"
@@ -174,7 +192,9 @@ const BusinessProviderInquiryForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Business Type *</label>
+          <label className="block text-sm font-medium mb-2">
+            Business Type *
+          </label>
           <select
             name="business_type"
             value={formData.business_type}
@@ -191,7 +211,9 @@ const BusinessProviderInquiryForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Authorized Person Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            Authorized Person Name *
+          </label>
           <input
             type="text"
             name="name"
@@ -203,7 +225,27 @@ const BusinessProviderInquiryForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Business Email *</label>
+          <label className="block text-sm font-medium mb-2">
+            Authorized Person Gender
+          </label>
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Business Email *
+          </label>
           <input
             type="email"
             name="email"
@@ -215,7 +257,9 @@ const BusinessProviderInquiryForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Authorized Person Contact *</label>
+          <label className="block text-sm font-medium mb-2">
+            Authorized Person Contact *
+          </label>
           <input
             type="tel"
             name="mobile"
@@ -227,7 +271,9 @@ const BusinessProviderInquiryForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Business Website</label>
+          <label className="block text-sm font-medium mb-2">
+            Business Website
+          </label>
           <input
             type="url"
             name="website"
@@ -238,7 +284,9 @@ const BusinessProviderInquiryForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Business Address *</label>
+          <label className="block text-sm font-medium mb-2">
+            Business Address *
+          </label>
           <textarea
             name="address"
             value={formData.address}
@@ -250,7 +298,9 @@ const BusinessProviderInquiryForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Number of Employees *</label>
+          <label className="block text-sm font-medium mb-2">
+            Number of Employees *
+          </label>
           <input
             type="number"
             name="no_of_employee"
@@ -263,7 +313,9 @@ const BusinessProviderInquiryForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Service Categories *</label>
+          <label className="block text-sm font-medium mb-2">
+            Service Categories *
+          </label>
           <Select
             isMulti
             options={serviceCategoriesOptions}
