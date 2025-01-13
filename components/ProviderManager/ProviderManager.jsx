@@ -19,6 +19,117 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+const getDisplayValue = (value, defaultValue = 'N/A') => {
+  if (Array.isArray(value)) {
+    return value.length > 0 ? value.join(', ') : defaultValue;
+  }
+  return value || defaultValue;
+};
+
+const formatLocation = (location) => {
+  try {
+    if (typeof location === 'string') {
+      const parsed = JSON.parse(location);
+      if (parsed.coordinates) {
+        return `${parsed.coordinates[1].toFixed(4)}, ${parsed.coordinates[0].toFixed(4)}`;
+      }
+    } else if (location?.coordinates) {
+      return `${location.coordinates[1].toFixed(4)}, ${location.coordinates[0].toFixed(4)}`;
+    }
+  } catch (e) {
+    return location || 'No location data';
+  }
+  return 'No location data';
+};
+
+const ProviderDetails = ({ provider }) => {
+  const getDisplayValue = (value, defaultValue = 'N/A') => {
+    if (Array.isArray(value)) {
+      return value.length > 0 ? value.join(', ') : defaultValue;
+    }
+    return value || defaultValue;
+  };
+
+  return (
+    <div className="space-y-6 p-4">
+      {/* Business/Individual Details */}
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-2">
+          {provider.business_type === 'business' ? 'Business Details' : 'Individual Details'}
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Name</p>
+            <p className="font-medium">{getDisplayValue(provider.business_name)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Type</p>
+            <p className="font-medium capitalize">{getDisplayValue(provider.business_type)}</p>
+          </div>
+          {provider.business_type === 'business' && (
+            <div>
+              <p className="text-sm text-gray-500">Registration Number</p>
+              <p className="font-medium">{getDisplayValue(provider.business_registration_number)}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Contact Details */}
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-2">Contact Details</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Location</p>
+            <p className="font-medium">{formatLocation(provider.primary_location)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Service Radius</p>
+            <p className="font-medium">{provider.service_radius || 0}km</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Languages Spoken</p>
+            <p className="font-medium">{getDisplayValue(provider.languages_spoken)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Professional Info */}
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-2">Professional Info</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Experience</p>
+            <p className="font-medium">{provider.years_experience || 0} years</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Specializations</p>
+            <p className="font-medium">{getDisplayValue(provider.specializations)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Qualification</p>
+            <p className="font-medium">{getDisplayValue(provider.qualification)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Service Details */}
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold border-b pb-2">Service Details</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Availability</p>
+            <p className="font-medium capitalize">{getDisplayValue(provider.availability_type)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Payment Method</p>
+            <p className="font-medium uppercase">{getDisplayValue(provider.payment_method)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ProviderManager = () => {
   const [providers, setProviders] = useState([]);
@@ -29,20 +140,31 @@ const ProviderManager = () => {
   const [sortDate, setSortDate] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [tabValue, setTabValue] = useState("pending_approval");
-
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [rejectingProvider, setRejectingProvider] = useState(null);
   useEffect(() => {
     fetchProviders();
   }, []);
+  
+  
+  const handleReject = async () => {
+    try {
+      await handleStatusUpdate(rejectingProvider.provider_id, "rejected", rejectionReason);
+      setIsRejectDialogOpen(false);
+      setRejectionReason("");
+      setRejectingProvider(null);
+    } catch (error) {
+      console.error("Error rejecting provider:", error);
+    }
+  };
+
 
   const fetchProviders = async () => {
     try {
       const response = await providerAPI.getProviders();
       const formattedProviders = response.data.map((provider) => ({
         ...provider,
-        primary_location:
-          typeof provider.primary_location === "object"
-            ? JSON.stringify(provider.primary_location)
-            : provider.primary_location,
         languages_spoken: Array.isArray(provider.languages_spoken)
           ? provider.languages_spoken
           : [],
@@ -61,17 +183,41 @@ const ProviderManager = () => {
     }
   };
 
-  const handleStatusUpdate = async (providerId, newStatus) => {
-    setIsDialogOpen(true);
+  const handleStatusUpdate = async (providerId, newStatus, rejectionReason = null) => {
     try {
-      await providerAPI.updateProvider(providerId, { status: newStatus });
+      const updateData = {
+        status: newStatus
+      };
+      
+      if (newStatus === 'rejected') {
+        if (!rejectionReason) {
+          setRejectingProvider({ provider_id: providerId });
+          setIsRejectDialogOpen(true);
+          return;
+        }
+        updateData.rejection_reason = rejectionReason;
+      }
+  
+      await providerAPI.updateProvider(providerId, updateData);
+      
       const updatedProviders = providers.map((provider) =>
         provider.provider_id === providerId
-          ? { ...provider, status: newStatus }
+          ? { 
+              ...provider, 
+              status: newStatus,
+              ...(newStatus === 'rejected' ? { rejection_reason: rejectionReason } : {})
+            }
           : provider
       );
+      
       setProviders(updatedProviders);
-      setIsDialogOpen(false);
+      setFilteredProviders(updatedProviders);
+      
+      if (newStatus === 'rejected') {
+        setRejectionReason("");
+        setIsRejectDialogOpen(false);
+        setRejectingProvider(null);
+      }
     } catch (error) {
       console.error("Error updating provider status:", error);
     }
@@ -114,48 +260,6 @@ const ProviderManager = () => {
   useEffect(() => {
     filterProviders();
   }, [tabValue, businessTypeFilter, sortDate, selectedDate, providers]);
-
-  const formatLocation = (location) => {
-    if (typeof location === "object") {
-      return location?.coordinates?.join(", ") || "No location data";
-    }
-    return location || "No location data";
-  };
-
-  const ProviderDetails = ({ provider }) => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <h3 className="font-semibold">Business Details</h3>
-          <p>Name: {provider.business_name || "N/A"}</p>
-          <p>Type: {provider.business_type || "N/A"}</p>
-          <p>Registration: {provider.business_registration_number || "N/A"}</p>
-        </div>
-        <div>
-          <h3 className="font-semibold">Contact Details</h3>
-          <p>Location: {formatLocation(provider.primary_location)}</p>
-          <p>Service Radius: {provider.service_radius || 0}km</p>
-          <p>
-            Languages: {(provider.languages_spoken || []).join(", ") || "N/A"}
-          </p>
-        </div>
-      </div>
-      <div>
-        <h3 className="font-semibold">Professional Info</h3>
-        <p>Experience: {provider.years_experience || 0} years</p>
-        <p>
-          Specializations:{" "}
-          {(provider.specializations || []).join(", ") || "N/A"}
-        </p>
-        <p>Qualification: {provider.qualification || "N/A"}</p>
-      </div>
-      <div>
-        <h3 className="font-semibold">Service Details</h3>
-        <p>Availability: {provider.availability_type || "N/A"}</p>
-        <p>Payment Method: {provider.payment_method || "N/A"}</p>
-      </div>
-    </div>
-  );
 
   return (
     <div className="p-6">
@@ -209,7 +313,7 @@ const ProviderManager = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Business Name</TableHead>
+                <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Experience</TableHead>
@@ -220,21 +324,20 @@ const ProviderManager = () => {
             <TableBody>
               {filteredProviders.map((provider) => (
                 <TableRow key={provider.provider_id}>
-                  <TableCell>{provider.business_name || "N/A"}</TableCell>
-                  <TableCell>{provider.business_type || "N/A"}</TableCell>
+                  <TableCell>{getDisplayValue(provider.business_name)}</TableCell>
+                  <TableCell className="capitalize">{getDisplayValue(provider.business_type)}</TableCell>
                   <TableCell>
                     {formatLocation(provider.primary_location)}
                   </TableCell>
                   <TableCell>{provider.years_experience || 0} years</TableCell>
                   <TableCell>
                     <span
-                      className={`px-2 py-1 rounded-full text-sm ${
-                        provider.status === "approved"
+                      className={`px-2 py-1 rounded-full text-sm ${provider.status === "approved"
                           ? "bg-green-100 text-green-800"
                           : provider.status === "rejected"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
+                            ? "bg-red-100 text-red-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
                     >
                       {provider.status}
                     </span>
@@ -255,10 +358,7 @@ const ProviderManager = () => {
                           <Button
                             variant="default"
                             onClick={() =>
-                              handleStatusUpdate(
-                                provider.provider_id,
-                                "approved"
-                              )
+                              handleStatusUpdate(provider.provider_id, "approved")
                             }
                           >
                             Approve
@@ -266,10 +366,7 @@ const ProviderManager = () => {
                           <Button
                             variant="destructive"
                             onClick={() =>
-                              handleStatusUpdate(
-                                provider.provider_id,
-                                "rejected"
-                              )
+                              handleStatusUpdate(provider.provider_id, "rejected")
                             }
                           >
                             Reject
@@ -291,6 +388,42 @@ const ProviderManager = () => {
             <DialogTitle>Provider Details</DialogTitle>
           </DialogHeader>
           {selectedProvider && <ProviderDetails provider={selectedProvider} />}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Provider Registration</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 p-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Rejection Reason
+              </label>
+              <textarea
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                rows={4}
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Please provide a reason for rejection..."
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsRejectDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleReject}
+                disabled={!rejectionReason.trim()}
+              >
+                Reject Registration
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
