@@ -2,20 +2,27 @@ import React, { useMemo } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export function CartPreview({ cart, removeFromCart }) {
+export function CartPreview({ cart = [], removeFromCart, onCheckout }) {
   const cartTotal = useMemo(() => {
-    return cart.reduce((sum, item) => sum + Number(item.finalPrice || item.base_price), 0);
+    if (!Array.isArray(cart) || cart.length === 0) return 0;
+    
+    return cart.reduce((sum, item) => {
+      const price = Number(item.finalPrice || item.base_price || 0);
+      return sum + (price * (item.quantity || 1));
+    }, 0);
   }, [cart]);
 
-  if (cart.length === 0) {
-    return (
-      <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg z-50">
-        <div className="flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5" />
-          <span className="font-bold">Cart (Empty)</span>
-        </div>
+  const renderEmptyCart = () => (
+    <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg z-50">
+      <div className="flex items-center gap-2">
+        <ShoppingCart className="h-5 w-5" />
+        <span className="font-bold">Cart (Empty)</span>
       </div>
-    );
+    </div>
+  );
+
+  if (!Array.isArray(cart) || cart.length === 0) {
+    return renderEmptyCart();
   }
 
   return (
@@ -33,6 +40,11 @@ export function CartPreview({ cart, removeFromCart }) {
           >
             <div className="flex-1">
               <p className="font-medium text-sm">{item.name}</p>
+              {item.quantity > 1 && (
+                <p className="text-xs text-gray-600">
+                  Quantity: {item.quantity}
+                </p>
+              )}
               {item.type === 'package' && item.sections && (
                 <div className="text-xs text-gray-600 mt-1">
                   {item.sections.map((section, index) => (
@@ -45,12 +57,12 @@ export function CartPreview({ cart, removeFromCart }) {
             </div>
             <div className="flex flex-col items-end gap-1">
               <span className="font-bold">
-                ₹{item.finalPrice || item.base_price}
+                ₹{(item.finalPrice || item.base_price || 0).toFixed(2)}
               </span>
               <Button 
                 variant="destructive" 
                 size="sm"
-                onClick={() => removeFromCart(item.item_id)}
+                onClick={() => removeFromCart?.(item.item_id, item.type)}
               >
                 Remove
               </Button>
@@ -62,12 +74,18 @@ export function CartPreview({ cart, removeFromCart }) {
       <div className="mt-4 pt-3 border-t">
         <div className="flex justify-between items-center mb-3">
           <span className="font-bold">Total:</span>
-          <span className="text-xl font-bold">₹{cartTotal}</span>
+          <span className="text-xl font-bold">₹{cartTotal.toFixed(2)}</span>
         </div>
-        <Button className="w-full">
+        <Button 
+          className="w-full"
+          onClick={onCheckout}
+          disabled={cart.length === 0}
+        >
           Proceed to Checkout
         </Button>
       </div>
     </div>
   );
 }
+
+export default CartPreview;

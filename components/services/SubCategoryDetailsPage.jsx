@@ -6,8 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceList } from "./ServiceList";
-import { CartPreview } from "./CartPreview";
 import { PackageList } from "./PackageList";
+import { BookingPage } from "./BookingPage";
 import Navbar from "@components/Navbar";
 import Footer from "@components/Footer";
 import DOMPurify from "dompurify";
@@ -21,8 +21,9 @@ export function SubCategoryDetailsPage({
   const [subCategory, setSubCategory] = useState(null);
   const [serviceTypes, setServiceTypes] = useState([]);
   const [cityId, setCityId] = useState(null);
-  const [cart, setCart] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showBooking, setShowBooking] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -93,27 +94,86 @@ export function SubCategoryDetailsPage({
   };
 
   const handleBack = () => {
-    router.push(`/services/${cityName}/${categorySlug}`);
+    if (showBooking) {
+      setShowBooking(false);
+    } else {
+      router.push(`/services/${cityName}/${categorySlug}`);
+    }
   };
 
   const addToCart = (item, type) => {
-    setCart((prev) => [...prev, { ...item, type }]);
+    const existingItem = selectedItems.find(
+      (i) => i.id === item.item_id && i.type === type
+    );
+
+    if (existingItem) {
+      setSelectedItems(
+        selectedItems.map((i) =>
+          i.id === item.item_id && i.type === type
+            ? { ...i, quantity: (i.quantity || 1) + 1 }
+            : i
+        )
+      );
+    } else {
+      setSelectedItems([
+        ...selectedItems,
+        {
+          id: item.item_id,
+          type: type,
+          name: item.name,
+          price: item.SpecialPricings[0]?.special_price || item.base_price,
+          quantity: 1,
+        },
+      ]);
+    }
+
     toast({
-      title: "Added to cart",
-      description: `${item.name} has been added to your cart.`,
+      title: "Added to selection",
+      description: `${item.name} has been added to your selection.`,
     });
   };
 
-  const removeFromCart = (itemId) => {
-    setCart((prev) => prev.filter((item) => item.item_id !== itemId));
+  const removeFromSelection = (itemId, type) => {
+    setSelectedItems(
+      selectedItems.filter((item) => !(item.id === itemId && item.type === type))
+    );
     toast({
-      title: "Removed from cart",
-      description: "Item has been removed from your cart.",
+      title: "Removed from selection",
+      description: "Item has been removed from your selection.",
     });
+  };
+
+  const handleProceedToBooking = () => {
+    if (selectedItems.length === 0) {
+      toast({
+        title: "No items selected",
+        description: "Please select at least one service or package to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowBooking(true);
   };
 
   if (loading) {
     return <div className="text-center py-8">Loading services...</div>;
+  }
+
+  if (showBooking) {
+    return (
+      <div>
+        <Navbar />
+        <BookingPage
+          cityName={cityName}
+          categorySlug={categorySlug}
+          subCategorySlug={subCategorySlug}
+          selectedItems={selectedItems}
+          onBack={handleBack}
+          cityId={cityId}
+        />
+        <Footer />
+      </div>
+    );
   }
 
   return (
@@ -128,39 +188,90 @@ export function SubCategoryDetailsPage({
 
           <h1 className="text-4xl font-bold mb-8">{subCategory?.name}</h1>
 
-          <div className="space-y-8">
-            {serviceTypes.map((type) => (
-              <Card key={type.type_id}>
-                <div className="flex justify-between">
-                  <CardHeader>
-                    <CardTitle>{type.name}</CardTitle>
-                  </CardHeader>
-                  <Button
-                    onClick={() => openModal(type.description)}
-                    className="mt-5 mr-5"
-                  >
-                    View Details
-                  </Button>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="md:col-span-2 space-y-8">
+              {serviceTypes.map((type) => (
+                <Card key={type.type_id}>
+                  <div className="flex justify-between">
+                    <CardHeader>
+                      <CardTitle>{type.name}</CardTitle>
+                    </CardHeader>
+                    <Button
+                      onClick={() => openModal(type.description)}
+                      className="mt-5 mr-5"
+                    >
+                      View Details
+                    </Button>
+                  </div>
 
+                  <CardContent>
+                    <ServiceList
+                      typeId={type.type_id}
+                      cityId={cityId}
+                      addToCart={addToCart}
+                    />
+                    <PackageList
+                      typeId={type.type_id}
+                      cityId={cityId}
+                      addToCart={addToCart}
+                    />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="md:col-span-1">
+              <Card className="sticky top-8">
+                <CardHeader>
+                  <CardTitle>Selected Items</CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <ServiceList
-                    typeId={type.type_id}
-                    cityId={cityId}
-                    addToCart={addToCart}
-                  />
-                  <PackageList
-                    typeId={type.type_id}
-                    cityId={cityId}
-                    addToCart={addToCart}
-                  />
+                  {selectedItems.length === 0 ? (
+                    <p className="text-gray-500 text-center py-4">
+                      No items selected
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {selectedItems.map((item) => (
+                        <div
+                          key={`${item.id}-${item.type}`}
+                          className="flex justify-between items-center"
+                        >
+                          <div>
+                            <p className="font-medium">{item.name}</p>
+                            <p className="text-sm text-gray-500">
+                              Quantity: {item.quantity || 1}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span>₹{item.price}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFromSelection(item.id, item.type)}
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="border-t pt-4">
+                        <Button
+                          className="w-full"
+                          onClick={handleProceedToBooking}
+                        >
+                          Proceed to Booking
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            ))}
+            </div>
           </div>
         </div>
-        <CartPreview cart={cart} removeFromCart={removeFromCart} />
       </div>
+
       <Modal
         isOpen={isOpen}
         onRequestClose={closeModal}
