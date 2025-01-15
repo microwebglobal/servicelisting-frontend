@@ -220,14 +220,14 @@ const ProviderManager = () => {
             <TableBody>
               {filteredProviders.map((provider) => (
                 <TableRow key={provider.provider_id}>
-                  <TableCell>
-                    {getDisplayValue(provider.business_name)}
-                  </TableCell>
+                  <TableCell>{provider.business_name}</TableCell>
                   <TableCell className="capitalize">
-                    {getDisplayValue(provider.business_type)}
+                    {provider.business_type}
                   </TableCell>
                   <TableCell>
-                    {formatLocation(provider.primary_location)}
+                    {typeof provider.primary_location === "object"
+                      ? JSON.stringify(provider.primary_location)
+                      : provider.primary_location}
                   </TableCell>
                   <TableCell>{provider.years_experience || 0} years</TableCell>
                   <TableCell>
