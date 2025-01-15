@@ -166,6 +166,9 @@ const BusinessProviderInquiryForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-6">
+        Business Provider Registration
+      </h2>
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
@@ -233,9 +236,9 @@ const BusinessProviderInquiryForm = () => {
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
