@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import { LoginAPI } from "@/api/login";
 
-const AdminLogin = () => {
+const ServiceProviderLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,9 +20,9 @@ const AdminLogin = () => {
       setIsLoading(true);
       setError("");
       
-      const response = await LoginAPI.adminLogin(email, password);
+      const response = await LoginAPI.providerLogin(email, password);
       if (response.data.success) {
-        router.push("/admin/dashboard");
+        router.push("/provider/dashboard");
       }
     } catch (error) {
       setError(error.response?.data?.message || "Invalid credentials");
@@ -35,7 +36,7 @@ const AdminLogin = () => {
       <div className="bg-white flex gap-14 p-10 rounded-lg shadow-md pr-20">
         <Image
           src="/assets/images/reg_img.png"
-          alt="Admin Login"
+          alt="Provider Login"
           width={500}
           height={100}
           className="border-solid border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
@@ -43,10 +44,10 @@ const AdminLogin = () => {
         
         <div className="ml-14 w-96">
           <h2 className="text-3xl font-semibold text-center mb-2">
-            Admin Login
+            Service Provider Login
           </h2>
           <p className="text-center mb-8">
-            Enter your credentials to access admin panel
+            Enter your credentials to access your account
           </p>
 
           {error && (
@@ -89,10 +90,19 @@ const AdminLogin = () => {
           >
             {isLoading ? "Logging in..." : "Login"}
           </button>
+
+          <div className="mt-4 text-center">
+            <Link 
+              href="/provider/register" 
+              className="text-indigo-500 hover:text-indigo-600"
+            >
+              Don&apos;t have an account? Register as a service provider
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default AdminLogin;
+export default ServiceProviderLogin;

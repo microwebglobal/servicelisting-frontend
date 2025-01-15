@@ -1,303 +1,300 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import {profileAPI} from "@/api/profile";
 import Modal from "react-modal";
 import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
-import AddNewAdres from "@components/AddNewAdres";
+import { toast } from "react-hot-toast";
 
-export default function ProfilePage() {
-  const [userData, setUserData] = useState({});
-  const [isOpen, setIsOpen] = useState(false);
-  const [addAddres, setAddAddres] = useState(false);
-  const [allAdress, setAllAdress] = useState([]);
+export default function CustomerProfile() {
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    gender: "",
+    dob: "",
+    photo: null
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [addresses, setAddresses] = useState([]);
+  const [newAddress, setNewAddress] = useState({
+    type: "home",
+    street: "",
+    city: "",
+    state: "",
+    country: "",
+    postal_code: "",
+    lat: "",
+    long: ""
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY
   });
 
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
-
   useEffect(() => {
-    const fetchUserData = async () => {
-      const uId = localStorage.getItem("userId");
-
-      console.log(process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY);
-
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/users/${uId}`
-      );
-      setUserData(response.data);
-      console.log(response.data);
-    };
-    fetchUserData();
+    fetchUserProfile();
+    fetchAddresses();
   }, []);
 
-  const fetchUserAddress = async () => {
-    const uId = localStorage.getItem("userId");
+  const fetchUserProfile = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/adress/user/${uId}`
-      );
-      setAllAdress(response.data);
+      const response = await profileAPI.getUserProfile();
+      setUserData(response.data);
+      setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to load profile");
+      if (error.response?.status === 401) {
+        router.push('/login/user');
+      }
     }
   };
 
-  const displayAddres = () => {
-    fetchUserAddress();
-    openModal();
+  const fetchAddresses = async () => {
+    try {
+      const response = await profileAPI.getAddresses();
+      setAddresses(response.data);
+    } catch (error) {
+      toast.error("Failed to load addresses");
+    }
   };
 
-  if (loadError) {
-    return <div>Error loading Google Maps</div>;
-  }
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await profileAPI.updateUserProfile(userData);
+      setIsEditing(false);
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      toast.error("Failed to update profile");
+    }
+  };
 
-  if (!isLoaded) {
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    try {
+      await profileAPI.uploadProfilePhoto(file);
+      fetchUserProfile();
+      toast.success("Photo uploaded successfully");
+    } catch (error) {
+      toast.error("Failed to upload photo");
+    }
+  };
+
+  const handleAddAddress = async (e) => {
+    e.preventDefault();
+    try {
+      await profileAPI.addAddress(newAddress);
+      setIsAddressModalOpen(false);
+      fetchAddresses();
+      toast.success("Address added successfully");
+    } catch (error) {
+      toast.error("Failed to add address");
+    }
+  };
+
+  const handleLogout = () => {
+    // Clear auth token and redirect to login
+    document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+    router.push('/login/user');
+  };
+
+  if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  const handleAddNewAddres = () => {
-    setAddAddres(true);
-    console.log(addAddres);
-  };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       {/* Sidebar */}
       <aside className="w-full md:w-1/4 bg-white p-4 border-r">
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-4">
+          <div className="relative w-24 h-24 mx-auto mb-4">
             <Image
-              src="/assets/images/def_pro.webp"
-              alt="John Doe"
+              src={userData.photo || "/assets/images/def_pro.webp"}
+              alt={userData.name}
               width={100}
               height={100}
               className="rounded-full"
             />
+            <label className="absolute bottom-0 right-0 bg-blue-500 p-1 rounded-full cursor-pointer">
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+              />
+              <span className="text-white text-xs">Edit</span>
+            </label>
           </div>
           <h2 className="text-xl font-bold">{userData.name}</h2>
-          <p className="text-black bg-yellow-400 p-1 rounded-2xl w-40 text-sm mx-auto">
-            Premium Plus User
-          </p>
         </div>
-        <hr className="mt-5" />
-        <div className="mt-5">
-          <h3 className="text-lg bg-slate-300 rounded-lg px-4 py-1 font-semibold mb-2">
-            Your Information
-          </h3>
-          <ul className="space-y-4 ml-5">
-            <li className="flex flex-col">
-              <span className="font-bold">Name</span>
-              <span>{userData.name}</span>
-            </li>
-            <li className="flex flex-col">
-              <span className="font-bold">Email</span>
-              <span>{userData.email}</span>
-            </li>
-            <li className="flex flex-col">
-              <span className="font-bold">Contact Number</span>
-              <span>{userData.mobile}</span>
-            </li>
-            <li className="flex justify-between" onClick={displayAddres}>
-              <span className="font-bold">Locations</span>
-              <span>&gt;</span>
-            </li>
-          </ul>
 
-          <div className="mt-8">
-            <h3 className="text-lg bg-slate-300 rounded-lg px-4 py-1 font-semibold mb-2">
-              General
-            </h3>
-            <ul className="space-y-4 ml-5">
-              <li className="justify-between flex">
-                <span>App Language</span>
-                <span>&gt;</span>
-              </li>
-              <li className="justify-between flex">
-                <span>Notifications</span>
-                <span>&gt;</span>
-              </li>
-              <li className="justify-between flex">
-                <span>Support</span>
-                <span>&gt;</span>
-              </li>
-              <li className="justify-between flex">
-                <span>Rate Us</span>
-                <span>&gt;</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="mt-8">
-            <h3 className="text-lg bg-slate-300 rounded-lg px-4 py-1 font-semibold mb-2">
-              About App
-            </h3>
-            <ul className="space-y-4 ml-5">
-              <li>Privacy Policy</li>
-              <li>Terms & Conditions</li>
-              <li>About</li>
-            </ul>
-          </div>
-
-          <button className="w-full bg-red-500 text-white py-2 mt-6 rounded-md">
-            Logout
-          </button>
+        {/* Profile Information */}
+        <div className="mt-8">
+          {isEditing ? (
+            <form onSubmit={handleProfileUpdate}>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={userData.name}
+                  onChange={(e) => setUserData({...userData, name: e.target.value})}
+                  placeholder="Name"
+                  className="w-full p-2 border rounded"
+                />
+                <input
+                  type="email"
+                  value={userData.email}
+                  onChange={(e) => setUserData({...userData, email: e.target.value})}
+                  placeholder="Email"
+                  className="w-full p-2 border rounded"
+                />
+                <select
+                  value={userData.gender}
+                  onChange={(e) => setUserData({...userData, gender: e.target.value})}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+                <input
+                  type="date"
+                  value={userData.dob}
+                  onChange={(e) => setUserData({...userData, dob: e.target.value})}
+                  className="w-full p-2 border rounded"
+                />
+                <div className="flex gap-2">
+                  <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </form>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <span className="font-bold">Name:</span> {userData.name}
+              </div>
+              <div>
+                <span className="font-bold">Email:</span> {userData.email}
+              </div>
+              <div>
+                <span className="font-bold">Mobile:</span> {userData.mobile}
+              </div>
+              <div>
+                <span className="font-bold">Gender:</span> {userData.gender || 'Not set'}
+              </div>
+              <div>
+                <span className="font-bold">Date of Birth:</span> {userData.dob || 'Not set'}
+              </div>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+              >
+                Edit Profile
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Addresses Section */}
+        <div className="mt-8">
+          <h3 className="font-bold mb-4">Your Addresses</h3>
+          <div className="space-y-4">
+            {addresses.map((address) => (
+              <div key={address.id} className="border p-2 rounded">
+                <div className="font-bold">{address.type}</div>
+                <div>{address.street}</div>
+                <div>{address.city}, {address.state}</div>
+                <div>{address.postal_code}</div>
+              </div>
+            ))}
+            <button
+              onClick={() => setIsAddressModalOpen(true)}
+              className="bg-green-500 text-white px-4 py-2 rounded w-full"
+            >
+              Add New Address
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          className="w-full bg-red-500 text-white py-2 mt-8 rounded"
+        >
+          Logout
+        </button>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1">
-        <h1 className="text-2xl font-bold mb-6 bg-white p-5">
-          <span>&lt;</span> Your Profile
-        </h1>
-
-        <div className="flex flex-col gap-6 p-6">
-          {/* Promo Cards */}
-          <div className="bg-purple-100 p-4 rounded-lg">
-            <h3 className="font-semibold text-lg mb-2">
-              Get 100% Cashback On Your First Month Of [App Name] Premium!
-            </h3>
-            <button className="bg-purple-500 text-white px-4 py-2 rounded-md">
-              Check It Out
-            </button>
-          </div>
-
-          <div className="bg-blue-100 p-4 rounded-lg">
-            <h3 className="font-semibold text-lg mb-2">
-              Level Up Your [App Name] Experience With Premium!
-            </h3>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-              See Prices
-            </button>
-          </div>
-
-          <div className="bg-green-100 p-4 rounded-lg">
-            <h3 className="font-semibold text-lg mb-2">
-              Get 100% Cashback On Your First Month Of [App Name] Premium!
-            </h3>
-            <button className="bg-green-500 text-white px-4 py-2 rounded-md">
-              Check It Out
-            </button>
-          </div>
-
-          <div className="bg-orange-100 p-4 rounded-lg">
-            <h3 className="font-semibold text-lg mb-2">
-              Level Up Your [App Name] Experience With Premium!
-            </h3>
-            <button className="bg-orange-500 text-white px-4 py-2 rounded-md">
-              See Prices
-            </button>
-          </div>
-        </div>
-
-        <Modal
-          isOpen={isOpen}
-          onRequestClose={closeModal}
-          contentLabel="Example Modal"
-          className="m-10 bg-white p-8 rounded-xl shadow-xl transform transition-all duration-300 ease-in-out w-2/4"
-          overlayClassName="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50"
-        >
-          {!addAddres ? (
-            <div
-              className="w-full"
-              style={{
-                maxHeight: "80vh",
-                overflowY: "auto",
-              }}
-            >
-              <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
-                Your Locations
-              </h2>
-              {allAdress
-                .sort((a) => (a.address_type === "primary" ? -1 : 1))
-                .map((addr, index) => (
-                  <div key={index}>
-                    <h3 className="text-lg bg-slate-200 text-gray-700 rounded-lg px-6 py-2 font-semibold mb-4 mt-10">
-                      {addr.address_type} Address
-                    </h3>
-                    <div className="flex justify-between">
-                      <ul className="space-y-6 ml-5 flex-1">
-                        <li className="flex flex-col space-y-2">
-                          <span className="font-semibold text-gray-600">
-                            Street
-                          </span>
-                          <span className="text-gray-800">{addr.street}</span>
-                        </li>
-                        <li className="flex flex-col space-y-2">
-                          <span className="font-semibold text-gray-600">
-                            City
-                          </span>
-                          <span className="text-gray-800">{addr.city}</span>
-                        </li>
-                        <li className="flex flex-col space-y-2">
-                          <span className="font-semibold text-gray-600">
-                            Country
-                          </span>
-                          <span className="text-gray-800">{addr.country}</span>
-                        </li>
-                        <li className="flex flex-col space-y-2">
-                          <span className="font-semibold text-gray-600">
-                            State
-                          </span>
-                          <span className="text-gray-800">{addr.state}</span>
-                        </li>
-                        <li className="flex flex-col space-y-2">
-                          <span className="font-semibold text-gray-600">
-                            Postal Code
-                          </span>
-                          <span className="text-gray-800">
-                            {addr.postal_code}
-                          </span>
-                        </li>
-                      </ul>
-                      <div className="w-full rounded-lg overflow-hidden flex-1 ml-5">
-                        <GoogleMap
-                          mapContainerStyle={{
-                            width: "100%",
-                            height: "100%",
-                            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-                          }}
-                          center={{
-                            lat: parseFloat(addr.lat),
-                            lng: parseFloat(addr.long),
-                          }}
-                          zoom={14}
-                        >
-                          <Marker
-                            position={{
-                              lat: parseFloat(addr.lat),
-                              lng: parseFloat(addr.long),
-                            }}
-                          />
-                        </GoogleMap>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-              <div className="flex justify-center mt-6">
-                <button
-                  onClick={closeModal}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 ease-in-out mx-5"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={handleAddNewAddres}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 ease-in-out"
-                >
-                  Add New Address
-                </button>
-              </div>
-            </div>
-          ) : (
-            <AddNewAdres />
-          )}
-        </Modal>
+      <main className="flex-1 p-6">
+        <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
+        {/* Add your main content here */}
       </main>
+
+      {/* Address Modal */}
+      <Modal
+        isOpen={isAddressModalOpen}
+        onRequestClose={() => setIsAddressModalOpen(false)}
+        className="m-10 bg-white p-8 rounded-xl shadow-xl w-2/4"
+        overlayClassName="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50"
+      >
+        <h2 className="text-2xl font-bold mb-4">Add New Address</h2>
+        <form onSubmit={handleAddAddress} className="space-y-4">
+          <select
+            value={newAddress.type}
+            onChange={(e) => setNewAddress({...newAddress, type: e.target.value})}
+            className="w-full p-2 border rounded"
+          >
+            <option value="home">Home</option>
+            <option value="work">Work</option>
+            <option value="other">Other</option>
+          </select>
+          <input
+            type="text"
+            value={newAddress.street}
+            onChange={(e) => setNewAddress({...newAddress, street: e.target.value})}
+            placeholder="Street Address"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            value={newAddress.city}
+            onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
+            placeholder="City"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            value={newAddress.state}
+            onChange={(e) => setNewAddress({...newAddress, state: e.target.value})}
+            placeholder="State"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            value={newAddress.postal_code}
+            onChange={(e) => setNewAddress({...newAddress, postal_code: e.target.value})}
+            placeholder="Postal Code"
+            className="w-full p-2 border rounded"
+          />
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+            Save Address
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 }
