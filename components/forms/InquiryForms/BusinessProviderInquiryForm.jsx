@@ -5,6 +5,7 @@ import { serviceAPI } from "@/api/services";
 import { providerAPI } from "@/api/provider";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "@hooks/use-toast";
 
 const BusinessProviderInquiryForm = () => {
   const [formData, setFormData] = useState({
@@ -135,7 +136,12 @@ const BusinessProviderInquiryForm = () => {
 
     try {
       const response = await providerAPI.createEnquiry(formDataToSend);
-      alert("Business inquiry submitted successfully!");
+
+      toast({
+        title: "Success!",
+        description: "Your inquiry was submitted successfully.",
+        variant: "default",
+      });
       // Reset form
       setFormData({
         type: "business",
@@ -156,8 +162,22 @@ const BusinessProviderInquiryForm = () => {
       console.error("Submission error:", error);
       if (error.response?.data?.error === "Duplicate entry") {
         setError("An account with this email already exists");
+
+        toast({
+          title: "Error",
+          description: "An account with this email already exists.",
+          variant: "destructive",
+        });
       } else {
         setError(error.response?.data?.error || "Failed to submit inquiry");
+        const errorMessage =
+          error.response?.data?.details ||
+          "Failed to submit inquiry. Please try again.";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
       }
     } finally {
       setIsSubmitting(false);
@@ -166,9 +186,6 @@ const BusinessProviderInquiryForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">
-        Business Provider Registration
-      </h2>
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
