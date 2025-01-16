@@ -67,7 +67,7 @@ const ProviderDetails = ({ provider }) => {
           <div>
             <p className="text-sm text-gray-500">Name</p>
             <p className="font-medium">
-              {getDisplayValue(provider.business_name)}
+              {getDisplayValue(provider.business_name || provider?.User.name)}
             </p>
           </div>
           <div>
@@ -76,13 +76,31 @@ const ProviderDetails = ({ provider }) => {
               {getDisplayValue(provider.business_type)}
             </p>
           </div>
+          {provider.business_type === "individual" && (
+            <>
+              <div>
+                <p className="text-sm text-gray-500">AAHAR Number</p>
+                <p className="font-medium">
+                  {getDisplayValue(provider.aadhar_number)}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">PAN Number</p>
+                <p className="font-medium">
+                  {getDisplayValue(provider.pan_number)}
+                </p>
+              </div>
+            </>
+          )}
           {provider.business_type === "business" && (
-            <div>
-              <p className="text-sm text-gray-500">Registration Number</p>
-              <p className="font-medium">
-                {getDisplayValue(provider.business_registration_number)}
-              </p>
-            </div>
+            <>
+              <div>
+                <p className="text-sm text-gray-500">Registration Number</p>
+                <p className="font-medium">
+                  {getDisplayValue(provider.business_registration_number)}
+                </p>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -98,44 +116,52 @@ const ProviderDetails = ({ provider }) => {
             </p>
           </div>
           <div>
+            <p className="text-sm text-gray-500">Whatsapp No</p>
+            <p className="font-medium">{provider.whatsapp_number}</p>
+          </div>
+          <div>
             <p className="text-sm text-gray-500">Service Radius</p>
             <p className="font-medium">{provider.service_radius || 0}km</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Languages Spoken</p>
-            <p className="font-medium">
-              {getDisplayValue(provider.languages_spoken)}
-            </p>
-          </div>
+          {provider.languages_spoken && (
+            <div>
+              <p className="text-sm text-gray-500">Languages Spoken</p>
+              <p className="font-medium">
+                {getDisplayValue(provider.languages_spoken)}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Professional Info */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-2">
-          Professional Info
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Experience</p>
-            <p className="font-medium">
-              {provider.years_experience || 0} years
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Specializations</p>
-            <p className="font-medium">
-              {getDisplayValue(provider.specializations)}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Qualification</p>
-            <p className="font-medium">
-              {getDisplayValue(provider.qualification)}
-            </p>
+      {provider.business_type === "individual" && (
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold border-b pb-2">
+            Professional Info
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-500">Experience</p>
+              <p className="font-medium">
+                {provider.years_experience || 0} years
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Specializations</p>
+              <p className="font-medium">
+                {getDisplayValue(provider.specializations)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Qualification</p>
+              <p className="font-medium">
+                {getDisplayValue(provider.qualification)}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Service Details */}
       <div className="space-y-2">
@@ -155,6 +181,65 @@ const ProviderDetails = ({ provider }) => {
           </div>
         </div>
       </div>
+
+      {/* provider employees */}
+      {provider.ServiceProviderEmployees.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold border-b pb-2">
+            Employee Details
+          </h3>
+          <div className="grid grid-cols-2 gap-4 ">
+            {provider.ServiceProviderEmployees.map((employee) => {
+              return (
+                <div
+                  key={employee.employee_id}
+                  className="bg-slate-100 p-4 rounded-lg"
+                >
+                  {" "}
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-500 ">Employee Name:</p>
+                    <p className="font-medium uppercase">
+                      {employee?.User.name}
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-500 ">Employee Mobile:</p>
+                    <p className="font-medium uppercase">
+                      {employee?.User.mobile}
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-500 ">Employee Id:</p>
+                    <p className="font-medium uppercase">
+                      {employee.employee_id}
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-500">Employee Role:</p>
+                    <p className="font-medium uppercase">
+                      {getDisplayValue(employee.role)}
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-500 ">
+                      Employee Account Status:
+                    </p>
+                    <p className="font-medium uppercase">
+                      {employee?.User.account_status}
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-500">Employee Status:</p>
+                    <p className="font-medium uppercase">
+                      {getDisplayValue(employee.status)}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -361,7 +446,9 @@ const ProviderManager = () => {
               {filteredProviders.map((provider) => (
                 <TableRow key={provider.provider_id}>
                   <TableCell>
-                    {getDisplayValue(provider.business_name)}
+                    {getDisplayValue(
+                      provider.business_name || provider?.User.name
+                    )}
                   </TableCell>
                   <TableCell className="capitalize">
                     {getDisplayValue(provider.business_type)}
