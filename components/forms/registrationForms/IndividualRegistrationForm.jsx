@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import Select from "react-select";
+import { toast } from "@hooks/use-toast";
 
 const IndividualRegistrationForm = ({ previousData }) => {
   const [formData, setFormData] = useState({
@@ -260,14 +261,32 @@ const IndividualRegistrationForm = ({ previousData }) => {
       }
 
       const response = await providerAPI.registerProvider(formDataObj);
+      toast({
+        title: "Success!",
+        description: "Your registration was submitted successfully.",
+        variant: "default",
+      });
 
       const providerId = response?.provider_id || response?.data?.provider_id;
 
       if (providerId) {
-        alert("Registration successful!");
+        toast({
+          title: "Success!",
+          description: "Your registration was submitted successfully.",
+          variant: "default",
+        });
       } else if (response?.message === "Provider registered successfully") {
-        alert("Registration successful!");
+        toast({
+          title: "Success!",
+          description: "Your registration was submitted successfully.",
+          variant: "default",
+        });
       } else {
+        toast({
+          title: "Error",
+          description: response?.message,
+          variant: "destructive",
+        });
         throw new Error("Registration failed: Invalid response format");
       }
     } catch (error) {
@@ -276,7 +295,11 @@ const IndividualRegistrationForm = ({ previousData }) => {
         error.response?.data?.message ||
         error.message ||
         "Registration failed. Please try again.";
-      alert(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

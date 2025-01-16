@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
+import { toast } from "@hooks/use-toast";
 
 const BusinessRegistrationForm = ({ previousData }) => {
   console.log(previousData);
@@ -124,32 +125,6 @@ const BusinessRegistrationForm = ({ previousData }) => {
     }));
   };
 
-  // const addEmployee = () => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     employees: [
-  //       ...prev.employees,
-  //       {
-  //         name: "",
-  //         gender: "",
-  //         qualification: "",
-  //         designation: "",
-  //         phone: "",
-  //         whatsapp_number: "",
-  //         service_category: "",
-  //         experience: "",
-  //       },
-  //     ],
-  //   }));
-  // };
-
-  // const removeEmployee = (index) => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     employees: prev.employees.filter((_, i) => i !== index),
-  //   }));
-  // };
-
   const validateStep = (stepNumber) => {
     const newErrors = {};
 
@@ -251,13 +226,25 @@ const BusinessRegistrationForm = ({ previousData }) => {
       const response = await providerAPI.registerProvider(formDataToSend);
 
       if (response?.provider_id) {
-        alert("Registration successful!");
+        toast({
+          title: "Success!",
+          description: "Your registration was submitted successfully.",
+          variant: "default",
+        });
         // Handle successful registration (e.g., redirect)
       }
     } catch (error) {
       console.error("Registration error:", error);
       setErrors(error.response?.data?.validation || {});
-      alert(error.response?.data?.message || "Registration failed");
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Registration failed. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
