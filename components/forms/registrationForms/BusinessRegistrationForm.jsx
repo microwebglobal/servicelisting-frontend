@@ -133,7 +133,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
         if (!formData.business_registration_number?.trim())
           newErrors.business_registration_number = "Required";
         if (!formData.tax_id?.trim()) newErrors.tax_id = "Required";
-        if (!formData.whatsapp_number?.trim())
+        if (!formData.whatsapp_number?.match(/^\d{10}$/))
           newErrors.whatsapp_number = "Required";
         break;
       case 2:
@@ -145,7 +145,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
         formData.employees.forEach((employee, index) => {
           if (!employee.name?.trim())
             newErrors[`employees.${index}.name`] = "Required";
-          if (!employee.phone?.trim())
+          if (!employee.phone?.match(/^\d{10}$/))
             newErrors[`employees.${index}.phone`] = "Required";
         });
         break;
@@ -224,7 +224,12 @@ const BusinessRegistrationForm = ({ previousData }) => {
       });
 
       const response = await providerAPI.registerProvider(formDataToSend);
-
+      toast({
+        title: "Success!",
+        description: "Your registration was submitted successfully.",
+        variant: "default",
+      });
+      console.log(response);
       if (response?.provider_id) {
         toast({
           title: "Success!",
