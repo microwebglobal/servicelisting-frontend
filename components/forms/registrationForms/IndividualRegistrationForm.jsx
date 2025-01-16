@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
+import Select from "react-select";
 
 const IndividualRegistrationForm = ({ previousData }) => {
   const [formData, setFormData] = useState({
@@ -77,6 +78,11 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const spokenLanguages = [
+    { label: "Hindi", value: "hindi" },
+    { label: "Tamil", value: "tamil" },
+  ];
 
   useEffect(() => {
     if (previousData?.enquiry_id) {
@@ -192,6 +198,10 @@ const IndividualRegistrationForm = ({ previousData }) => {
     }
 
     setLoading(true);
+    setFormData((prev) => ({
+      ...prev,
+      languages_spoken: selectedLanguages.map((lan) => lan.value),
+    }));
 
     try {
       const formDataObj = new FormData();
@@ -331,11 +341,27 @@ const IndividualRegistrationForm = ({ previousData }) => {
           className="p-2 border rounded w-full"
           disabled
         >
-          <option value="">Select Gender</option>
+          <option value="">{formData.gender}</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
           <option value="other">Other</option>
         </select>
+
+        <Select
+          id="categories"
+          options={spokenLanguages}
+          isMulti
+          value={selectedLanguages}
+          onChange={(selectedOptions) => {
+            setSelectedLanguages(selectedOptions);
+            setFormData((prev) => ({
+              ...prev,
+              languages_spoken: selectedOptions.map((lan) => lan.value),
+            }));
+          }}
+          required
+        />
+
         {renderInputField("aadhar_number", "Aadhar Number")}
         {renderInputField("pan_number", "PAN Number")}
         {renderInputField("email", "Email", "email", true)}
