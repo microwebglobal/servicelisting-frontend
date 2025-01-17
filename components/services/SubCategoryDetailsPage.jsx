@@ -121,7 +121,10 @@ export function SubCategoryDetailsPage({
           id: item.item_id,
           type: type,
           name: item.name,
-          price: item.SpecialPricings[0]?.special_price || item.base_price,
+          price:
+            type === "package"
+              ? item.finalPrice
+              : item.SpecialPricings[0]?.special_price || item.base_price,
           quantity: 1,
         },
       ]);
@@ -135,7 +138,9 @@ export function SubCategoryDetailsPage({
 
   const removeFromSelection = (itemId, type) => {
     setSelectedItems(
-      selectedItems.filter((item) => !(item.id === itemId && item.type === type))
+      selectedItems.filter(
+        (item) => !(item.id === itemId && item.type === type)
+      )
     );
     toast({
       title: "Removed from selection",
@@ -147,7 +152,8 @@ export function SubCategoryDetailsPage({
     if (selectedItems.length === 0) {
       toast({
         title: "No items selected",
-        description: "Please select at least one service or package to continue.",
+        description:
+          "Please select at least one service or package to continue.",
         variant: "destructive",
       });
       return;
@@ -248,7 +254,9 @@ export function SubCategoryDetailsPage({
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => removeFromSelection(item.id, item.type)}
+                              onClick={() =>
+                                removeFromSelection(item.id, item.type)
+                              }
                             >
                               ✕
                             </Button>
