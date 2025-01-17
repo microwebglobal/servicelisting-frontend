@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { ChevronLeft } from 'lucide-react';
-import BookingForm from '../booking/BookingForm';
-import {CartPreview} from '../services/CartPreview';
-import { serviceAPI } from '@/api/services';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { ChevronLeft } from "lucide-react";
+import BookingForm from "../booking/BookingForm";
+import { CartPreview } from "../services/CartPreview";
+import { serviceAPI } from "@/api/services";
 
 export function BookingPage({
   cityName,
@@ -14,7 +14,7 @@ export function BookingPage({
   subCategorySlug,
   selectedItems = [],
   cityId,
-  onBack
+  onBack,
 }) {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,8 +23,8 @@ export function BookingPage({
 
   // Function to safely convert price to number and format it
   const formatPrice = (price) => {
-    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-    return isNaN(numPrice) ? '0.00' : numPrice.toFixed(2);
+    const numPrice = typeof price === "string" ? parseFloat(price) : price;
+    return isNaN(numPrice) ? "0.00" : numPrice.toFixed(2);
   };
 
   const handleBookingSubmit = async (bookingDetails) => {
@@ -32,16 +32,16 @@ export function BookingPage({
       setLoading(true);
       const response = await serviceAPI.addToCart({
         cityId: cityId,
-        items: selectedItems.map(item => ({
+        items: selectedItems.map((item) => ({
           itemId: item.id,
           itemType: item.type,
-          quantity: item.quantity || 1
+          quantity: item.quantity || 1,
         })),
         bookingDate: bookingDetails.bookingDate,
         startTime: bookingDetails.startTime,
-        serviceAddress: '', // This should be collected from user
-        serviceLocation: '', // This should be collected from user
-        customerNotes: ''
+        serviceAddress: "", // This should be collected from user
+        serviceLocation: "", // This should be collected from user
+        customerNotes: "",
       });
 
       setCart(response.data);
@@ -59,9 +59,10 @@ export function BookingPage({
 
   // Calculate total amount
   const totalAmount = selectedItems.reduce((sum, item) => {
-    const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+    const price =
+      typeof item.price === "string" ? parseFloat(item.price) : item.price;
     const quantity = item.quantity || 1;
-    return sum + (price * quantity);
+    return sum + price * quantity;
   }, 0);
 
   return (
@@ -81,7 +82,10 @@ export function BookingPage({
               <CardContent>
                 <div className="space-y-4">
                   {selectedItems.map((item) => (
-                    <div key={`${item.id}-${item.type}`} className="flex justify-between items-center">
+                    <div
+                      key={`${item.id}-${item.type}`}
+                      className="flex justify-between items-center"
+                    >
                       <div>
                         <span className="font-medium">{item.name}</span>
                         {item.quantity > 1 && (
@@ -111,7 +115,7 @@ export function BookingPage({
           </div>
 
           <div>
-            <CartPreview 
+            <CartPreview
               items={selectedItems}
               loading={loading}
               totalAmount={totalAmount}

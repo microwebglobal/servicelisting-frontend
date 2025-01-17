@@ -53,8 +53,8 @@ export const ServiceTypeForm = ({
     }
 
     try {
-      if (mode === "edit" && data?.service_type_id) {
-        await serviceAPI.updateServiceType(data.service_type_id, formData);
+      if (mode === "edit") {
+        await serviceAPI.updateServiceType(data.type_id, formData);
       } else {
         await serviceAPI.createServiceType(formDataToSend);
       }

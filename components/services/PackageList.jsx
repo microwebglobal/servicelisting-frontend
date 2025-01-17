@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Package } from 'lucide-react';
-import { serviceAPI } from '@/api/services';
+import React, { useState, useEffect } from "react";
+import { Package } from "lucide-react";
+import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
-import  PackageDetails  from '../packages/PackageDetails';
+import PackageDetails from "../packages/PackageDetails";
 
 export function PackageList({ typeId, cityId, addToCart }) {
   const [packages, setPackages] = useState([]);
@@ -19,13 +19,14 @@ export function PackageList({ typeId, cityId, addToCart }) {
     try {
       const response = await serviceAPI.getPackagesByType(typeId);
       setPackages(response.data);
+      console.log(response.data);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching packages:', error);
+      console.error("Error fetching packages:", error);
       toast({
         title: "Error",
         description: "Failed to load packages. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -46,7 +47,7 @@ export function PackageList({ typeId, cityId, addToCart }) {
       </div>
       <div className="grid gap-4">
         {packages.map((pkg) => (
-          <PackageDetails 
+          <PackageDetails
             key={pkg.package_id}
             pkg={pkg}
             addToCart={addToCart}

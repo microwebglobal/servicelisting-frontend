@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { serviceAPI } from "@/api/services";
 import Select from "react-select";
 import { providerAPI } from "@api/provider";
-import { useToast } from "@/hooks/use-toast";
 import SetLocation from "@components/SetLocation";
+import { toast } from "@hooks/use-toast";
 
 const IndividualProviderInquiryForm = () => {
   const [step, setStep] = useState(1);
@@ -29,7 +29,8 @@ const IndividualProviderInquiryForm = () => {
   const [selectedServiceCategories, setSelectedServiceCategories] = useState(
     []
   );
-  const { toast } = useToast();
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
     const fetchCities = async () => {
       try {
@@ -67,8 +68,39 @@ const IndividualProviderInquiryForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validateStep1 = () => {
+    let newErrors = {};
+
+    if (!formData.name.trim()) newErrors.name = "Full name is required";
+    if (!formData.email.match(/^\S+@\S+\.\S+$/))
+      newErrors.email = "Invalid email format";
+    if (!formData.mobile.match(/^\d{10}$/))
+      newErrors.mobile = "Phone number must be 10 digits";
+    if (!formData.gender) newErrors.gender = "Gender is required";
+    if (!formData.dob) newErrors.dob = "Date of birth is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    let newErrors = {};
+
+    if (formData.years_experience < 1)
+      newErrors.years_experience = "Experience must be at least 1 year";
+    if (!selectedCities.length) newErrors.cities = "Select at least one city";
+    if (!selectedServiceCategories.length)
+      newErrors.categories = "Select at least one category";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   // Go to Next Step
-  const nextStep = () => setStep((prev) => prev + 1);
+  const nextStep = () => {
+    if (step === 1 && validateStep1()) {
+      setStep(2);
+    }
+  };
 
   // Go to Previous Step
   const prevStep = () => setStep((prev) => prev - 1);
@@ -76,6 +108,7 @@ const IndividualProviderInquiryForm = () => {
   // Handle Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateStep2) return;
     const formDataToSend = {
       ...formData,
       cities: selectedCities.map((city) => city.value),
@@ -90,16 +123,19 @@ const IndividualProviderInquiryForm = () => {
     try {
       await providerAPI.createEnquiry(formDataToSend);
       console.log("Final Form Data:", formDataToSend);
-      alert("Form submitted successfully!");
       toast({
-        title: "Success",
-        description: "Inquiry Form Sucessfully Submitted",
+        title: "Success!",
+        description: "Your inquiry was submitted successfully.",
+        variant: "default",
       });
     } catch (error) {
       console.error(error);
+      const errorMessage =
+        error.response?.data?.details ||
+        "Failed to submit inquiry. Please try again.";
       toast({
         title: "Error",
-        description: "Failed To Submit Inquiry Form",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -120,6 +156,7 @@ const IndividualProviderInquiryForm = () => {
               required
               className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             />
+            {errors.name && <p className="text-red-500">{errors.name}</p>}
 
             <label className="block mb-2">Gender</label>
             <select
@@ -134,6 +171,7 @@ const IndividualProviderInquiryForm = () => {
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
+            {errors.gender && <p className="text-red-500">{errors.gender}</p>}
 
             <label className="block mb-2">Date Of Birth</label>
             <input
@@ -144,6 +182,7 @@ const IndividualProviderInquiryForm = () => {
               required
               className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             />
+            {errors.dob && <p className="text-red-500">{errors.dob}</p>}
 
             <label className="block mb-2">Email</label>
             <input
@@ -154,6 +193,7 @@ const IndividualProviderInquiryForm = () => {
               required
               className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             />
+            {errors.email && <p className="text-red-500">{errors.email}</p>}
 
             <label className="block mb-2">Phone</label>
             <input
@@ -164,6 +204,7 @@ const IndividualProviderInquiryForm = () => {
               required
               className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             />
+            {errors.mobile && <p className="text-red-500">{errors.mobile}</p>}
 
             <button
               type="button"
@@ -188,6 +229,7 @@ const IndividualProviderInquiryForm = () => {
                 onChange={setSelectedCities}
                 required
               />
+              {errors.cities && <p className="text-red-500">{errors.cities}</p>}
             </div>
 
             <label className="block mb-2">Exact Location</label>
@@ -209,6 +251,9 @@ const IndividualProviderInquiryForm = () => {
                 onChange={setSelectedServiceCategories}
                 required
               />
+              {errors.categories && (
+                <p className="text-red-500">{errors.categories}</p>
+              )}
             </div>
 
             <label className="block mb-2">Years Experiance</label>
@@ -220,6 +265,9 @@ const IndividualProviderInquiryForm = () => {
               required
               className="w-full border p-2 mb-4"
             />
+            {errors.years_experience && (
+              <p className="text-red-500">{errors.years_experience}</p>
+            )}
 
             <label className="block mb-2">Skills</label>
             <input

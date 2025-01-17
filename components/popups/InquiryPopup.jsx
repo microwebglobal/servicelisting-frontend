@@ -35,34 +35,6 @@ const InquiryPopup = ({ inquiry }) => {
             <span className="font-semibold">Email:</span> {inquiry.User?.email}
           </p>
           <p>
-            <span className="font-semibold">Mobile:</span>{" "}
-            {inquiry.User?.mobile}
-          </p>
-          <p>
-            <span className="font-semibold">Gender:</span>{" "}
-            {inquiry.User?.gender}
-          </p>
-        </div>
-      </div>
-
-      {/* Business Information */}
-      <div className="bg-gray-50 p-4 rounded-lg shadow-md mt-4">
-        <div className="flex items-center gap-3">
-          <FaBriefcase className="text-gray-600 text-xl" />
-          <h3 className="text-lg font-semibold text-gray-700">
-            Business Information
-          </h3>
-        </div>
-        <div className="grid grid-cols-2 gap-2 mt-3 text-sm text-gray-700">
-          <p>
-            <span className="font-semibold">Business Type:</span>{" "}
-            {inquiry.business_type}
-          </p>
-          <p>
-            <span className="font-semibold">Experience:</span>{" "}
-            {inquiry.years_experience} Years
-          </p>
-          <p>
             <span className="font-semibold">Status:</span>
             <span
               className={`px-2 py-1 ml-2 text-xs font-semibold rounded-full 
@@ -75,8 +47,57 @@ const InquiryPopup = ({ inquiry }) => {
               {inquiry.status}
             </span>
           </p>
+          <p>
+            <span className="font-semibold">Mobile:</span>{" "}
+            {inquiry.User?.mobile}
+          </p>
+          <p>
+            <span className="font-semibold">Gender:</span>{" "}
+            {inquiry.User?.gender}
+          </p>
+          {inquiry.business_type === "individual" && (
+            <>
+              <p>
+                <span className="font-semibold">Experience:</span>{" "}
+                {inquiry.years_experience}
+              </p>
+              <p>
+                <span className="font-semibold">Skills:</span> {inquiry.skills}
+              </p>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Business Information */}
+      {inquiry.business_type === "business" && (
+        <div className="bg-gray-50 p-4 rounded-lg shadow-md mt-4">
+          <div className="flex items-center gap-3">
+            <FaBriefcase className="text-gray-600 text-xl" />
+            <h3 className="text-lg font-semibold text-gray-700">
+              Business Information
+            </h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-3 text-sm text-gray-700">
+            <p>
+              <span className="font-semibold">Business Type:</span>{" "}
+              {inquiry.business_type}
+            </p>
+            <p>
+              <span className="font-semibold">Business Name:</span>{" "}
+              {inquiry.business_name}
+            </p>
+            <p>
+              <span className="font-semibold">No Of Employees:</span>{" "}
+              {inquiry.number_of_employees}
+            </p>
+            <p>
+              <span className="font-semibold">Business Website:</span>{" "}
+              <a href={inquiry.business_website}>{inquiry.business_website}</a>
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Location */}
       {inquiry.primary_location && (

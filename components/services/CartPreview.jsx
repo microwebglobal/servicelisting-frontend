@@ -1,14 +1,14 @@
-import React, { useMemo } from 'react';
-import { ShoppingCart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useMemo } from "react";
+import { ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function CartPreview({ cart = [], removeFromCart, onCheckout }) {
   const cartTotal = useMemo(() => {
     if (!Array.isArray(cart) || cart.length === 0) return 0;
-    
+
     return cart.reduce((sum, item) => {
       const price = Number(item.finalPrice || item.base_price || 0);
-      return sum + (price * (item.quantity || 1));
+      return sum + price * (item.quantity || 1);
     }, 0);
   }, [cart]);
 
@@ -31,10 +31,10 @@ export function CartPreview({ cart = [], removeFromCart, onCheckout }) {
         <ShoppingCart className="h-5 w-5" />
         <span className="font-bold">Cart ({cart.length} items)</span>
       </div>
-      
+
       <div className="max-h-60 overflow-y-auto space-y-3">
         {cart.map((item) => (
-          <div 
+          <div
             key={`${item.item_id}-${item.type}`}
             className="flex justify-between items-center gap-2 border-b pb-2"
           >
@@ -45,12 +45,10 @@ export function CartPreview({ cart = [], removeFromCart, onCheckout }) {
                   Quantity: {item.quantity}
                 </p>
               )}
-              {item.type === 'package' && item.sections && (
+              {item.type === "package" && item.sections && (
                 <div className="text-xs text-gray-600 mt-1">
                   {item.sections.map((section, index) => (
-                    <div key={index}>
-                      {section.item.name}
-                    </div>
+                    <div key={index}>{section.item.name}</div>
                   ))}
                 </div>
               )}
@@ -59,8 +57,8 @@ export function CartPreview({ cart = [], removeFromCart, onCheckout }) {
               <span className="font-bold">
                 ₹{(item.finalPrice || item.base_price || 0).toFixed(2)}
               </span>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 size="sm"
                 onClick={() => removeFromCart?.(item.item_id, item.type)}
               >
@@ -76,7 +74,7 @@ export function CartPreview({ cart = [], removeFromCart, onCheckout }) {
           <span className="font-bold">Total:</span>
           <span className="text-xl font-bold">₹{cartTotal.toFixed(2)}</span>
         </div>
-        <Button 
+        <Button
           className="w-full"
           onClick={onCheckout}
           disabled={cart.length === 0}
