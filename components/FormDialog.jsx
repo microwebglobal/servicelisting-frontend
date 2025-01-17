@@ -21,7 +21,7 @@ export const FormDialog = ({
 }) => {
   const { type, mode, item } = dialogState;
 
-  console.log(selectedData);
+  console.log(item);
 
   const DIALOG_COMPONENTS = {
     category: CategoryForm,
