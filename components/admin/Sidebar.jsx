@@ -47,7 +47,7 @@ const Sidebar = () => {
     {
       name: "Services Management",
       subMenu: [
-        { name: "Services List", link: "admin/services" },
+        { name: "Services List", link: "/admin/services" },
         { name: "Add Service", link: "/add-service" },
       ],
     },

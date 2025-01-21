@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { serviceAPI } from "../../api/services";
 import TextEditor from "@components/ui/textEditor";
+import { toast } from "@hooks/use-toast";
 
 export const ServiceTypeForm = ({
   mode = "create",
@@ -63,6 +64,56 @@ export const ServiceTypeForm = ({
       console.error("Error submitting service type:", error);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      if (data?.type_id) {
+        await serviceAPI.deleteServiceType(data.type_id);
+
+        toast({
+          title: "Success!",
+          description: "Service Type deleted successfully!",
+          variant: "default",
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "No Service Type selected for deletion!",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting Service Type:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to delete Service Type!",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (mode === "delete") {
+    return (
+      <div className="space-y-4">
+        <p>Are you sure you want to delete this Service Type?</p>
+        <div className="flex space-x-4">
+          <Button className="flex-1" onClick={handleDelete}>
+            Confirm
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form

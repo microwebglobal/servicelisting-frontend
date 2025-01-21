@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import { LoginAPI } from "@/api/login";
+import { useAuth } from "@src/context/AuthContext";
 
 const ServiceProviderLogin = () => {
   const [email, setEmail] = useState("");
@@ -12,17 +13,22 @@ const ServiceProviderLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  
+  const { login } = useAuth();
+
   const router = useRouter();
 
   const handleLogin = async () => {
     try {
       setIsLoading(true);
       setError("");
-      
+
       const response = await LoginAPI.providerLogin(email, password);
       if (response.data.success) {
-        router.push("/provider/dashboard");
+        login({
+          email: response.data.user.email,
+          role: "service_provider",
+        });
+        router.push("/profile/provider");
       }
     } catch (error) {
       setError(error.response?.data?.message || "Invalid credentials");
@@ -41,7 +47,7 @@ const ServiceProviderLogin = () => {
           height={100}
           className="border-solid border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
         />
-        
+
         <div className="ml-14 w-96">
           <h2 className="text-3xl font-semibold text-center mb-2">
             Service Provider Login
@@ -51,9 +57,7 @@ const ServiceProviderLogin = () => {
           </p>
 
           {error && (
-            <div className="mb-4 text-red-500 text-center">
-              {error}
-            </div>
+            <div className="mb-4 text-red-500 text-center">{error}</div>
           )}
 
           <div className="relative mb-6">
@@ -92,8 +96,8 @@ const ServiceProviderLogin = () => {
           </button>
 
           <div className="mt-4 text-center">
-            <Link 
-              href="/provider/register" 
+            <Link
+              href="/provider/register"
               className="text-indigo-500 hover:text-indigo-600"
             >
               Don&apos;t have an account? Register as a service provider

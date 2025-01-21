@@ -2,19 +2,21 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {profileAPI} from "@/api/profile";
+import { profileAPI } from "@/api/profile";
 import Modal from "react-modal";
 import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
 import { toast } from "react-hot-toast";
+import withAuth from "@components/isAuth";
+import { useAuth } from "@src/context/AuthContext";
 
-export default function CustomerProfile() {
+function CustomerProfile() {
   const [userData, setUserData] = useState({
     name: "",
     email: "",
     mobile: "",
     gender: "",
     dob: "",
-    photo: null
+    photo: null,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -27,13 +29,16 @@ export default function CustomerProfile() {
     country: "",
     postal_code: "",
     lat: "",
-    long: ""
+    long: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const { logout } = useAuth();
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
   });
 
   useEffect(() => {
@@ -43,13 +48,14 @@ export default function CustomerProfile() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await profileAPI.getUserProfile();
+      const response = await profileAPI.getProfileByUserId(user.uId);
+      console.log(response);
       setUserData(response.data);
       setIsLoading(false);
     } catch (error) {
       toast.error("Failed to load profile");
       if (error.response?.status === 401) {
-        router.push('/login/user');
+        router.push("/login/user");
       }
     }
   };
@@ -98,14 +104,13 @@ export default function CustomerProfile() {
   };
 
   const handleLogout = () => {
-    // Clear auth token and redirect to login
-    document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
-    router.push('/login/user');
+    logout();
+    router.push("/login");
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
@@ -141,20 +146,26 @@ export default function CustomerProfile() {
                 <input
                   type="text"
                   value={userData.name}
-                  onChange={(e) => setUserData({...userData, name: e.target.value})}
+                  onChange={(e) =>
+                    setUserData({ ...userData, name: e.target.value })
+                  }
                   placeholder="Name"
                   className="w-full p-2 border rounded"
                 />
                 <input
                   type="email"
                   value={userData.email}
-                  onChange={(e) => setUserData({...userData, email: e.target.value})}
+                  onChange={(e) =>
+                    setUserData({ ...userData, email: e.target.value })
+                  }
                   placeholder="Email"
                   className="w-full p-2 border rounded"
                 />
                 <select
                   value={userData.gender}
-                  onChange={(e) => setUserData({...userData, gender: e.target.value})}
+                  onChange={(e) =>
+                    setUserData({ ...userData, gender: e.target.value })
+                  }
                   className="w-full p-2 border rounded"
                 >
                   <option value="">Select Gender</option>
@@ -165,11 +176,16 @@ export default function CustomerProfile() {
                 <input
                   type="date"
                   value={userData.dob}
-                  onChange={(e) => setUserData({...userData, dob: e.target.value})}
+                  onChange={(e) =>
+                    setUserData({ ...userData, dob: e.target.value })
+                  }
                   className="w-full p-2 border rounded"
                 />
                 <div className="flex gap-2">
-                  <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+                  <button
+                    type="submit"
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
                     Save
                   </button>
                   <button
@@ -194,10 +210,12 @@ export default function CustomerProfile() {
                 <span className="font-bold">Mobile:</span> {userData.mobile}
               </div>
               <div>
-                <span className="font-bold">Gender:</span> {userData.gender || 'Not set'}
+                <span className="font-bold">Gender:</span>{" "}
+                {userData.gender || "Not set"}
               </div>
               <div>
-                <span className="font-bold">Date of Birth:</span> {userData.dob || 'Not set'}
+                <span className="font-bold">Date of Birth:</span>{" "}
+                {userData.dob || "Not set"}
               </div>
               <button
                 onClick={() => setIsEditing(true)}
@@ -217,7 +235,9 @@ export default function CustomerProfile() {
               <div key={address.id} className="border p-2 rounded">
                 <div className="font-bold">{address.type}</div>
                 <div>{address.street}</div>
-                <div>{address.city}, {address.state}</div>
+                <div>
+                  {address.city}, {address.state}
+                </div>
                 <div>{address.postal_code}</div>
               </div>
             ))}
@@ -255,7 +275,9 @@ export default function CustomerProfile() {
         <form onSubmit={handleAddAddress} className="space-y-4">
           <select
             value={newAddress.type}
-            onChange={(e) => setNewAddress({...newAddress, type: e.target.value})}
+            onChange={(e) =>
+              setNewAddress({ ...newAddress, type: e.target.value })
+            }
             className="w-full p-2 border rounded"
           >
             <option value="home">Home</option>
@@ -265,32 +287,43 @@ export default function CustomerProfile() {
           <input
             type="text"
             value={newAddress.street}
-            onChange={(e) => setNewAddress({...newAddress, street: e.target.value})}
+            onChange={(e) =>
+              setNewAddress({ ...newAddress, street: e.target.value })
+            }
             placeholder="Street Address"
             className="w-full p-2 border rounded"
           />
           <input
             type="text"
             value={newAddress.city}
-            onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
+            onChange={(e) =>
+              setNewAddress({ ...newAddress, city: e.target.value })
+            }
             placeholder="City"
             className="w-full p-2 border rounded"
           />
           <input
             type="text"
             value={newAddress.state}
-            onChange={(e) => setNewAddress({...newAddress, state: e.target.value})}
+            onChange={(e) =>
+              setNewAddress({ ...newAddress, state: e.target.value })
+            }
             placeholder="State"
             className="w-full p-2 border rounded"
           />
           <input
             type="text"
             value={newAddress.postal_code}
-            onChange={(e) => setNewAddress({...newAddress, postal_code: e.target.value})}
+            onChange={(e) =>
+              setNewAddress({ ...newAddress, postal_code: e.target.value })
+            }
             placeholder="Postal Code"
             className="w-full p-2 border rounded"
           />
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
             Save Address
           </button>
         </form>
@@ -298,3 +331,5 @@ export default function CustomerProfile() {
     </div>
   );
 }
+
+export default withAuth(CustomerProfile, ["customer"]);

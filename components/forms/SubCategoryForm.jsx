@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { serviceAPI } from "../../api/services";
+import { toast } from "@hooks/use-toast";
 
 export const SubCategoryForm = ({
   mode = "create",
@@ -64,6 +65,56 @@ export const SubCategoryForm = ({
       console.error("Error submitting subcategory:", error);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      if (data?.sub_category_id) {
+        await serviceAPI.deleteSubCategory(data.sub_category_id);
+
+        toast({
+          title: "Success!",
+          description: "Sub-Category deleted successfully!",
+          variant: "default",
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "No sub-category selected for deletion!",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting sub-category:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to delete sub-category!",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (mode === "delete") {
+    return (
+      <div className="space-y-4">
+        <p>Are you sure you want to delete this sub-category?</p>
+        <div className="flex space-x-4">
+          <Button className="flex-1" onClick={handleDelete}>
+            Confirm
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

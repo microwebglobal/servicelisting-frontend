@@ -82,6 +82,8 @@ export const serviceAPI = {
     api.get(`/package-items/section/${sectionId}`),
   createPackageSection: (data) => api.post("/sections", data),
   updatePackageSection: (id, data) => api.put(`/sections/${id}`, data),
+  deletePackageSection: (id) => api.delete(`/sections/${id}`),
+
   //city pricing
   createCityPricing: (data) => api.post("/city-pricing", data),
   updateCityPricing: (id, data) =>

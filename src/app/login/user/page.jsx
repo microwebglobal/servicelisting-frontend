@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LoginAPI } from "@/api/login";
+import { useAuth } from "@src/context/AuthContext";
 
 const CustomerLogin = () => {
   const [step, setStep] = useState(1);
@@ -11,14 +12,15 @@ const CustomerLogin = () => {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  
+  const { login } = useAuth();
+
   const router = useRouter();
 
   const handleSendOtp = async () => {
     try {
       setIsLoading(true);
       setError("");
-      
+
       const response = await LoginAPI.customerLoginSendOTP(mobile);
       if (response.data.success) {
         setStep(2);
@@ -34,9 +36,14 @@ const CustomerLogin = () => {
     try {
       setIsLoading(true);
       setError("");
-      
+
       const response = await LoginAPI.customerLoginVerifyOTP(mobile, otp);
       if (response.data.success) {
+        console.log(response.data);
+        login({
+          role: "customer",
+          uId: response.data.user.id,
+        });
         router.push("/profile/customer");
       }
     } catch (error) {
@@ -56,16 +63,14 @@ const CustomerLogin = () => {
           height={100}
           className="border-solid border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
         />
-        
+
         <div className="ml-14 w-96">
           <h2 className="text-3xl font-semibold text-center mb-2">
             Welcome Back!
           </h2>
-          
+
           {error && (
-            <div className="mb-4 text-red-500 text-center">
-              {error}
-            </div>
+            <div className="mb-4 text-red-500 text-center">{error}</div>
           )}
 
           {step === 1 ? (

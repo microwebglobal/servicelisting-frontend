@@ -4,6 +4,7 @@ import axios from "axios";
 import Image from "next/image";
 import dayjs from "dayjs";
 import Rating from "@mui/material/Rating";
+import withAuth from "@components/isAuth";
 
 const Page = () => {
   const [userData, setUserData] = useState({});
@@ -214,4 +215,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuth(Page, ["service_provider"]);

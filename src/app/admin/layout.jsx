@@ -1,6 +1,8 @@
+"use client";
 import React from "react";
 import Header from "@components/admin/Header";
 import Sidebar from "@components/admin/Sidebar";
+import withAuth from "@components/isAuth";
 
 const layout = ({ children }) => {
   return (
@@ -16,4 +18,4 @@ const layout = ({ children }) => {
   );
 };
 
-export default layout;
+export default withAuth(layout, ["admin"]);
