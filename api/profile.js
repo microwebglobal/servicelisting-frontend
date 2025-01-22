@@ -4,11 +4,13 @@ export const profileAPI = {
   // User Profile
   getProfile: () => api.get("/users/profile"),
   getProfileByUserId: (id) => api.get(`/customer-profiles/user/${id}`),
-  updateProfile: (data) => api.put("/users/profile", data),
+  updateProfile: (data, id) => api.put(`/users/profile/${id}`, data),
   uploadPhoto: (formData) =>
     api.post("/users/profile/photo", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
+  sendEmailValidation: (id) => api.get(`/users/send-emailvalidate/${id}`),
+  validateEmail: (id) => api.put(`/users/validate-email/${id}`),
 
   // User Addresses
   getAddresses: () => api.get("/users/addresses"),
