@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import { LoginAPI } from "@/api/login";
 import { useAuth } from "@src/context/AuthContext";
+import { toast } from "@hooks/use-toast";
 
 const ServiceProviderLogin = () => {
   const [email, setEmail] = useState("");
@@ -27,11 +28,17 @@ const ServiceProviderLogin = () => {
         login({
           email: response.data.user.email,
           role: "service_provider",
+          uId: response.data.user.id,
         });
         router.push("/profile/provider");
       }
     } catch (error) {
       setError(error.response?.data?.message || "Invalid credentials");
+      toast({
+        title: "Error",
+        description: "Invalid credentials",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

@@ -263,7 +263,7 @@ function CustomerProfile() {
               <div>
                 <span className="font-bold">Name:</span> {userData.name}
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap">
                 <span className="font-bold">Email:</span> {userData.email}
                 <span
                   className={`ml-2 ${
