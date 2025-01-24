@@ -12,6 +12,7 @@ export const providerAPI = {
   registerProvider: (data) => api.post("/provider/register", data),
   getProvider: (id) => api.get(`/provider/${id}`),
   updateProvider: (id, data) => api.put(`/provider/${id}`, data),
+  updateProviderProfile: (id, data) => api.put(`/provider/update/${id}`, data),
   deleteProvider: (id) => api.delete(`/provider/${id}`),
   getProviders: () => api.get("/providers"),
   getProviderByUserId: (userId) => api.get(`/provider/user/${userId}`),
