@@ -4,15 +4,14 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { serviceAPI } from '@/api/services';
-
-const TIP_PERCENTAGES = [5, 10, 15, 20];
+import { cartService } from '@/services/cartService';
+import { AlertCircle, Trash2 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function CartPage() {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tipPercentage, setTipPercentage] = useState(0);
-  const [customTip, setCustomTip] = useState('');
+  const [tipAmount, setTipAmount] = useState(0);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -23,63 +22,63 @@ export function CartPage() {
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const response = await serviceAPI.getCart();
-      setCart(response.data);
+      const cartData = await cartService.getCart();
+      setCart(cartData);
+      setTipAmount(cartData.BookingPayment?.tip_amount || 0);
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load cart details.",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleTipChange = async (percentage) => {
+  const handleUpdateQuantity = async (itemId, quantity) => {
     try {
-      setTipPercentage(percentage);
-      setCustomTip('');
-      const tipAmount = (cart.BookingPayment.subtotal * (percentage / 100));
-      await updateTip(tipAmount);
+      await cartService.updateCartItem({ itemId, quantity });
+      await fetchCart();
+      toast({
+        title: 'Success',
+        description: 'Cart updated successfully',
+      });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to update tip.",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
       });
     }
   };
 
-  const handleCustomTipChange = async (value) => {
-    setCustomTip(value);
-    setTipPercentage(0);
-    if (value && !isNaN(value)) {
-      await updateTip(parseFloat(value));
-    }
-  };
-
-  const updateTip = async (tipAmount) => {
+  const handleUpdateTip = async () => {
     try {
-      const response = await serviceAPI.updateTip(tipAmount);
-      setCart(prevCart => ({
-        ...prevCart,
-        BookingPayment: response.data.payment
-      }));
-    } catch (error) {
-      console.error('Error updating tip:', error);
-    }
-  };
-
-  const handleProceedToPayment = async () => {
-    try {
-      await serviceAPI.proceedToPayment();
-      router.push('/checkout');
+      await cartService.updateTip(Number(tipAmount));
+      await fetchCart();
+      toast({
+        title: 'Success',
+        description: 'Tip amount updated',
+      });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to proceed to payment.",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      await cartService.proceedToCheckout();
+      router.push('/payment');
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
       });
     }
   };
@@ -88,87 +87,105 @@ export function CartPage() {
     return <div className="text-center py-8">Loading cart...</div>;
   }
 
-  if (!cart) {
-    return <div className="text-center py-8">Your cart is empty</div>;
+  if (!cart || !cart.BookingItems?.length) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>Your cart is empty</AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
-
-        <div className="grid gap-8">
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">Shopping Cart</h1>
+      
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Items</CardTitle>
+              <CardTitle>Cart Items</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               {cart.BookingItems.map((item) => (
-                <div key={item.id} className="flex justify-between py-2">
-                  <span>{item.name}</span>
-                  <span>₹{item.total_price.toFixed(2)}</span>
+                <div key={item.item_id} className="flex justify-between items-center p-4 border rounded-lg">
+                  <div>
+                    <h3 className="font-medium">{item.ServiceItem?.name || item.PackageItem?.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      Unit Price: ₹{item.unit_price}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUpdateQuantity(item.item_id, Math.max(0, item.quantity - 1))}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUpdateQuantity(item.item_id, item.quantity + 1)}
+                      >
+                        +
+                      </Button>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleUpdateQuantity(item.item_id, 0)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </CardContent>
           </Card>
+        </div>
 
+        <div>
           <Card>
             <CardHeader>
-              <CardTitle>Add a Tip</CardTitle>
+              <CardTitle>Order Summary</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  {TIP_PERCENTAGES.map((percent) => (
-                    <Button
-                      key={percent}
-                      variant={tipPercentage === percent ? "default" : "outline"}
-                      onClick={() => handleTipChange(percent)}
-                    >
-                      {percent}%
-                    </Button>
-                  ))}
-                </div>
-                <div>
-                  <Input
-                    type="number"
-                    placeholder="Custom tip amount"
-                    value={customTip}
-                    onChange={(e) => handleCustomTipChange(e.target.value)}
-                    className="mt-2"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Payment Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>₹{cart.BookingPayment.subtotal.toFixed(2)}</span>
+                  <span>₹{cart.BookingPayment?.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax (18%)</span>
-                  <span>₹{cart.BookingPayment.tax_amount.toFixed(2)}</span>
+                  <span>₹{cart.BookingPayment?.tax_amount.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Tip</span>
-                  <span>₹{cart.BookingPayment.tip_amount.toFixed(2)}</span>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={tipAmount}
+                    onChange={(e) => setTipAmount(e.target.value)}
+                    placeholder="Add tip amount"
+                  />
+                  <Button onClick={handleUpdateTip} variant="outline" size="sm">
+                    Update
+                  </Button>
                 </div>
-                <div className="flex justify-between font-bold pt-2 border-t">
-                  <span>Total</span>
-                  <span>₹{cart.BookingPayment.total_amount.toFixed(2)}</span>
+                <div className="pt-4 border-t">
+                  <div className="flex justify-between font-bold">
+                    <span>Total</span>
+                    <span>₹{cart.BookingPayment?.total_amount.toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
 
-              <Button
-                className="w-full mt-6"
-                onClick={handleProceedToPayment}
+              <Button 
+                className="w-full" 
+                onClick={handleCheckout}
               >
                 Proceed to Payment
               </Button>

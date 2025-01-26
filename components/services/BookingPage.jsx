@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { format } from 'date-fns'; // Added missing import
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +8,7 @@ import { ChevronLeft } from "lucide-react";
 import BookingForm from "../booking/BookingForm";
 import { CartPreview } from "../services/CartPreview";
 import { serviceAPI } from "@/api/services";
+import { cartService } from "@api/cartService";
 
 export function BookingPage({
   cityName,
@@ -16,12 +18,10 @@ export function BookingPage({
   cityId,
   onBack,
 }) {
-  const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
-  // Function to safely convert price to number and format it
   const formatPrice = (price) => {
     const numPrice = typeof price === "string" ? parseFloat(price) : price;
     return isNaN(numPrice) ? "0.00" : numPrice.toFixed(2);
@@ -29,27 +29,49 @@ export function BookingPage({
 
   const handleBookingSubmit = async (bookingDetails) => {
     try {
+      if (!selectedItems.length) {
+        toast({
+          title: "Error",
+          description: "Please select at least one service",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!cityId) {
+        toast({
+          title: "Error",
+          description: "City ID is required",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setLoading(true);
-      const response = await serviceAPI.addToCart({
-        cityId: cityId,
+      
+      const cartData = {
+        cityId,
         items: selectedItems.map((item) => ({
           itemId: item.id,
           itemType: item.type,
           quantity: item.quantity || 1,
         })),
-        bookingDate: bookingDetails.bookingDate,
+        bookingDate: format(bookingDetails.bookingDate, 'yyyy-MM-dd'),
         startTime: bookingDetails.startTime,
-        serviceAddress: "", // This should be collected from user
-        serviceLocation: "", // This should be collected from user
-        customerNotes: "",
-      });
+        serviceAddress: bookingDetails.serviceAddress,
+        serviceLocation: bookingDetails.serviceLocation,
+        customerNotes: bookingDetails.customerNotes || ''
+      };
 
-      setCart(response.data);
-      router.push(`/cart`);
+      console.log('Submitting cart data:', cartData); // Debug log
+
+      const response = await cartService.addToCart(cartData);
+      router.push('/cart');
     } catch (error) {
+      console.error('Booking error:', error);
       toast({
         title: "Error",
-        description: "Failed to create booking. Please try again.",
+        description: error.response?.data?.message || "Failed to create booking. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -57,10 +79,8 @@ export function BookingPage({
     }
   };
 
-  // Calculate total amount
   const totalAmount = selectedItems.reduce((sum, item) => {
-    const price =
-      typeof item.price === "string" ? parseFloat(item.price) : item.price;
+    const price = typeof item.price === "string" ? parseFloat(item.price) : item.price;
     const quantity = item.quantity || 1;
     return sum + price * quantity;
   }, 0);
