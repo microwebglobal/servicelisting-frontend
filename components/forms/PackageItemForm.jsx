@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { serviceAPI } from "../../api/services";
+import { toast } from "@hooks/use-toast";
 
 export const PackageItemForm = ({ mode, data, selectedData, onClose }) => {
   const [cities, setCities] = useState([]);
@@ -161,6 +162,56 @@ export const PackageItemForm = ({ mode, data, selectedData, onClose }) => {
       console.error("Error submitting package item:", error);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      if (data?.item_id) {
+        await serviceAPI.deletePackageItem(data.item_id);
+
+        toast({
+          title: "Success!",
+          description: "Package item deleted successfully!",
+          variant: "default",
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "No package item selected for deletion!",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting package item:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to delete package item!",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (mode === "delete") {
+    return (
+      <div className="space-y-4">
+        <p>Are you sure you want to delete this package item?</p>
+        <div className="flex space-x-4">
+          <Button className="flex-1" onClick={handleDelete}>
+            Confirm
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

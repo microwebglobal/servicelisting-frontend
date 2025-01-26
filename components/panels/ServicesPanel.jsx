@@ -67,6 +67,12 @@ export const ServicesPanel = ({
                   Edit Service
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  onClick={() => onAction("service", "delete", service)}
+                  className="text-red-600"
+                >
+                  Delete Service
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   onClick={() => onAction("serviceItem", "add", service)}
                 >
                   Add Item

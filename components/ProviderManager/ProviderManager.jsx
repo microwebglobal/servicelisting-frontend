@@ -12,13 +12,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
-import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, PenBoxIcon, XCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import ProviderDetails from "@components/ProviderDetails";
+
 const getDisplayValue = (value, defaultValue = "N/A") => {
   if (Array.isArray(value)) {
     return value.length > 0 ? value.join(", ") : defaultValue;
@@ -46,204 +48,6 @@ const formatLocation = (location) => {
   return "No location data";
 };
 
-const ProviderDetails = ({ provider }) => {
-  const getDisplayValue = (value, defaultValue = "N/A") => {
-    if (Array.isArray(value)) {
-      return value.length > 0 ? value.join(", ") : defaultValue;
-    }
-    return value || defaultValue;
-  };
-
-  return (
-    <div className="space-y-6 p-4">
-      {/* Business/Individual Details */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-2">
-          {provider.business_type === "business"
-            ? "Business Details"
-            : "Individual Details"}
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Name</p>
-            <p className="font-medium">
-              {getDisplayValue(provider.business_name || provider?.User.name)}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Type</p>
-            <p className="font-medium capitalize">
-              {getDisplayValue(provider.business_type)}
-            </p>
-          </div>
-          {provider.business_type === "individual" && (
-            <>
-              <div>
-                <p className="text-sm text-gray-500">AAHAR Number</p>
-                <p className="font-medium">
-                  {getDisplayValue(provider.aadhar_number)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">PAN Number</p>
-                <p className="font-medium">
-                  {getDisplayValue(provider.pan_number)}
-                </p>
-              </div>
-            </>
-          )}
-          {provider.business_type === "business" && (
-            <>
-              <div>
-                <p className="text-sm text-gray-500">Registration Number</p>
-                <p className="font-medium">
-                  {getDisplayValue(provider.business_registration_number)}
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Contact Details */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-2">Contact Details</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Location</p>
-            <p className="font-medium">
-              {formatLocation(provider.primary_location)}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Whatsapp No</p>
-            <p className="font-medium">{provider.whatsapp_number}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Service Radius</p>
-            <p className="font-medium">{provider.service_radius || 0}km</p>
-          </div>
-          {provider.languages_spoken && (
-            <div>
-              <p className="text-sm text-gray-500">Languages Spoken</p>
-              <p className="font-medium">
-                {getDisplayValue(provider.languages_spoken)}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Professional Info */}
-      {provider.business_type === "individual" && (
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold border-b pb-2">
-            Professional Info
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Experience</p>
-              <p className="font-medium">
-                {provider.years_experience || 0} years
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Specializations</p>
-              <p className="font-medium">
-                {getDisplayValue(provider.specializations)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Qualification</p>
-              <p className="font-medium">
-                {getDisplayValue(provider.qualification)}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Service Details */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold border-b pb-2">Service Details</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Availability</p>
-            <p className="font-medium capitalize">
-              {getDisplayValue(provider.availability_type)}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Payment Method</p>
-            <p className="font-medium uppercase">
-              {getDisplayValue(provider.payment_method)}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* provider employees */}
-      {provider.ServiceProviderEmployees.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold border-b pb-2">
-            Employee Details
-          </h3>
-          <div className="grid grid-cols-2 gap-4 ">
-            {provider.ServiceProviderEmployees.map((employee) => {
-              return (
-                <div
-                  key={employee.employee_id}
-                  className="bg-slate-100 p-4 rounded-lg"
-                >
-                  {" "}
-                  <div className="mb-2">
-                    <p className="text-sm text-gray-500 ">Employee Name:</p>
-                    <p className="font-medium uppercase">
-                      {employee?.User.name}
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <p className="text-sm text-gray-500 ">Employee Mobile:</p>
-                    <p className="font-medium uppercase">
-                      {employee?.User.mobile}
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <p className="text-sm text-gray-500 ">Employee Id:</p>
-                    <p className="font-medium uppercase">
-                      {employee.employee_id}
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <p className="text-sm text-gray-500">Employee Role:</p>
-                    <p className="font-medium uppercase">
-                      {getDisplayValue(employee.role)}
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <p className="text-sm text-gray-500 ">
-                      Employee Account Status:
-                    </p>
-                    <p className="font-medium uppercase">
-                      {employee?.User.account_status}
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <p className="text-sm text-gray-500">Employee Status:</p>
-                    <p className="font-medium uppercase">
-                      {getDisplayValue(employee.status)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
 const ProviderManager = () => {
   const [providers, setProviders] = useState([]);
   const [filteredProviders, setFilteredProviders] = useState([]);
@@ -256,6 +60,7 @@ const ProviderManager = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectingProvider, setRejectingProvider] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     fetchProviders();
   }, []);
@@ -517,8 +322,16 @@ const ProviderManager = () => {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Provider Details</DialogTitle>
+            <Button onClick={() => setIsEditing(true)}>
+              <PenBoxIcon />
+            </Button>
           </DialogHeader>
-          {selectedProvider && <ProviderDetails provider={selectedProvider} />}
+          {selectedProvider && (
+            <ProviderDetails
+              provider={selectedProvider}
+              isEditing={isEditing}
+            />
+          )}
         </DialogContent>
       </Dialog>
       <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>

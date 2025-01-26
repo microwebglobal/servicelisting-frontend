@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { serviceAPI } from "../../api/services";
+import { toast } from "@hooks/use-toast";
 
 export const ServiceForm = ({ mode, data, selectedData, onClose }) => {
   console.log(selectedData);
@@ -33,6 +34,56 @@ export const ServiceForm = ({ mode, data, selectedData, onClose }) => {
       console.error("Error submitting service:", error);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      if (data?.service_id) {
+        await serviceAPI.deleteService(data.service_id);
+
+        toast({
+          title: "Success!",
+          description: "Service deleted successfully!",
+          variant: "default",
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "No service selected for deletion!",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting service:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to delete service!",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (mode === "delete") {
+    return (
+      <div className="space-y-4">
+        <p>Are you sure you want to delete this service?</p>
+        <div className="flex space-x-4">
+          <Button className="flex-1" onClick={handleDelete}>
+            Confirm
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

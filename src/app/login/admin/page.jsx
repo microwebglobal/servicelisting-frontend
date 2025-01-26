@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import { LoginAPI } from "@/api/login";
+import { useAuth } from "@src/context/AuthContext";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -11,17 +12,24 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  
+  const { login } = useAuth();
+
   const router = useRouter();
 
   const handleLogin = async () => {
     try {
       setIsLoading(true);
       setError("");
-      
+
       const response = await LoginAPI.adminLogin(email, password);
       if (response.data.success) {
-        router.push("/admin/dashboard");
+        console.log(response.data);
+        login({
+          email: response.data.user.email,
+          role: "admin",
+        });
+
+        router.push("/admin");
       }
     } catch (error) {
       setError(error.response?.data?.message || "Invalid credentials");
@@ -40,7 +48,7 @@ const AdminLogin = () => {
           height={100}
           className="border-solid border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
         />
-        
+
         <div className="ml-14 w-96">
           <h2 className="text-3xl font-semibold text-center mb-2">
             Admin Login
@@ -50,9 +58,7 @@ const AdminLogin = () => {
           </p>
 
           {error && (
-            <div className="mb-4 text-red-500 text-center">
-              {error}
-            </div>
+            <div className="mb-4 text-red-500 text-center">{error}</div>
           )}
 
           <div className="relative mb-6">

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { serviceAPI } from "../../api/services";
+import { toast } from "@hooks/use-toast";
 
 export const PackageForm = ({ mode, data, selectedData, onClose }) => {
   const [formData, setFormData] = useState({
@@ -14,20 +15,72 @@ export const PackageForm = ({ mode, data, selectedData, onClose }) => {
     sections: data?.PackageSections || [],
   });
 
+  console.log(data, mode);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
     try {
-      if (mode === "edit" && data?.service_id) {
-        await serviceAPI.updatePackage(data.service_id, formData);
+      if (mode === "edit" && data?.package_id) {
+        await serviceAPI.updatePackage(data.package_id, formData);
       } else {
         await serviceAPI.createPackage(formData);
       }
       onClose();
     } catch (error) {
-      console.error("Error submitting service:", error);
+      console.error("Error submitting package:", error);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      if (data?.package_id) {
+        await serviceAPI.deletePackage(data.package_id);
+
+        toast({
+          title: "Success!",
+          description: "Package deleted successfully!",
+          variant: "default",
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "No package selected for deletion!",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting package:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to delete package:!",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (mode === "delete") {
+    return (
+      <div className="space-y-4">
+        <p>Are you sure you want to delete this package:?</p>
+        <div className="flex space-x-4">
+          <Button className="flex-1" onClick={handleDelete}>
+            Confirm
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

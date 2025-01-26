@@ -18,13 +18,6 @@ const ServiceManagement = () => {
   const { dialogState, handleDialog } = useDialog();
   const { modalState, handleModal } = useModal();
 
-  // Handle dialog actions
-  const handleDialogAction = (type, mode, item = null) => {
-    console.log(type, mode, item);
-
-    handleDialog.open(type, mode, item);
-  };
-
   const handleOpenModal = (type, item = null) => {
     setIsOpen(true);
     handleModal.open(type, item);
@@ -32,6 +25,13 @@ const ServiceManagement = () => {
 
   const handleCloseModal = () => {
     setIsOpen(false);
+  };
+
+  // Handle dialog actions
+  const handleDialogAction = (type, mode, item = null) => {
+    console.log(type, mode, item);
+
+    handleDialog.open(type, mode, item);
   };
 
   // Handle dialog close and refresh data

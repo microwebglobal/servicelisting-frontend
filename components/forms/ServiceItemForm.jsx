@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { serviceAPI } from "../../api/services";
 import TextEditor from "@components/ui/textEditor";
+import { toast } from "@hooks/use-toast";
 
 export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
   const [cities, setCities] = useState([]);
@@ -143,6 +144,56 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
       (pricing) => pricing.city_id === cityId
     );
   };
+
+  const handleDelete = async () => {
+    try {
+      if (data?.item_id) {
+        await serviceAPI.deleteServiceItem(data.item_id);
+
+        toast({
+          title: "Success!",
+          description: "Service Item deleted successfully!",
+          variant: "default",
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "No service item selected for deletion!",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting service item:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to delete service item!",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (mode === "delete") {
+    return (
+      <div className="space-y-4">
+        <p>Are you sure you want to delete this service item?</p>
+        <div className="flex space-x-4">
+          <Button className="flex-1" onClick={handleDelete}>
+            Confirm
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
