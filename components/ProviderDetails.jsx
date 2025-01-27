@@ -5,6 +5,8 @@ import { serviceAPI } from "@/api/services";
 import { providerAPI } from "@api/provider";
 import { Button } from "./ui/button";
 import { toast } from "@hooks/use-toast";
+import { DeleteForeverOutlined } from "@node_modules/@mui/icons-material";
+import { PlusCircle } from "lucide-react";
 
 const ProviderDetails = ({ provider, isEditing }) => {
   const [serviceProvider, setServiceProvider] = useState({
@@ -142,12 +144,16 @@ const ProviderDetails = ({ provider, isEditing }) => {
     }));
   };
 
-  const handleRemove = (employeeId) => {
+  const handleRemove = (index) => {
     const updatedEmployees = employeeData.filter(
-      (emp) => emp.employee_id !== employeeId
+      (_, empIndex) => empIndex !== index
     );
     setEmployeeData(updatedEmployees);
-    onUpdate(updatedEmployees);
+
+    setServiceProvider((prevProvider) => ({
+      ...prevProvider,
+      employees: updatedEmployees,
+    }));
   };
 
   const handleCategoryChange = (selectedOptions) => {
@@ -424,14 +430,16 @@ const ProviderDetails = ({ provider, isEditing }) => {
                 <label className="block text-sm font-medium mb-2">
                   Account Status
                 </label>
-                <input
-                  type="text"
+                <select
                   value={serviceProvider.account_status}
                   className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                   onChange={(e) =>
                     handleChange("account_status", e.target.value)
                   }
-                />
+                >
+                  <option value="active">Active</option>
+                  <option value="suspended">Suspend</option>
+                </select>
               </div>
             </div>
 
@@ -463,11 +471,26 @@ const ProviderDetails = ({ provider, isEditing }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
+                <div className="flex gap-4">
+                  <label className="block text-sm font-medium mb-2">
+                    Email
+                  </label>
+                  <span
+                    className={`text-sm font-medium ${
+                      provider?.User?.email_verified
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {provider?.User?.email_verified
+                      ? "Verified"
+                      : "Not Verified"}
+                  </span>
+                </div>
                 <input
                   type="email"
                   value={serviceProvider.email}
-                  className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                  className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                   onChange={(e) => handleChange("email", e.target.value)}
                   placeholder="Email"
                 />
@@ -670,120 +693,187 @@ const ProviderDetails = ({ provider, isEditing }) => {
             </div>
 
             <div className="mt-8">
-              <h2 className="text-xl font-bold text-gray-800">
-                Service Provider Employees
-              </h2>
-              <hr className="mb-6 border-gray-300" />
-
-              <div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  {employeeData.map((emp, index) => (
-                    <div
-                      key={index}
-                      className="bg-white border rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-300"
-                    >
-                      <div className="flex flex-col gap-3">
-                        <input
-                          type="text"
-                          name="name"
-                          placeholder="Name"
-                          value={emp?.User?.name || ""}
-                          onChange={(e) =>
-                            handleEmployeeChange(e, emp.employee_id)
-                          }
-                          className="border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                        />
-                        <input
-                          type="email"
-                          name="email"
-                          placeholder="Email"
-                          value={emp?.User?.email || ""}
-                          onChange={(e) =>
-                            handleEmployeeChange(e, emp.employee_id)
-                          }
-                          className="border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                        />
-                        <input
-                          type="text"
-                          name="mobile"
-                          placeholder="Mobile"
-                          value={emp?.User?.mobile || ""}
-                          onChange={(e) =>
-                            handleEmployeeChange(e, emp.employee_id)
-                          }
-                          className="border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                        />
-                        <input
-                          type="text"
-                          name="role"
-                          placeholder="Role"
-                          value={emp.role || ""}
-                          onChange={(e) =>
-                            handleEmployeeChange(e, emp.employee_id)
-                          }
-                          className="border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                        />
-                        <input
-                          type="text"
-                          name="qualification"
-                          placeholder="Qualification"
-                          value={emp.qualification || ""}
-                          onChange={(e) =>
-                            handleEmployeeChange(e, emp.employee_id)
-                          }
-                          className="border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                        />
-                        <input
-                          type="number"
-                          name="years_experience"
-                          placeholder="Years of Experience"
-                          value={emp.years_experience || 0}
-                          onChange={(e) =>
-                            handleEmployeeChange(e, emp.employee_id)
-                          }
-                          className="border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                        />
-                        <select
-                          name="gender"
-                          value={emp?.User?.gender || ""}
-                          onChange={(e) =>
-                            handleEmployeeChange(e, emp.employee_id)
-                          }
-                          className="border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                        >
-                          <option value="" disabled>
-                            Select Gender
-                          </option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Other">Other</option>
-                        </select>
-                        <input
-                          type="date"
-                          name="dob"
-                          placeholder="Date of Birth"
-                          value={emp?.User?.dob || ""}
-                          onChange={(e) =>
-                            handleEmployeeChange(e, emp.employee_id)
-                          }
-                          className="border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="flex justify-between mb-2">
+                <h2 className="text-xl font-bold text-gray-800">
+                  Service Provider Employees
+                </h2>
 
                 <button
                   type="button"
                   onClick={handleAddEmployee}
-                  className="mt-6 bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition-all duration-300"
+                  className="bg-black flex space-x-2 text-white px-2 py-1 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300"
                 >
-                  Add Employee
+                  <PlusCircle />
+                  <span>Add Employee</span>
                 </button>
               </div>
-            </div>
+              <hr className="mb-6 border-gray-300" />
 
-            {/* Add similar sections for cities and payment details */}
+              <div className="p-6">
+                <div className="grid  grid-cols-2 gap-6">
+                  {employeeData.map((emp, index) => (
+                    <div
+                      key={index}
+                      className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 justify-between w-64"
+                    >
+                      <div className="flex justify-between items-center mb-4 bg-black p-3 rounded-t-xl">
+                        <h3 className="text-lg font-semibold text-white">
+                          {emp?.User?.name || "New Employee"}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => handleRemove(index)}
+                          className="text-red-600 hover:text-red-800 transition-all"
+                        >
+                          <DeleteForeverOutlined />
+                        </button>
+                      </div>
+
+                      <div className="flex flex-col gap-4 p-6">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Employee Name
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            placeholder="Name"
+                            value={emp?.User?.name || ""}
+                            onChange={(e) =>
+                              handleEmployeeChange(e, emp.employee_id)
+                            }
+                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                          />
+                        </div>
+                        <div>
+                          <div className="flex gap-5">
+                            <label className="block text-sm font-medium mb-2">
+                              Employee Email
+                            </label>
+                            <span
+                              className={`text-xs ${
+                                emp?.User?.email_verified
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {emp?.User?.email_verified
+                                ? "Verified"
+                                : "Not Verified"}
+                            </span>
+                          </div>
+                          <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            value={emp?.User?.email || ""}
+                            onChange={(e) =>
+                              handleEmployeeChange(e, emp.employee_id)
+                            }
+                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Employee Mobile
+                          </label>
+                          <input
+                            type="text"
+                            name="mobile"
+                            placeholder="Mobile"
+                            value={emp?.User?.mobile || ""}
+                            onChange={(e) =>
+                              handleEmployeeChange(e, emp.employee_id)
+                            }
+                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Employee Role
+                          </label>
+                          <input
+                            type="text"
+                            name="role"
+                            placeholder="Role"
+                            value={emp.role || ""}
+                            onChange={(e) =>
+                              handleEmployeeChange(e, emp.employee_id)
+                            }
+                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                          />
+                        </div>{" "}
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Employee Qualification
+                          </label>
+                          <input
+                            type="text"
+                            name="qualification"
+                            placeholder="Qualification"
+                            value={emp.qualification || ""}
+                            onChange={(e) =>
+                              handleEmployeeChange(e, emp.employee_id)
+                            }
+                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Yers Experiance
+                          </label>
+                          <input
+                            type="number"
+                            name="years_experience"
+                            placeholder="Years of Experience"
+                            value={emp.years_experience || 0}
+                            onChange={(e) =>
+                              handleEmployeeChange(e, emp.employee_id)
+                            }
+                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Gender
+                          </label>
+                          <select
+                            name="gender"
+                            value={emp?.User?.gender || ""}
+                            onChange={(e) =>
+                              handleEmployeeChange(e, emp.employee_id)
+                            }
+                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                          >
+                            <option value="" disabled>
+                              Select Gender
+                            </option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Birth Date
+                          </label>
+                          <input
+                            type="date"
+                            name="dob"
+                            placeholder="Date of Birth"
+                            value={emp?.User?.dob || ""}
+                            onChange={(e) =>
+                              handleEmployeeChange(e, emp.employee_id)
+                            }
+                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <Button
               type="submit"
@@ -932,6 +1022,7 @@ const ProviderDetails = ({ provider, isEditing }) => {
               <h3 className="text-lg font-semibold border-b pb-2">
                 Employee Details
               </h3>
+
               <div className="grid grid-cols-2 gap-4 ">
                 {provider.ServiceProviderEmployees.map((employee) => {
                   return (

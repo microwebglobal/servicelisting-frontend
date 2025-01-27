@@ -9,7 +9,12 @@ export const providerAPI = {
   rejectEnquiry: (inquiryId) => api.put(`/enquiry/${inquiryId}/reject`),
 
   // Service Provider Registration
-  registerProvider: (data) => api.post("/provider/register", data),
+  registerProvider: (data) =>
+    api.post("/provider/register", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   getProvider: (id) => api.get(`/provider/${id}`),
   updateProvider: (id, data) => api.put(`/provider/${id}`, data),
   updateProviderProfile: (id, data) => api.put(`/provider/update/${id}`, data),

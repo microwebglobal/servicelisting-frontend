@@ -50,12 +50,12 @@ const BusinessRegistrationForm = ({ previousData }) => {
       experience: "",
     }),
     documents: {
-      business_registration_doc: null,
+      business_registration: null,
       address_proof: null,
-      employee_insurance_docs: null,
-      signed_terms: null,
-      signed_agreement: null,
-      logo: null,
+      insurance: null,
+      terms_acceptance: null,
+      agreement: null,
+      aadhar: null,
     },
     payment_method: "upi",
     payment_details: {
@@ -193,7 +193,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    console.log("Form data:", formData);
 
     if (!validateStep(step)) {
       return;
@@ -206,7 +206,11 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
       // Append non-file fields
       Object.keys(formData).forEach((key) => {
-        if (key !== "documents") {
+        if (
+          key !== "documents" &&
+          formData[key] !== undefined &&
+          formData[key] !== null
+        ) {
           formDataToSend.append(
             key,
             typeof formData[key] === "object"
@@ -216,35 +220,46 @@ const BusinessRegistrationForm = ({ previousData }) => {
         }
       });
 
-      // Append files
+      // Append file fields
       Object.entries(formData.documents).forEach(([key, file]) => {
         if (file) {
           formDataToSend.append(key, file);
         }
       });
 
+      console.log("FormData to send:");
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(`${key}:`, value);
+      }
+
       const response = await providerAPI.registerProvider(formDataToSend);
+
       toast({
         title: "Success!",
         description: "Your registration was submitted successfully.",
         variant: "default",
       });
+
       console.log(response);
+
       if (response?.provider_id) {
+        // Handle success
         toast({
           title: "Success!",
           description: "Your registration was submitted successfully.",
           variant: "default",
         });
-        // Handle successful registration (e.g., redirect)
       }
     } catch (error) {
       console.error("Registration error:", error);
+
       setErrors(error.response?.data?.validation || {});
+
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
         "Registration failed. Please try again.";
+
       toast({
         title: "Error",
         description: errorMessage,
