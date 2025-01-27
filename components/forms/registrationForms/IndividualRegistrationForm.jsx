@@ -36,19 +36,20 @@ const IndividualRegistrationForm = ({ previousData }) => {
     },
     years_experience: previousData?.years_experience || "",
     specializations: previousData?.skills || [],
+
     profile_bio: "",
     certificates_awards: "",
-    profile_picture: null,
+    logo: null,
     id_proof: null,
-    aadhar_card: null,
-    pan_card: null,
+    aadhar: null,
+    pan: null,
     address_proof: null,
     qualification_proof: null,
-    service_certificates: null,
-    insurance_documents: null,
-    signed_agreement: null,
-    signed_terms: null,
-    portfolio_images: [],
+    service_certificate: null,
+    insurance: null,
+    agreement: null,
+    terms_acceptance: null,
+
     social_media_links: {
       facebook: "",
       instagram: "",
@@ -163,13 +164,13 @@ const IndividualRegistrationForm = ({ previousData }) => {
         if (!formData.profile_bio) newErrors.profile_bio = "Required";
         break;
       case 3:
-        if (!formData.profile_picture) newErrors.profile_picture = "Required";
+        if (!formData.logo) newErrors.logo = "Required";
         if (!formData.id_proof) newErrors.id_proof = "Required";
-        if (!formData.aadhar_card) newErrors.aadhar_card = "Required";
-        if (!formData.pan_card) newErrors.pan_card = "Required";
+        if (!formData.aadhar) newErrors.aadhar = "Required";
+        if (!formData.pan) newErrors.pan = "Required";
         if (!formData.address_proof) newErrors.address_proof = "Required";
-        if (!formData.signed_agreement) newErrors.signed_agreement = "Required";
-        if (!formData.signed_terms) newErrors.signed_terms = "Required";
+        if (!formData.agreement) newErrors.agreement = "Required";
+        if (!formData.terms_acceptance) newErrors.terms_acceptance = "Required";
         break;
       case 4:
         if (formData.payment_method === "upi") {
@@ -215,17 +216,16 @@ const IndividualRegistrationForm = ({ previousData }) => {
       Object.keys(formData).forEach((key) => {
         if (
           ![
-            "portfolio_images",
-            "profile_picture",
+            "logo",
             "id_proof",
-            "aadhar_card",
-            "pan_card",
+            "aadhar",
+            "pan",
             "address_proof",
             "qualification_proof",
-            "service_certificates",
-            "insurance_documents",
-            "signed_agreement",
-            "signed_terms",
+            "service_certificate",
+            "insurance",
+            "agreement",
+            "terms_acceptance",
           ].includes(key)
         ) {
           formDataObj.append(
@@ -238,30 +238,25 @@ const IndividualRegistrationForm = ({ previousData }) => {
       });
 
       const singleFiles = [
-        "profile_picture",
+        "logo",
         "id_proof",
-        "aadhar_card",
-        "pan_card",
+        "aadhar",
+        "pan",
         "address_proof",
         "qualification_proof",
-        "insurance_documents",
-        "signed_agreement",
-        "signed_terms",
+        "service_certificate",
+        "insurance",
+        "agreement",
+        "terms_acceptance",
       ];
 
       singleFiles.forEach((file) => {
         if (formData[file]) formDataObj.append(file, formData[file]);
       });
 
-      if (formData.portfolio_images?.length) {
-        Array.from(formData.portfolio_images).forEach((image) => {
-          formDataObj.append("portfolio_images", image);
-        });
-      }
-
-      if (formData.service_certificates?.length) {
-        Array.from(formData.service_certificates).forEach((cert) => {
-          formDataObj.append("service_certificates", cert);
+      if (formData.service_certificate?.length) {
+        Array.from(formData.service_certificate).forEach((cert) => {
+          formDataObj.append("service_certificate", cert);
         });
       }
 
@@ -481,18 +476,17 @@ const IndividualRegistrationForm = ({ previousData }) => {
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Document Uploads</h2>
       <div className="grid grid-cols-2 gap-4">
-        {renderFileInput("profile_picture", "Profile Picture", true)}
+        {renderFileInput("logo", "Profile Picture", true)}
         {renderFileInput("id_proof", "ID Proof", true)}
-        {renderFileInput("aadhar_card", "Aadhar Card", true)}
-        {renderFileInput("pan_card", "PAN Card", true)}
+        {renderFileInput("aadhar", "Aadhar Card", true)}
+        {renderFileInput("pan", "PAN Card", true)}
         {renderFileInput("address_proof", "Address Proof", true)}
         {renderFileInput("qualification_proof", "Qualification Proof")}
-        {renderFileInput("service_certificates", "Service Certificates")}
-        {renderFileInput("insurance_documents", "Insurance Documents")}
-        {renderFileInput("portfolio_images", "Portfolio Images")}
+        {renderFileInput("service_certificate", "Service Certificates")}
+        {renderFileInput("insurance", "Insurance Documents")}
       </div>
-      {renderFileInput("signed_agreement", "Signed Agreement", true)}
-      {renderFileInput("signed_terms", "Signed Terms & Conditions", true)}
+      {renderFileInput("agreement", "Signed Agreement", true)}
+      {renderFileInput("terms_acceptance", "Signed Terms & Conditions", true)}
     </div>
   );
 
