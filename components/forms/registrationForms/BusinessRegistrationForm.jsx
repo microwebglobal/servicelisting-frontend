@@ -55,7 +55,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
       insurance: null,
       terms_acceptance: null,
       agreement: null,
-      aadhar: null,
+      logo: null,
     },
     payment_method: "upi",
     payment_details: {
@@ -150,13 +150,13 @@ const BusinessRegistrationForm = ({ previousData }) => {
         });
         break;
       case 4:
-        if (!formData.documents.business_registration_doc)
+        if (!formData.documents.business_registration)
           newErrors.business_registration_doc = "Required";
         if (!formData.documents.address_proof)
           newErrors.address_proof = "Required";
-        if (!formData.documents.signed_terms)
+        if (!formData.documents.terms_acceptance)
           newErrors.signed_terms = "Required";
-        if (!formData.documents.signed_agreement)
+        if (!formData.documents.agreement)
           newErrors.signed_agreement = "Required";
         break;
       case 5:
@@ -513,7 +513,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
           <label className="block mb-2">Business Registration Document*</label>
           <input
             type="file"
-            name="business_registration_doc"
+            name="business_registration"
             onChange={handleChange}
             className={`w-full ${
               errors.business_registration_doc ? "border-red-500" : ""
@@ -541,7 +541,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
           <label className="block mb-2">Employee Insurance Documents</label>
           <input
             type="file"
-            name="employee_insurance_docs"
+            name="insurance"
             onChange={handleChange}
             className="w-full"
           />
@@ -550,7 +550,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
           <label className="block mb-2">Signed Terms & Conditions*</label>
           <input
             type="file"
-            name="signed_terms"
+            name="terms_acceptance"
             onChange={handleChange}
             className={`w-full ${errors.signed_terms ? "border-red-500" : ""}`}
           />
@@ -562,7 +562,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
           <label className="block mb-2">Signed Service Agreement*</label>
           <input
             type="file"
-            name="signed_agreement"
+            name="agreement"
             onChange={handleChange}
             className={`w-full ${
               errors.signed_agreement ? "border-red-500" : ""
