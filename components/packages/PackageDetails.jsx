@@ -123,19 +123,22 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
       const selectedItem = section.items.find(
         (item) => item.item_id === selectedItems[section.section_id]
       );
+
       return {
         section: section.name,
         item: selectedItem,
+        itemId: selectedItem.item_id,
       };
     });
 
+    console.log(selectedItemsList);
     const packageWithSelections = {
       ...pkg,
       finalPrice: packageTotal,
       sections: selectedItemsList,
     };
 
-    addToCart(packageWithSelections, "package");
+    addToCart(packageWithSelections, "package_item");
     setIsCustomizing(false);
   };
 

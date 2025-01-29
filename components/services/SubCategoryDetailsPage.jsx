@@ -102,39 +102,84 @@ export function SubCategoryDetailsPage({
   };
 
   const addToCart = (item, type) => {
-    const existingItem = selectedItems.find(
-      (i) => i.id === item.item_id && i.type === type
-    );
+    console.log("item", item);
 
-    if (existingItem) {
-      setSelectedItems(
-        selectedItems.map((i) =>
-          i.id === item.item_id && i.type === type
-            ? { ...i, quantity: (i.quantity || 1) + 1 }
-            : i
-        )
+    // If the item type is service_item, handle adding a single item
+    if (type === "service_item") {
+      const existingItem = selectedItems.find(
+        (i) => i.id === item.item_id && i.type === type
       );
-    } else {
-      setSelectedItems([
-        ...selectedItems,
-        {
-          id: item.item_id,
-          type: type,
-          name: item.name,
-          price:
-            type === "package"
-              ? item.finalPrice
-              : item.SpecialPricings[0]?.special_price || item.base_price,
-          quantity: 1,
-        },
-      ]);
+
+      if (existingItem) {
+        setSelectedItems(
+          selectedItems.map((i) =>
+            i.id === item.item_id && i.type === type
+              ? { ...i, quantity: (i.quantity || 1) + 1 }
+              : i
+          )
+        );
+      } else {
+        setSelectedItems([
+          ...selectedItems,
+          {
+            id: item.item_id,
+            type: type,
+            name: item.name,
+            price:
+              type === "package_item"
+                ? item.finalPrice
+                : item.SpecialPricings[0]?.special_price || item.base_price,
+            quantity: 1,
+          },
+        ]);
+      }
+
+      toast({
+        title: "Added to selection",
+        description: `${item.name} has been added to your selection.`,
+      });
     }
 
-    toast({
-      title: "Added to selection",
-      description: `${item.name} has been added to your selection.`,
-    });
+    // If the item type is package_item, handle adding multiple items
+    if (type === "package_item") {
+      item.sections.forEach((sec) => {
+        const existingItem = selectedItems.find(
+          (i) => i.id === sec.itemId && i.type === type
+        );
+
+        if (existingItem) {
+          setSelectedItems((prevItems) =>
+            prevItems.map((i) =>
+              i.id === sec.itemId && i.type === type
+                ? { ...i, quantity: (i.quantity || 1) + 1 }
+                : i
+            )
+          );
+        } else {
+          setSelectedItems((prevItems) => [
+            ...prevItems,
+            {
+              pkgName: item.name,
+              id: sec.itemId,
+              type: type,
+              name: sec.item.name,
+              price: sec.item.price,
+              quantity: 1,
+            },
+          ]);
+        }
+      });
+
+      toast({
+        title: "Added to selection",
+        description: `${item.name} and its package items have been added to your selection.`,
+      });
+    }
   };
+
+  useEffect(() => {
+    console.log(selectedItems);
+  }, [selectedItems]);
 
   const removeFromSelection = (itemId, type) => {
     setSelectedItems(

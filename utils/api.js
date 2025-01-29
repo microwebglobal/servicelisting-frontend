@@ -14,7 +14,7 @@ export const api = axios.create({
 
 const handleSessionExpired = (user) => {
   localStorage.removeItem("user");
-  
+
   toast({
     title: "Session Expired",
     description: "Please log in again to continue.",
@@ -22,9 +22,10 @@ const handleSessionExpired = (user) => {
   });
 
   // Determine redirect path based on user role
-  const redirectPath = user?.role === "admin" 
-    ? "/login/admin"
-    : user?.role === "service_provider" 
+  const redirectPath =
+    user?.role === "admin"
+      ? "/login/admin"
+      : user?.role === "service_provider"
       ? "/login/provider"
       : "/";
 
@@ -36,7 +37,7 @@ const handleSessionExpired = (user) => {
 
 const handleInsufficientPermissions = () => {
   localStorage.removeItem("user");
-  
+
   toast({
     title: "Access Denied",
     description: "You don't have permission to perform this action.",
@@ -92,7 +93,8 @@ api.interceptors.response.use(
         case 422:
           toast({
             title: "Validation Error",
-            description: error.response.data?.message || "Please check your input.",
+            description:
+              error.response.data?.message || "Please check your input.",
             variant: "destructive",
           });
           break;
@@ -108,7 +110,8 @@ api.interceptors.response.use(
         default:
           toast({
             title: "Error",
-            description: error.response.data?.message || "An unexpected error occurred.",
+            description:
+              error.response.data?.message || "An unexpected error occurred.",
             variant: "destructive",
           });
       }

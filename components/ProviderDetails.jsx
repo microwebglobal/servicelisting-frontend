@@ -7,8 +7,14 @@ import { Button } from "./ui/button";
 import { toast } from "@hooks/use-toast";
 import { DeleteForeverOutlined } from "@node_modules/@mui/icons-material";
 import { PlusCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-const ProviderDetails = ({ provider, isEditing }) => {
+const ProviderDetails = ({
+  provider,
+  isEditing,
+  onCloseDialog,
+  onUpdateProvider,
+}) => {
   const [serviceProvider, setServiceProvider] = useState({
     business_name: provider?.business_name || "",
     business_type: provider?.business_type || "",
@@ -298,12 +304,17 @@ const ProviderDetails = ({ provider, isEditing }) => {
         provider.provider_id,
         serviceProvider
       );
+      if (onUpdateProvider) {
+        onUpdateProvider(serviceProvider);
+      }
       toast({
         title: "Success!",
         description: "Service Provider Details Updated Successfully!",
         variant: "default",
       });
       console.log(response);
+
+      onCloseDialog();
     } catch (error) {
       toast({
         title: "Error",
@@ -311,6 +322,7 @@ const ProviderDetails = ({ provider, isEditing }) => {
         variant: "destructive",
       });
       console.error;
+      onCloseDialog();
     }
   };
 

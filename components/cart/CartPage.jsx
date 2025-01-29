@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { cartService } from '@/services/cartService';
-import { AlertCircle, Trash2 } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { cartService } from "@/api/cartService";
+import { AlertCircle, Trash2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function CartPage() {
   const [cart, setCart] = useState(null);
@@ -23,13 +24,14 @@ export function CartPage() {
     try {
       setLoading(true);
       const cartData = await cartService.getCart();
+      console.log(cartData);
       setCart(cartData);
       setTipAmount(cartData.BookingPayment?.tip_amount || 0);
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -41,31 +43,35 @@ export function CartPage() {
       await cartService.updateCartItem({ itemId, quantity });
       await fetchCart();
       toast({
-        title: 'Success',
-        description: 'Cart updated successfully',
+        title: "Success",
+        description: "Cart updated successfully",
       });
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
 
   const handleUpdateTip = async () => {
     try {
-      await cartService.updateTip(Number(tipAmount));
+      await cartService.updateTip(
+        tipAmount,
+        cart?.BookingPayment?.subtotal,
+        cart?.BookingPayment?.tax_amount
+      );
       await fetchCart();
       toast({
-        title: 'Success',
-        description: 'Tip amount updated',
+        title: "Success",
+        description: "Tip amount updated",
       });
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -73,12 +79,12 @@ export function CartPage() {
   const handleCheckout = async () => {
     try {
       await cartService.proceedToCheckout();
-      router.push('/payment');
+      router.push("/payment");
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -101,7 +107,7 @@ export function CartPage() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Shopping Cart</h1>
-      
+
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2">
           <Card>
@@ -110,9 +116,14 @@ export function CartPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {cart.BookingItems.map((item) => (
-                <div key={item.item_id} className="flex justify-between items-center p-4 border rounded-lg">
+                <div
+                  key={item.item_id}
+                  className="flex justify-between items-center p-4 border rounded-lg"
+                >
                   <div>
-                    <h3 className="font-medium">{item.ServiceItem?.name || item.PackageItem?.name}</h3>
+                    <h3 className="font-medium">
+                      {item.serviceItem?.name || item.packageItem?.name}
+                    </h3>
                     <p className="text-sm text-gray-500">
                       Unit Price: ₹{item.unit_price}
                     </p>
@@ -122,7 +133,12 @@ export function CartPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleUpdateQuantity(item.item_id, Math.max(0, item.quantity - 1))}
+                        onClick={() =>
+                          handleUpdateQuantity(
+                            item.item_id,
+                            Math.max(0, item.quantity - 1)
+                          )
+                        }
                       >
                         -
                       </Button>
@@ -130,7 +146,9 @@ export function CartPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleUpdateQuantity(item.item_id, item.quantity + 1)}
+                        onClick={() =>
+                          handleUpdateQuantity(item.item_id, item.quantity + 1)
+                        }
                       >
                         +
                       </Button>
@@ -158,11 +176,11 @@ export function CartPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>₹{cart.BookingPayment?.subtotal.toFixed(2)}</span>
+                  <span>₹{cart?.BookingPayment?.subtotal}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax (18%)</span>
-                  <span>₹{cart.BookingPayment?.tax_amount.toFixed(2)}</span>
+                  <span>₹{cart.BookingPayment?.tax_amount}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Input
@@ -178,15 +196,12 @@ export function CartPage() {
                 <div className="pt-4 border-t">
                   <div className="flex justify-between font-bold">
                     <span>Total</span>
-                    <span>₹{cart.BookingPayment?.total_amount.toFixed(2)}</span>
+                    <span>₹{cart.BookingPayment?.total_amount}</span>
                   </div>
                 </div>
               </div>
 
-              <Button 
-                className="w-full" 
-                onClick={handleCheckout}
-              >
+              <Button className="w-full" onClick={handleCheckout}>
                 Proceed to Payment
               </Button>
             </CardContent>

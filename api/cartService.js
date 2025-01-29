@@ -1,49 +1,57 @@
 // cartService.js
-import { api } from '../utils/api';
+import { api } from "../utils/api";
 
 export const cartService = {
   addToCart: async (cartData) => {
     try {
-      const response = await api.post('/cart/add', cartData);
+      const response = await api.post("/cart/add", cartData);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to add to cart');
+      throw new Error(error.response?.data?.message || "Failed to add to cart");
     }
   },
 
   getCart: async () => {
     try {
-      const response = await api.get('/cart');
+      const response = await api.get("/cart");
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch cart');
+      throw new Error(error.response?.data?.message || "Failed to fetch cart");
     }
   },
 
   updateCartItem: async (itemData) => {
     try {
-      const response = await api.put('/cart/item', itemData);
+      const response = await api.put("/cart/item", itemData);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to update cart item');
+      throw new Error(
+        error.response?.data?.message || "Failed to update cart item"
+      );
     }
   },
 
-  updateTip: async (tipAmount) => {
+  updateTip: async (tipAmount, subTotal, taxAmount) => {
     try {
-      const response = await api.put('/cart/tip', { tipAmount });
+      const response = await api.put("/cart/tip", {
+        tipAmount,
+        subTotal,
+        taxAmount,
+      });
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to update tip');
+      throw new Error(error.response?.data?.message || "Failed to update tip");
     }
   },
 
   proceedToCheckout: async () => {
     try {
-      const response = await api.post('/cart/checkout');
+      const response = await api.post("/cart/checkout");
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to proceed to checkout');
+      throw new Error(
+        error.response?.data?.message || "Failed to proceed to checkout"
+      );
     }
-  }
+  },
 };

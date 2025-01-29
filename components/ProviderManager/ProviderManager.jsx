@@ -63,7 +63,7 @@ const ProviderManager = () => {
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     fetchProviders();
-  }, []);
+  }, [isDialogOpen]);
 
   const handleReject = async () => {
     try {
@@ -181,6 +181,18 @@ const ProviderManager = () => {
     }
 
     setFilteredProviders(filtered);
+  };
+
+  const handleUpdateProvider = (updatedProvider) => {
+    console.log("Updated", updatedProvider);
+    setFilteredProviders((prevProviders) =>
+      prevProviders.map((provider) =>
+        provider.provider_id === updatedProvider.provider_id
+          ? { ...updatedProvider }
+          : provider
+      )
+    );
+    console.log(filteredProviders);
   };
 
   useEffect(() => {
@@ -321,15 +333,23 @@ const ProviderManager = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Provider Details</DialogTitle>
-            <Button onClick={() => setIsEditing(true)}>
-              <PenBoxIcon />
-            </Button>
+            <div className="flex gap-10">
+              <DialogTitle className="font-bold text-3xl">
+                Provider Details
+              </DialogTitle>
+              {!isEditing && (
+                <Button onClick={() => setIsEditing(true)}>
+                  <PenBoxIcon />
+                </Button>
+              )}
+            </div>
           </DialogHeader>
           {selectedProvider && (
             <ProviderDetails
               provider={selectedProvider}
               isEditing={isEditing}
+              onCloseDialog={() => setIsDialogOpen(false)}
+              onUpdateProvider={handleUpdateProvider}
             />
           )}
         </DialogContent>

@@ -124,7 +124,7 @@ export function ServiceList({ typeId, cityId, addToCart }) {
                       <Button
                         size="sm"
                         className="mt-2"
-                        onClick={() => addToCart(item, "service")}
+                        onClick={() => addToCart(item, "service_item")}
                       >
                         Add to Cart
                       </Button>
