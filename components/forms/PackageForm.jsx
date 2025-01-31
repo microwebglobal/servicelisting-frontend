@@ -14,17 +14,30 @@ export const PackageForm = ({ mode, data, selectedData, onClose }) => {
     duration_minutes: data?.duration_minutes || 0,
     sections: data?.PackageSections || [],
   });
-
-  console.log(data, mode);
+  const [image, setImage] = useState();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formDataToSend = new FormData();
+
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("type_id", formData.type_id);
+    formDataToSend.append("duration_hours", formData.duration_hours);
+    formDataToSend.append("duration_minutes", formData.duration_minutes);
+    formDataToSend.append("sections", formData.sections);
+
+    if (image) {
+      console.log(image);
+      formDataToSend.append("image", image);
+    }
     console.log(formData);
     try {
       if (mode === "edit" && data?.package_id) {
-        await serviceAPI.updatePackage(data.package_id, formData);
+        await serviceAPI.updatePackage(data.package_id, formDataToSend);
       } else {
-        await serviceAPI.createPackage(formData);
+        await serviceAPI.createPackage(formDataToSend);
       }
       onClose();
     } catch (error) {
@@ -127,6 +140,15 @@ export const PackageForm = ({ mode, data, selectedData, onClose }) => {
               })
             }
             required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Package Icon</label>
+          <Input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImage(e.target.files[0])}
           />
         </div>
       </div>

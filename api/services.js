@@ -43,7 +43,12 @@ export const serviceAPI = {
 
   // Services
   getServices: (typeId) => api.get(`/services/items/${typeId}`),
-  createService: (data) => api.post("/services", data),
+  createService: (data) =>
+    api.post("/services", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   updateService: (id, data) => api.put(`/services/${id}`, data),
   deleteService: (id) => api.delete(`/services/${id}`),
 
@@ -63,14 +68,24 @@ export const serviceAPI = {
   deleteCity: (id) => api.delete(`/cities/${id}`),
 
   //packages
-  createPackage: (data) => api.post("/packages", data),
+  createPackage: (data) =>
+    api.post("/packages", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   updatePackage: (id, data) => api.put(`/packages/${id}`, data),
   deletePackage: (id) => api.delete(`/packages/${id}`),
   getPackages: (itemId) => api.get(`/packages/item/${itemId}`),
   getPackagesByType: (typeId) => api.get(`/packages/types/${typeId}`),
 
   //paclage items
-  createPackageItem: (data) => api.post("/package-items", data),
+  createPackageItem: (data) =>
+    api.post("/package-items", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   updatePackageItem: (id, data) => api.put(`/package-items/${id}`, data),
   deletePackageItem: (id) => api.delete(`/package-items/${id}`),
   getPackageItems: (packageId) =>
@@ -80,7 +95,12 @@ export const serviceAPI = {
     api.get(`/sections/package/${packageId}`),
   getItemsbySection: (sectionId) =>
     api.get(`/package-items/section/${sectionId}`),
-  createPackageSection: (data) => api.post("/sections", data),
+  createPackageSection: (data) =>
+    api.post("/sections", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   updatePackageSection: (id, data) => api.put(`/sections/${id}`, data),
   deletePackageSection: (id) => api.delete(`/sections/${id}`),
 

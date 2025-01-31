@@ -18,9 +18,25 @@ export const PackageSectionForm = ({
     display_order: data?.display_order || 0,
     package_id: data?.package_id || selectedData?.packageId || "",
   });
+  const [image, setImage] = useState();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formDataToSend = new FormData();
+
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append(
+      "display_order",
+      parseInt(formData.display_order) || 0
+    );
+    formDataToSend.append("package_id", formData.package_id);
+
+    if (image) {
+      console.log(image);
+      formDataToSend.append("image", image);
+    }
 
     if (!selectedData?.packageId) {
       console.error("Package ID is required");
@@ -28,16 +44,10 @@ export const PackageSectionForm = ({
     }
 
     try {
-      const submissionData = {
-        ...formData,
-        display_order: parseInt(formData.display_order) || 0,
-        package_id: selectedData.packageId,
-      };
-
       if (mode === "add") {
-        await serviceAPI.createPackageSection(submissionData);
+        await serviceAPI.createPackageSection(formDataToSend);
       } else {
-        await serviceAPI.updatePackageSection(data.section_id, submissionData);
+        await serviceAPI.updatePackageSection(data.section_id, formDataToSend);
       }
       onClose();
     } catch (error) {
@@ -135,6 +145,16 @@ export const PackageSectionForm = ({
               display_order: parseInt(e.target.value) || 0,
             })
           }
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="image">Package Section Icon</Label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
         />
       </div>
 

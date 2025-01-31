@@ -327,6 +327,19 @@ function CustomerProfile() {
           </div>
         </div>
 
+        {/* Bookings Section */}
+        <div className="mt-8">
+          <h3 className="font-bold mb-4">My Bookings</h3>
+          <div className="space-y-4">
+            <button
+              onClick={() => router.push("/profile/customer/bookings")}
+              className="bg-green-500 text-white px-4 py-2 rounded w-full"
+            >
+              Bookings
+            </button>
+          </div>
+        </div>
+
         <button
           onClick={handleLogout}
           className="w-full bg-red-500 text-white py-2 mt-8 rounded"

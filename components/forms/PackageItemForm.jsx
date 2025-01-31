@@ -40,6 +40,8 @@ export const PackageItemForm = ({ mode, data, selectedData, onClose }) => {
       })) || [],
   });
 
+  const [image, setImage] = useState();
+
   console.log(data);
 
   useEffect(() => {
@@ -152,10 +154,35 @@ export const PackageItemForm = ({ mode, data, selectedData, onClose }) => {
         return;
       }
 
+      const formDataToSend = new FormData();
+
+      formDataToSend.append("name", submissionData.name);
+      formDataToSend.append("description", submissionData.description);
+      formDataToSend.append("price", submissionData.price);
+      formDataToSend.append("is_default", submissionData.is_default);
+      formDataToSend.append("section_id", submissionData.section_id);
+      formDataToSend.append(
+        "city_prices",
+        JSON.stringify(submissionData.city_prices)
+      );
+      formDataToSend.append(
+        "specialPricing",
+        JSON.stringify(submissionData.specialPricing)
+      );
+      formDataToSend.append(
+        "display_order",
+        parseInt(submissionData.display_order) || 0
+      );
+
+      if (image) {
+        console.log(image);
+        formDataToSend.append("image", image);
+      }
+
       if (mode === "add") {
-        await serviceAPI.createPackageItem(submissionData);
+        await serviceAPI.createPackageItem(formDataToSend);
       } else {
-        await serviceAPI.updatePackageItem(data.item_id, submissionData);
+        await serviceAPI.updatePackageItem(data.item_id, formDataToSend);
       }
       onClose();
     } catch (error) {
@@ -428,6 +455,16 @@ export const PackageItemForm = ({ mode, data, selectedData, onClose }) => {
             </Button>
           </div>
         ))}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="image">Package Item Icon</Label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+        />
       </div>
 
       <div className="flex gap-2 justify-end pt-4">

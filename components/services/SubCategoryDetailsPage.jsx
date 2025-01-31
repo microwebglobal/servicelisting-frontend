@@ -193,6 +193,12 @@ export function SubCategoryDetailsPage({
     });
   };
 
+  const getUserInfo = () => {
+    const userInfo = JSON.parse(localStorage.getItem("user"));
+    console.log(userInfo);
+    return userInfo ? userInfo : null;
+  };
+
   const handleProceedToBooking = () => {
     if (selectedItems.length === 0) {
       toast({
@@ -203,7 +209,20 @@ export function SubCategoryDetailsPage({
       });
       return;
     }
-    setShowBooking(true);
+    const userInfo = getUserInfo();
+
+    if (userInfo) {
+      setShowBooking(true);
+    } else {
+      toast({
+        title: "Plase Login",
+        description: "Please login to palce an order",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        router.push("/login/user");
+      }, 2000);
+    }
   };
 
   if (loading) {

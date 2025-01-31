@@ -54,4 +54,37 @@ export const cartService = {
       );
     }
   },
+
+  getBooking: async (bookingId) => {
+    try {
+      const response = await api.get(`/booking/${bookingId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch booking"
+      );
+    }
+  },
+
+  getCustomerBooking: async () => {
+    try {
+      const response = await api.get("/customer/booking");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch booking"
+      );
+    }
+  },
+
+  proceedPayment: async (paymentData) => {
+    try {
+      const response = await api.post("/book/payment", paymentData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to compleate payment"
+      );
+    }
+  },
 };

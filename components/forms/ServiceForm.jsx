@@ -16,18 +16,30 @@ export const ServiceForm = ({ mode, data, selectedData, onClose }) => {
     type_id: selectedData?.typeId || data?.type_id,
   });
 
+  const [image, setImage] = useState();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = {
-        ...formData,
-        display_order: parseInt(formData.display_order) || 0,
-      };
+      const formDataToSend = new FormData();
+
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("type_id", formData.type_id);
+      formDataToSend.append(
+        "display_order",
+        parseInt(formData.display_order) || 0
+      );
+
+      if (image) {
+        console.log(image);
+        formDataToSend.append("image", image);
+      }
 
       if (mode === "edit" && data?.service_id) {
-        await serviceAPI.updateService(data.service_id, payload);
+        await serviceAPI.updateService(data.service_id, formDataToSend);
       } else {
-        await serviceAPI.createService(payload);
+        await serviceAPI.createService(formDataToSend);
       }
       onClose();
     } catch (error) {
@@ -122,6 +134,16 @@ export const ServiceForm = ({ mode, data, selectedData, onClose }) => {
             setFormData({ ...formData, display_order: e.target.value })
           }
           required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="image">Service Icon</Label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
         />
       </div>
 

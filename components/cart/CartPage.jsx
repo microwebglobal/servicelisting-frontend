@@ -79,7 +79,7 @@ export function CartPage() {
   const handleCheckout = async () => {
     try {
       await cartService.proceedToCheckout();
-      router.push("/payment");
+      router.push(`/payment/${cart?.booking_id}`);
     } catch (error) {
       toast({
         title: "Error",
