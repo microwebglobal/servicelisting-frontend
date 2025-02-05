@@ -17,7 +17,10 @@ const BookingForm = ({ onBookingSubmit }) => {
     bookingDate: new Date(),
     startTime: '',
     serviceAddress: '',
-    serviceLocation: '',
+    coordinates: {
+      type: 'Point',
+      coordinates: [0, 0] // Default coordinates
+    },
     customerNotes: ''
   });
   const [validationError, setValidationError] = useState('');
@@ -44,10 +47,28 @@ const BookingForm = ({ onBookingSubmit }) => {
     setValidationError('');
   };
 
+  const handleAddressChange = async (address) => {
+    try {
+      handleInputChange('serviceAddress', address);
+//TO DO: Add geocoding logic here
+      const dummyCoordinates = {
+        type: 'Point',
+        coordinates: [0, 0]  // [longitude, latitude]
+      };
+      handleInputChange('coordinates', dummyCoordinates);
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      toast({
+        title: 'Location Error',
+        description: 'Failed to get location coordinates. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
     if (!bookingDetails.startTime) {
       setValidationError('Please select a time slot');
       return;
@@ -56,14 +77,13 @@ const BookingForm = ({ onBookingSubmit }) => {
       setValidationError('Please enter service address');
       return;
     }
-    if (!bookingDetails.serviceLocation.trim()) {
-      setValidationError('Please enter service location');
-      return;
-    }
 
     try {
       setIsSubmitting(true);
-      await onBookingSubmit(bookingDetails);
+      await onBookingSubmit({
+        ...bookingDetails,
+        serviceLocation: bookingDetails.coordinates
+      });
     } catch (error) {
       console.error('Booking error:', error);
       toast({
@@ -71,7 +91,6 @@ const BookingForm = ({ onBookingSubmit }) => {
         description: error.message || 'Failed to process your booking. Please try again.',
         variant: 'destructive'
       });
-      setValidationError(error.message || 'Failed to process your booking. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -127,16 +146,7 @@ const BookingForm = ({ onBookingSubmit }) => {
               <Input
                 placeholder="Enter complete service address"
                 value={bookingDetails.serviceAddress}
-                onChange={(e) => handleInputChange('serviceAddress', e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Location Details</label>
-              <Input
-                placeholder="Apartment/Floor/Landmark"
-                value={bookingDetails.serviceLocation}
-                onChange={(e) => handleInputChange('serviceLocation', e.target.value)}
+                onChange={(e) => handleAddressChange(e.target.value)}
               />
             </div>
 

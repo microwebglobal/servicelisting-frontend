@@ -1,120 +1,91 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { cartService } from "@api/cartService";
-import {
-  FaCcVisa,
-  FaCcMastercard,
-  FaCcAmex,
-  FaCcDiscover,
-} from "react-icons/fa";
-import PaymentSuccess from "@components/PaymentSuccess";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CreditCard, Wallet, Loader2 } from "lucide-react";
+import PaymentSuccess from "@components/PaymentSuccess";
+
+const formatCurrency = (value) => {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  return isNaN(num) ? '0.00' : num.toFixed(2);
+};
 
 const PaymentPage = () => {
   const [selectedMethod, setSelectedMethod] = useState("");
   const [bookingData, setBookingData] = useState();
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-  });
-  const [upiId, setUpiId] = useState("");
-  const [bank, setBank] = useState("");
-
-  const paymentMethods = [
-    { id: "card", label: "Credit/Debit Card" },
-    { id: "upi", label: "UPI" },
-    { id: "net_banking", label: "Net Banking" },
-  ];
-
-  const banks = ["Commercial", "HDFC", "BOC", "PEOPLES", "HNB"];
   const [paymentResponse, setPaymentResponse] = useState();
   const [error, setError] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const params = useParams();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchBookingData = async () => {
       try {
+        setLoading(true);
         const response = await cartService.getBooking(params.bookingId);
-
+        if (response.status !== 'payment_pending') {
+          throw new Error("This payment has already been completed.");
+        }
         setBookingData(response);
-        console.log(response);
       } catch (error) {
-        setError("This payment has already been completed.");
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchBookingData();
-  }, []);
-
-  const getCardType = (number) => {
-    if (/^4/.test(number)) return "Visa";
-    if (/^5[1-5]/.test(number)) return "Mastercard";
-    if (/^3[47]/.test(number)) return "Amex";
-    if (/^6/.test(number)) return "Discover";
-    return null;
-  };
+    if (params.bookingId) {
+      fetchBookingData();
+    }
+  }, [params.bookingId]);
 
   const handlePayment = async () => {
     if (!selectedMethod) {
-      alert("Please select a payment method.");
+      setError("Please select a payment method.");
       return;
     }
 
-    let paymentDetails = {};
-
-    if (selectedMethod === "card") {
-      if (
-        !cardDetails.cardNumber ||
-        !cardDetails.expiryDate ||
-        !cardDetails.cvv
-      ) {
-        alert("Please fill in all the card details.");
-        return;
-      }
-      paymentDetails = {
-        method: "card",
-        bookingId: bookingData?.BookingPayment?.booking_id,
-        amount: bookingData?.BookingPayment?.total_amount,
-        cardNumber: cardDetails.cardNumber,
-        expiry: cardDetails.expiryDate,
-        cvv: cardDetails.cvv,
-      };
-    } else if (selectedMethod === "upi") {
-      if (!upiId) {
-        alert("Please enter your UPI ID.");
-        return;
-      }
-      paymentDetails = {
-        method: "upi",
-        upiId: upiId,
-      };
-    } else if (selectedMethod === "net_banking") {
-      if (!bank) {
-        alert("Please select a bank.");
-        return;
-      }
-      paymentDetails = {
-        method: "net_banking",
-        bank: bank,
-      };
-    }
-
-    console.log(paymentDetails);
-
     try {
+      setIsProcessing(true);
+      setError(null);
+
+      const paymentDetails = {
+        bookingId: bookingData?.booking_id,
+        amount: bookingData?.BookingPayment?.total_amount,
+        paymentMethod: selectedMethod,
+      };
+
       const response = await cartService.proceedPayment(paymentDetails);
-      console.log(response);
       setPaymentResponse(response);
+
+      if (response.success) {
+        if (selectedMethod === 'cash') {
+          await cartService.completeCashPayment(bookingData.booking_id);
+        }
+      }
     } catch (error) {
-      console.error("Booking payment error:", error);
+      setError(error.message || "Payment processing failed. Please try again.");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  if (paymentResponse?.status === "success") {
+  if (paymentResponse?.success) {
     return <PaymentSuccess paymentData={paymentResponse} />;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
 
   if (error) {
@@ -127,145 +98,67 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 ">
-      <div className="max-w-md w-full bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-gray-200">
-        {/* Booking Details */}
-        {bookingData ? (
-          <div className="mb-6 p-4 bg-gray-100 rounded-2xl shadow-sm">
-            <p className="text-gray-700 font-semibold text-lg">
-              Amount:{" "}
-              <span className="text-blue-600 font-bold">
-                ${bookingData?.BookingPayment?.total_amount}
-              </span>
-            </p>
-          </div>
-        ) : (
-          <p className="text-gray-500 text-center mb-6">
-            Loading booking details...
-          </p>
-        )}
-
-        {/* Payment Header */}
-        <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-6">
-          Select Payment Method
-        </h1>
-
-        {/* Payment Methods */}
-        <div className="space-y-4">
-          {paymentMethods.map((method) => (
-            <div
-              key={method.id}
-              className={`flex items-center p-4 border rounded-2xl cursor-pointer transition-all duration-300 ${
-                selectedMethod === method.id
-                  ? "border-blue-600 bg-blue-50 shadow-md"
-                  : "border-gray-300 hover:bg-gray-100"
-              }`}
-              onClick={() => setSelectedMethod(method.id)}
-            >
-              <span className="text-3xl text-blue-700 mr-4">{method.icon}</span>
-              <span className="text-lg font-medium text-gray-800">
-                {method.label}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Card Payment */}
-        {selectedMethod === "card" && (
-          <div className="mt-6 space-y-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Card Number"
-                className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
-                value={cardDetails.cardNumber}
-                maxLength={16}
-                onKeyDown={(e) => {
-                  if (
-                    !/^\d$/.test(e.key) &&
-                    e.key !== "Backspace" &&
-                    e.key !== "Tab"
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                onChange={(e) =>
-                  setCardDetails({ ...cardDetails, cardNumber: e.target.value })
-                }
-              />
-              <span className="absolute right-4 top-3 text-2xl text-gray-500">
-                {getCardType(cardDetails.cardNumber) === "Visa" && <FaCcVisa />}
-                {getCardType(cardDetails.cardNumber) === "Mastercard" && (
-                  <FaCcMastercard />
-                )}
-                {getCardType(cardDetails.cardNumber) === "Amex" && <FaCcAmex />}
-                {getCardType(cardDetails.cardNumber) === "Discover" && (
-                  <FaCcDiscover />
-                )}
-              </span>
-            </div>
-            {!getCardType(cardDetails.cardNumber) && cardDetails.cardNumber && (
-              <p className="text-red-500 text-xs mt-1">
-                Please enter a valid card number.
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">
+            Choose Payment Method
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {bookingData?.BookingPayment && (
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <p className="text-lg font-medium">
+                Total Amount:{" "}
+                <span className="font-bold text-primary">
+                  ₹{formatCurrency(bookingData.BookingPayment.total_amount)}
+                </span>
               </p>
-            )}
-            <input
-              type="text"
-              placeholder="Expiry Date (MM/YY)"
-              className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
-              value={cardDetails.expiryDate}
-              onChange={(e) =>
-                setCardDetails({ ...cardDetails, expiryDate: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="CVV"
-              className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
-              value={cardDetails.cvv}
-              onChange={(e) =>
-                setCardDetails({ ...cardDetails, cvv: e.target.value })
-              }
-            />
-          </div>
-        )}
+            </div>
+          )}
 
-        {selectedMethod === "upi" && (
-          <div className="mt-6">
-            <input
-              type="text"
-              placeholder="Enter UPI ID"
-              className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
-              value={upiId}
-              onChange={(e) => setUpiId(e.target.value)}
-            />
-          </div>
-        )}
-
-        {selectedMethod === "net_banking" && (
-          <div className="mt-6">
-            <select
-              className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
-              value={bank}
-              onChange={(e) => setBank(e.target.value)}
+          <div className="grid grid-cols-1 gap-4">
+            <Button
+              variant={selectedMethod === "card" ? "default" : "outline"}
+              className="h-20 text-lg flex gap-3"
+              onClick={() => setSelectedMethod("card")}
             >
-              <option value="">Select Bank</option>
-              {banks.map((bankName) => (
-                <option key={bankName} value={bankName}>
-                  {bankName}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+              <CreditCard className="h-6 w-6" />
+              Pay Online
+            </Button>
 
-        <button
-          className="mt-6 w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
-          onClick={handlePayment}
-        >
-          Pay Now
-        </button>
-      </div>
+            <Button
+              variant={selectedMethod === "cash" ? "default" : "outline"}
+              className="h-20 text-lg flex gap-3"
+              onClick={() => setSelectedMethod("cash")}
+            >
+              <Wallet className="h-6 w-6" />
+              Pay with Cash
+            </Button>
+          </div>
+
+          {selectedMethod === "cash" && (
+            <Alert>
+              <AlertDescription>
+                Payment will be collected in cash after service completion
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={handlePayment}
+            disabled={!selectedMethod || isProcessing}
+          >
+            {isProcessing
+              ? "Processing..."
+              : selectedMethod === "cash"
+              ? "Confirm Cash Payment"
+              : "Proceed to Payment"}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
