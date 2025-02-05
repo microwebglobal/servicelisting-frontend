@@ -1,6 +1,5 @@
-// src/app/login/user/page.jsx
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LoginAPI } from "@/api/login";
@@ -12,9 +11,31 @@ const CustomerLogin = () => {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [timer, setTimer] = useState(120);
   const { login } = useAuth();
-
   const router = useRouter();
+
+  useEffect(() => {
+    let countdown;
+    if (step === 2) {
+      countdown = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdown);
+            setStep(1);
+            setOtp("");
+            setError("OTP expired. Please request a new OTP.");
+            return 120;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      clearInterval(countdown);
+      setTimer(120);
+    }
+    return () => clearInterval(countdown);
+  }, [step]);
 
   const handleSendOtp = async () => {
     try {
@@ -39,7 +60,6 @@ const CustomerLogin = () => {
 
       const response = await LoginAPI.customerLoginVerifyOTP(mobile, otp);
       if (response.data.success) {
-        console.log(response.data);
         login({
           role: "customer",
           uId: response.data.user.id,
@@ -107,6 +127,10 @@ const CustomerLogin = () => {
                 onChange={(e) => setOtp(e.target.value)}
                 maxLength={6}
               />
+              <p className="text-center text-gray-500 mb-4">
+                OTP expires in {Math.floor(timer / 60)}:
+                {String(timer % 60).padStart(2, "0")}
+              </p>
               <button
                 className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
                 onClick={handleVerifyOtp}

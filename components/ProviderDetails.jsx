@@ -100,11 +100,11 @@ const ProviderDetails = ({
         account_number: provider?.payment_details?.account_number || "",
       },
     },
-    categories: (provider?.ServiceCategories || []).map((cat) => ({
+    categories: (provider?.serviceCategories || []).map((cat) => ({
       category_id: cat.category_id || "",
       name: cat.name,
     })),
-    cities: (provider?.Cities || []).map((city) => ({
+    cities: (provider?.serviceCities || []).map((city) => ({
       city_id: city.city_id || "",
       name: city.name,
       service_radius: 0,
@@ -183,16 +183,16 @@ const ProviderDetails = ({
   };
 
   useEffect(() => {
-    if (provider?.ServiceCategories) {
-      const formattedCategories = provider.ServiceCategories.map((cat) => ({
+    if (provider?.serviceCategories) {
+      const formattedCategories = provider.serviceCategories.map((cat) => ({
         value: cat.category_id,
         label: cat.name,
       }));
       setSelectedServiceCategories(formattedCategories);
     }
 
-    if (provider?.Cities) {
-      const formattedCities = provider.Cities.map((city) => ({
+    if (provider?.serviceCities) {
+      const formattedCities = provider.serviceCities.map((city) => ({
         value: city.city_id,
         label: city.name,
       }));
