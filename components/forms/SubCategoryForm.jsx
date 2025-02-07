@@ -11,11 +11,9 @@ export const SubCategoryForm = ({
   onClose,
   selectedData,
 }) => {
-  // Extract categoryId from selectedData and validate it
   const categoryId = selectedData?.categoryId;
 
   if (!categoryId) {
-    console.error("Category ID is required for SubCategory");
     return (
       <div className="p-4 text-red-500">
         Error: Category ID is required to create/edit a subcategory.
@@ -27,42 +25,47 @@ export const SubCategoryForm = ({
     name: data?.name || "",
     slug: data?.slug || "",
     display_order: data?.display_order || 0,
-    category_id: categoryId, // Use the validated categoryId
+    category_id: categoryId,
   });
   const [image, setImage] = useState();
-
-  console.log(data);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formDataToSend = new FormData();
-
     formDataToSend.append("name", formData.name);
     formDataToSend.append("slug", formData.slug);
     formDataToSend.append("display_order", formData.display_order);
     formDataToSend.append("category_id", formData.category_id);
 
     if (image) {
-      console.log(image);
       formDataToSend.append("image", image);
     }
 
-    // Additional validation before submission
-    if (!formData.category_id) {
-      console.error("Category ID is required");
-      return;
-    }
-
     try {
-      if (mode === "edit") {
-        await serviceAPI.updateSubCategory(data.sub_category_id, formData);
+      if (mode === "edit" && data?.sub_category_id) {
+        await serviceAPI.updateSubCategory(data.sub_category_id, formDataToSend);
+        toast({
+          title: "Success!",
+          description: "SubCategory updated successfully!",
+          variant: "default",
+        });
       } else {
         await serviceAPI.createSubCategory(formDataToSend);
+        toast({
+          title: "Success!",
+          description: "SubCategory created successfully!",
+          variant: "default",
+        });
       }
       onClose();
     } catch (error) {
       console.error("Error submitting subcategory:", error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.error || "Failed to save subcategory!",
+        variant: "destructive",
+      });
     }
   };
 
@@ -70,7 +73,6 @@ export const SubCategoryForm = ({
     try {
       if (data?.sub_category_id) {
         await serviceAPI.deleteSubCategory(data.sub_category_id);
-
         toast({
           title: "Success!",
           description: "Sub-Category deleted successfully!",
@@ -86,7 +88,6 @@ export const SubCategoryForm = ({
       }
     } catch (error) {
       console.error("Error deleting sub-category:", error);
-
       toast({
         title: "Error",
         description: "Failed to delete sub-category!",
@@ -117,7 +118,11 @@ export const SubCategoryForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+      encType="multipart/form-data"
+    >
       <div className="space-y-2">
         <Label htmlFor="name">SubCategory Name</Label>
         <Input
@@ -159,6 +164,15 @@ export const SubCategoryForm = ({
 
       <div className="space-y-2">
         <Label htmlFor="image">Sub Category Icon</Label>
+        {data?.icon_url && (
+          <div className="mb-2">
+            <img
+              src={data.icon_url}
+              alt="Current icon"
+              className="w-16 h-16 object-contain"
+            />
+          </div>
+        )}
         <Input
           id="image"
           type="file"
@@ -183,5 +197,3 @@ export const SubCategoryForm = ({
     </form>
   );
 };
-
-export default SubCategoryForm;

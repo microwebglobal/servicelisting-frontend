@@ -13,8 +13,14 @@ export const serviceAPI = {
         "Content-Type": "multipart/form-data",
       },
     }),
-  updateCategory: (id, data) => api.put(`/categories/${id}`, data),
+  updateCategory: (id, data) =>
+    api.put(`/categories/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
   deleteCategory: (id) => api.delete(`/categories/${id}`),
+
 
   // SubCategories
   getSubCategories: (categoryId) =>
@@ -25,7 +31,14 @@ export const serviceAPI = {
         "Content-Type": "multipart/form-data",
       },
     }),
-  updateSubCategory: (id, data) => api.put(`/subcategories/${id}`, data),
+
+  updateSubCategory: (id, data) =>
+    api.put(`/subcategories/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
+
   deleteSubCategory: (id) => api.delete(`/subcategories/${id}`),
   getSubCategoryBySlug: (slug) => api.get(`/subcategories/slugs/${slug}`),
 

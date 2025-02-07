@@ -38,43 +38,43 @@ export const CategoryForm = ({ mode, data, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
     formDataToSend.append("slug", formData.slug);
     formDataToSend.append("display_order", formData.display_order);
-
+  
+    // Convert selected cities to array of city IDs
+    const cityIds = selectedCities.map(city => city.value);
+    formDataToSend.append("cities", JSON.stringify(cityIds));
+  
     if (image) {
-      console.log(image);
       formDataToSend.append("image", image);
     }
-
+  
     try {
-      let categoryId;
+      let response;
+      
       if (mode === "edit" && data?.category_id) {
-        await serviceAPI.updateCategory(data.category_id, formDataToSend);
-        categoryId = data.category_id;
+        response = await serviceAPI.updateCategory(data.category_id, formDataToSend);
       } else {
-        const response = await serviceAPI.createCategory(formDataToSend);
-        categoryId = response.data.category_id;
+        response = await serviceAPI.createCategory(formDataToSend);
       }
-
-      if (selectedCities.length > 0) {
-        const categoryCityData = selectedCities.map((city) => ({
-          category_id: categoryId,
-          city_id: city.value,
-        }));
-
-        const requestBody = {
-          mappings: categoryCityData,
-        };
-
-        await serviceAPI.createCategoryCities(requestBody);
-      }
-
+  
+      toast({
+        title: "Success!",
+        description: `Category ${mode === "edit" ? "updated" : "created"} successfully!`,
+        variant: "default",
+      });
+  
       onClose();
     } catch (error) {
       console.error("Error submitting category:", error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.error || `Failed to ${mode} category!`,
+        variant: "destructive",
+      });
     }
   };
 

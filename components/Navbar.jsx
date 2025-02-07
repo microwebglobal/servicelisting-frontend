@@ -5,12 +5,14 @@ import "tailwindcss/tailwind.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@src/context/AuthContext";
+import { useToast } from "@/hooks/use-toast"
 
 const Navbar = () => {
   const [showLogout, setShowLogout] = useState(false);
   const { logout } = useAuth();
   const [isLoggedInState, setIsLoggedInState] = useState(false);
   const router = useRouter();
+  const { toast } = useToast()
 
   const handleLogout = () => {
     logout();
