@@ -24,4 +24,17 @@ export const providerAPI = {
 
   // Service Provider Password
   setProviderPassword: (data, id) => api.put(`/provider/password/${id}`, data),
+
+  // Service Provider Bookings
+  getProviderBookings: (id) => api.get(`/provider/bookings/${id}`),
+
+  // Service Provider Employee
+  getProviderEmployees: (providerId) =>
+    api.get(`/providers/${providerId}/employees`),
+  updateProviderEmployees: (employeeId, data) =>
+    api.put(`/providers/${employeeId}/employees`, data),
+  addProviderEmployees: (providerId, data) =>
+    api.post(`/providers/${providerId}/employees`, data),
+  updateProviderAvailability: (roviderId, data) =>
+    api.put(`/provider/availability/${roviderId}`, data),
 };

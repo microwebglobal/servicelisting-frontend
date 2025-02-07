@@ -1,11 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Image from "next/image";
-import dayjs from "dayjs";
-import Rating from "@mui/material/Rating";
 import withAuth from "@components/isAuth";
-import ServiceProviderSideBar from "@components/serviceProvider/ServiceProviderSideBar";
 import { providerAPI } from "@api/provider";
 import { profileAPI } from "@/api/profile";
 import {
@@ -16,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardImage, CardTitle } from "@/components/ui/card";
-import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
 
 const Page = () => {
   const [userData, setUserData] = useState({});
@@ -62,18 +56,8 @@ const Page = () => {
 
   return (
     <>
-      {/* Header */}
-      <div className="flex items-center gap-2 p-6 bg-white shadow-lg fixed w-full z-20">
-        <button className="text-gray-600 hover:text-gray-900">
-          <span className="text-2xl">&lt;</span>
-        </button>
-        <h1 className="text-3xl font-bold text-gray-800">Provider Details</h1>
-      </div>
-
-      <div className="pt-24 bg-gray-100">
-        <div className="flex gap-8 p-6">
-          <ServiceProviderSideBar profileData={profileData} />
-
+      <div className="pt-20 bg-gray-100">
+        <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
           <div className="lg:col-span-2">
             <h2 className="text-3xl text-gray-800 mb-6 pb-2 ml-10">Services</h2>
 
