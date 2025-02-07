@@ -17,7 +17,7 @@ const Page = () => {
   useEffect(() => {
     const fetchBookingData = async () => {
       try {
-        const response = await cartService.getCustomerBooking();
+        const response = await cartService.getCustomerBookings();
         setBookingData(response);
       } catch (error) {
         console.error("Error fetching booking data:", error);
@@ -44,7 +44,7 @@ const Page = () => {
               <ArrowBackIosNewSharp className="w-6 h-6" />
               <span>Bookings</span>
             </button>
-            
+
             <BookingStatus onStatusChange={setSelectedStatus} />
           </aside>
 
@@ -63,8 +63,12 @@ const Page = () => {
             ) : (
               <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
                 <div className="text-center">
-                  <p className="text-xl font-semibold text-gray-600">Loading bookings...</p>
-                  <p className="text-gray-500 mt-2">Please wait while we fetch your booking data</p>
+                  <p className="text-xl font-semibold text-gray-600">
+                    Loading bookings...
+                  </p>
+                  <p className="text-gray-500 mt-2">
+                    Please wait while we fetch your booking data
+                  </p>
                 </div>
               </div>
             )}

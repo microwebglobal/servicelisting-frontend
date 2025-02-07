@@ -24,11 +24,13 @@ const ServiceProviderLogin = () => {
       setError("");
 
       const response = await LoginAPI.providerLogin(email, password);
+      console.log(response.data);
       if (response.data.success) {
         login({
           email: response.data.user.email,
           role: "service_provider",
           uId: response.data.user.id,
+          providerId: response.data.user.provider,
         });
         router.push("/profile/provider");
       }
