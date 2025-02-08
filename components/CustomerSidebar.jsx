@@ -10,13 +10,14 @@ const CustomerSidebar = () => {
     const fetchUserData = async () => {
       const uId = localStorage.getItem("uId");
       const response = await axios.get(
-        `http://localhost:8080/api/users/${uId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${uId}`
       );
       setUserData(response.data);
       console.log(response.data);
     };
     fetchUserData();
   }, []);
+
   return (
     <aside className="w-full md:w-1/4 bg-white p-4 border-r">
       <div className="text-center">

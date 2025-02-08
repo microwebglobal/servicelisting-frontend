@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 const IndividualRegister = () => {
   const router = useRouter();
-  const [step, setStep] = useState(1); // Track the current step
+  const [step, setStep] = useState(1);
   const [userDetails, setUserDetails] = useState({
     name: "",
     user_name: "",
@@ -37,7 +37,7 @@ const IndividualRegister = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/otp/send-otp",
+        `${process.env.NEXT_PUBLIC_API_URL}/otp/send-otp`,
         {
           mobile: userDetails.mobile,
         }
@@ -52,7 +52,7 @@ const IndividualRegister = () => {
   // Handle OTP verification after sending OTP
   const handleVerification = async (otp) => {
     try {
-      await axios.post("http://localhost:8080/api/users/", {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/`, {
         ...userDetails,
         otp,
       });
@@ -67,7 +67,7 @@ const IndividualRegister = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/providerpro/",
+        `${process.env.NEXT_PUBLIC_API_URL}/providerpro/`,
         providerProfile
       );
 
@@ -80,6 +80,7 @@ const IndividualRegister = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center py-10">
+      {/* Rest of the JSX remains the same */}
       <h1 className="text-4xl font-bold text-gray-800 mb-8">
         Register as a Service Provider
       </h1>
