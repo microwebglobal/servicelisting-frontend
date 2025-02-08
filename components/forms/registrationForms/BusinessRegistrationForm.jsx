@@ -598,7 +598,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
         className="w-full p-2 border rounded"
       >
         <option value="upi">UPI</option>
-        <option value="bank_transfer">Bank Transfer</option>
+        <option value="bank">Bank Transfer</option>
       </select>
 
       {formData.payment_method === "upi" ? (

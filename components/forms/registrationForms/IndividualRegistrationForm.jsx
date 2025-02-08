@@ -238,16 +238,16 @@ const IndividualRegistrationForm = ({ previousData }) => {
       });
 
       const singleFiles = [
-        "logo",
-        "id_proof",
-        "aadhar",
-        "pan",
-        "address_proof",
-        "qualification_proof",
-        "service_certificate",
-        "insurance",
-        "agreement",
-        "terms_acceptance",
+        { fieldName: "logo", fieldType: "id_proof" }, 
+        { fieldName: "id_proof", fieldType: "id_proof" },
+        { fieldName: "aadhar", fieldType: "aadhar" },
+        { fieldName: "pan", fieldType: "pan" },
+        { fieldName: "address_proof", fieldType: "address_proof" },
+        { fieldName: "qualification_proof", fieldType: "qualification_proof" },
+        { fieldName: "service_certificate", fieldType: "service_certificate" },
+        { fieldName: "insurance", fieldType: "insurance" },
+        { fieldName: "agreement", fieldType: "agreement" },
+        { fieldName: "terms_acceptance", fieldType: "terms_acceptance" }
       ];
 
       singleFiles.forEach((file) => {
@@ -500,7 +500,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
         className="w-full p-2 border rounded"
       >
         <option value="upi">UPI</option>
-        <option value="bank_transfer">Bank Transfer</option>
+        <option value="bank">Bank Transfer</option>
       </select>
       {formData.payment_method === "upi" ? (
         <div className="space-y-2">

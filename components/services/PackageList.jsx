@@ -23,10 +23,8 @@ export function PackageList({ typeId, cityId, addToCart }) {
       setError(null);
       const response = await serviceAPI.getPackagesByType(typeId);
       
-      // Handle the response based on your API structure
       const packagesData = response.data?.data || response.data;
       
-      // Ensure we have an array of packages
       if (Array.isArray(packagesData)) {
         setPackages(packagesData);
       } else {

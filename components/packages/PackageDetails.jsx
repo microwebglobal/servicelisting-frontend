@@ -29,9 +29,13 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
   const fetchPackageSections = async () => {
     try {
       const response = await serviceAPI.getSectionsByPackage(pkg.package_id);
-      const sectionsData = response.data || [];
+      // Extract the sections array from the response.data.data
+      const sectionsData = Array.isArray(response.data?.data) ? response.data.data : [];
 
-      console.log(response.data);
+      if (!Array.isArray(response.data?.data)) {
+        console.warn('Response data is not an array:', response.data);
+        return;
+      }
 
       // Initialize variables for tracking default selections and total
       let defaultItemsTotal = 0;
@@ -40,8 +44,13 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
       // Fetch city-specific pricing and special pricing for each item
       const sectionsWithPricing = await Promise.all(
         sectionsData.map(async (section) => {
+          // Ensure PackageItems is an array
+          const packageItems = Array.isArray(section.PackageItems) 
+            ? section.PackageItems 
+            : [];
+
           const itemsWithPricing = await Promise.all(
-            (section.PackageItems || []).map(async (item) => {
+            packageItems.map(async (item) => {
               const cityPrice = item.CitySpecificPricings?.find(
                 (pricing) => pricing.city_id === cityId
               )?.price;
@@ -60,7 +69,7 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
           return {
             ...section,
             items: itemsWithPricing.sort(
-              (a, b) => a.display_order - b.display_order
+              (a, b) => (a.display_order || 0) - (b.display_order || 0)
             ),
           };
         })
@@ -71,13 +80,13 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
         const defaultItem = section.items.find((item) => item.is_default);
         if (defaultItem) {
           initialSelectedItems[section.section_id] = defaultItem.item_id;
-          defaultItemsTotal += Number(defaultItem.price);
+          defaultItemsTotal += Number(defaultItem.price || 0);
         }
       });
 
-      // Sort sections by display_order
+      // Sort sections by display_order, handling undefined values
       const sortedSections = sectionsWithPricing.sort(
-        (a, b) => a.display_order - b.display_order
+        (a, b) => (a.display_order || 0) - (b.display_order || 0)
       );
 
       setSelectedItems(initialSelectedItems);
@@ -101,12 +110,13 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
         (item) => item.item_id === selectedItemId
       );
       if (selectedItem) {
-        total += Number(selectedItem.price);
+        total += Number(selectedItem.price || 0);
       }
     });
     setPackageTotal(total);
   };
 
+  // Rest of the component remains the same
   useEffect(() => {
     calculateTotal(sections);
   }, [selectedItems, sections]);
@@ -127,11 +137,10 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
       return {
         section: section.name,
         item: selectedItem,
-        itemId: selectedItem.item_id,
+        itemId: selectedItem?.item_id,
       };
     });
 
-    console.log(selectedItemsList);
     const packageWithSelections = {
       ...pkg,
       finalPrice: packageTotal,
@@ -148,7 +157,7 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
         <div>
           <h6 className="font-medium">{pkg.name}</h6>
           <p className="text-sm text-gray-600 mt-1">{pkg.description}</p>
-          {(pkg.duration_hours > 0 || pkg.duration_minutes) > 0 && (
+          {(pkg.duration_hours > 0 || pkg.duration_minutes > 0) && (
             <p className="text-sm text-gray-600 mt-1">
               Service Duration: {pkg.duration_hours}h {pkg.duration_minutes}m
             </p>
