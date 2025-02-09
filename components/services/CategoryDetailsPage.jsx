@@ -11,7 +11,7 @@ import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import OfferCard from "@components/ui/offerCard";
+import OfferCard from "@/components/ui/offerCard";
 import { Height } from "@mui/icons-material";
 
 export function CategoryDetailsPage({ cityName, categorySlug }) {
