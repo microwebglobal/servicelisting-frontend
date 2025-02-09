@@ -1,0 +1,13 @@
+{
+  "type": "circle",
+  "properties": {
+    "radius": 682,
+    "fill": "#F0F0FA",
+    "stroke": null,
+    "strokeWidth": 0
+  },
+  "position": {
+    "x": 0,
+    "y": 0
+  }
+}

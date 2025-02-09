@@ -1,0 +1,189 @@
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardImage, CardTitle } from "@/components/ui/card";
+import { serviceAPI } from "@/api/services";
+import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
+import Navbar from "@components/Navbar";
+import FeaturedCard from "@components/ui/featuredCard";
+import Footer from "@components/Footer";
+
+export function CityServiceCategories({ cityName = "" }) {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [city, setCity] = useState(null);
+  const router = useRouter();
+  const { toast } = useToast();
+
+  // Fetch city and categories in a single useEffect
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!cityName) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // First get city
+        const citiesResponse = await serviceAPI.getCities();
+        const matchedCity = citiesResponse.data.find(
+          (city) => city.name.toLowerCase() === cityName.toLowerCase()
+        );
+
+        if (!matchedCity) {
+          setError("City not found");
+          toast({
+            title: "Error",
+            description: "City not found in our database",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setCity(matchedCity);
+
+        // Then get categories for this city
+        const categoriesResponse = await serviceAPI.getCategories(
+          matchedCity.city_id
+        );
+        const sortedCategories = [...categoriesResponse.data].sort(
+          (a, b) => a.display_order - b.display_order
+        );
+
+        setCategories(sortedCategories);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("Failed to load data");
+        toast({
+          title: "Error",
+          description: "Failed to load data. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [cityName, toast]);
+
+  const handleCategoryClick = (categorySlug) => {
+    router.push(`/services/${cityName}/${categorySlug}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="text-center py-8">
+          <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="text-center py-8 text-red-600">
+          <h2 className="text-xl">{error}</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (!city) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="text-center py-8">
+          <h2 className="text-xl text-gray-600">
+            Please select a valid city to view available services
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Navbar />
+      <div className="min-h-screen bg-gray-50 p-20">
+        <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20">
+          <div className="w-full lg:w-2/5">
+            <h1 className="text-4xl font-bold mb-2 capitalize">
+              Services in {cityName}, India
+            </h1>
+            <hr className="mb-10" />
+
+            {categories.length === 0 ? (
+              <div className="text-center py-8">
+                No services available in this city
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {categories.map((category) => (
+                  <Card
+                    key={category.category_id}
+                    className="cursor-pointer hover:shadow-md transition-shadow duration-300"
+                    onClick={() => handleCategoryClick(category.slug)}
+                  >
+                    <CardImage
+                      src={
+                        process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url
+                      }
+                      crossOrigin="anonymous"
+                      style={{
+                        height: "150px",
+                        objectFit: "cover",
+                        width: "100%",
+                      }}
+                      alt="card_image"
+                    />
+
+                    <CardHeader>
+                      <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
+                        {category.name}
+                      </CardTitle>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="w-full lg:w-3/5">
+            <Image
+              src="/assets/images/hair_clean.png"
+              alt="Professional Services"
+              width={800}
+              height={700}
+              className="rounded-xl mb-10"
+              priority
+            />
+            <hr />
+            <h2 className="text-2xl mt-5 mb-10">Featured Services</h2>
+            <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
+              {[1, 2, 3, 4].map((index) => (
+                <FeaturedCard
+                  key={index}
+                  imageSrc="/assets/images/hair_clean.png"
+                  badgeText="123"
+                  price="5000"
+                  title="Home Repair Service"
+                  rating={4.5}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+export default CityServiceCategories;
