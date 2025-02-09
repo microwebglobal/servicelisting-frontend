@@ -49,7 +49,7 @@ const EmailVerificationDialog = ({
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
               Please verify your email address to access all features of your account.
-              We'll send you a verification link to complete the process.
+              We&apos;ll send you a verification link to complete the process.
             </p>
             <div className="flex justify-end">
               <Button onClick={handleEmailValidate}>

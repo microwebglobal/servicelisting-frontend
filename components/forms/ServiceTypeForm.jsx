@@ -12,10 +12,16 @@ export const ServiceTypeForm = ({
   onClose,
   selectedData,
 }) => {
-  // Extract subCategoryId from selectedData and validate it
-  const subCategoryId = selectedData?.subCategoryId;
+  const [formData, setFormData] = useState({
+    name: data?.name || "",
+    description: data?.description || "",
+    display_order: data?.display_order || 0,
+    sub_category_id: selectedData?.subCategoryId || "",
+  });
+  const [image, setImage] = useState();
 
-  if (!subCategoryId) {
+  // Validation check moved after Hooks
+  if (!selectedData?.subCategoryId) {
     console.error("SubCategory ID is required for Service Type");
     return (
       <div className="p-4 text-red-500">
@@ -23,14 +29,6 @@ export const ServiceTypeForm = ({
       </div>
     );
   }
-
-  const [formData, setFormData] = useState({
-    name: data?.name || "",
-    description: data?.description || "",
-    display_order: data?.display_order || 0,
-    sub_category_id: subCategoryId,
-  });
-  const [image, setImage] = useState();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

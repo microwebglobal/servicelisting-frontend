@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Footer from "@components/Footer";
 import Navbar from "@components/Navbar";
 
-const page = ({ params }) => {
+const Page = ({ params }) => {
   const [token, setToken] = useState(null);
   const [error, setError] = useState(null);
   const [tokenData, setTokenData] = useState({
@@ -133,4 +133,4 @@ const page = ({ params }) => {
   );
 };
 
-export default page;
+export default Page;

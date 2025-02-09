@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { serviceAPI } from "@/api/services";
-import { providerAPI } from "@api/provider";
+import { providerAPI } from "@/api/provider";
 import { Button } from "./ui/button";
 import { toast } from "@hooks/use-toast";
-import { DeleteForeverOutlined } from "@node_modules/@mui/icons-material";
+import { DeleteForeverOutlined } from "@/node_modules/@mui/icons-material";
 import { PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 

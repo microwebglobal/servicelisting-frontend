@@ -1,4 +1,3 @@
-// BookingDetails.js
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
@@ -11,9 +10,10 @@ import {
 } from "../../utils/bookingUtils";
 
 const BookingDetails = ({ booking }) => {
-  if (!booking) return null;
-
   const [expanded, setExpanded] = useState(false);
+  
+  if (!booking) return null;
+  
   const payment = booking.BookingPayment || {};
 
   return (
