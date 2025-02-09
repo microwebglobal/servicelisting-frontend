@@ -32,8 +32,11 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          # Stop existing PM2 process if exists
-          pm2 stop qp-frontend || true
+          # Safely handle PM2 process
+          if pm2 list | grep -q "qp-frontend"; then
+            pm2 stop qp-frontend
+            pm2 delete qp-frontend
+          fi
           
           # Create application directory if it doesn't exist
           mkdir -p ~/qp/frontend
@@ -43,8 +46,9 @@ jobs:
             cp ~/qp/frontend/.env ~/qp/frontend/.env.backup
           fi
           
-          # Remove old files except .env
-          find ~/qp/frontend -mindepth 1 ! -name '.env' -exec rm -rf {} +
+          # Clean directory while preserving .env
+          cd ~/qp/frontend
+          find . -mindepth 1 ! -name '.env' -exec rm -rf {} \;
           
     - name: Copy files to server
       uses: appleboy/scp-action@master
