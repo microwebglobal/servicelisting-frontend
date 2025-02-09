@@ -11,11 +11,27 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+        
+    - name: Create .env file
+      run: |
+        echo "NEXT_PUBLIC_API_URL=https://${{ secrets.SERVER_HOST }}/api" >> .env
+        echo "NEXT_PUBLIC_API_ENDPOINT=https://${{ secrets.SERVER_HOST }}" >> .env
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+      
     - name: Deploy to Server
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           # Stop existing PM2 process if exists
@@ -24,28 +40,25 @@ jobs:
           # Create/Update application directory
           mkdir -p ~/qp/frontend
           
-          # Cleanup old deployment excluding .env
-          cd ~/qp/frontend
-          find . -mindepth 1 ! -name '.env' -delete
+          # Cleanup old deployment
+          rm -rf ~/qp/frontend/*
           
     - name: Copy files to server
       uses: appleboy/scp-action@master
       with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "."
         target: "~/qp/frontend"
-        strip_components: 1
         
     - name: Start application
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd ~/qp/frontend
           npm ci --production
-          npm run build
           pm2 start npm --name qp-frontend -- start
