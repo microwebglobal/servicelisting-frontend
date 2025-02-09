@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Plus, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
