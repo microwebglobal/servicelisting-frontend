@@ -1,9 +1,7 @@
 name: Deploy Frontend
-
 on:
   push:
     branches: [ prod ]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,10 +14,10 @@ jobs:
       with:
         node-version: '18'
         
-    - name: Create .env file
+    - name: Create temporary .env file for build
       run: |
-        echo "NEXT_PUBLIC_API_URL=https://${{ secrets.VPS_HOST }}/api" >> .env
-        echo "NEXT_PUBLIC_API_ENDPOINT=https://${{ secrets.VPS_HOST }}" >> .env
+        echo "NEXT_PUBLIC_API_URL=https://${{ secrets.API_DOMAIN }}/api" >> .env
+        echo "NEXT_PUBLIC_API_ENDPOINT=https://${{ secrets.API_DOMAIN }}" >> .env
         
     - name: Install dependencies
       run: npm ci
@@ -37,11 +35,16 @@ jobs:
           # Stop existing PM2 process if exists
           pm2 stop qp-frontend || true
           
-          # Create/Update application directory
+          # Create application directory if it doesn't exist
           mkdir -p ~/qp/frontend
           
-          # Cleanup old deployment
-          rm -rf ~/qp/frontend/*
+          # Backup existing .env file if it exists
+          if [ -f ~/qp/frontend/.env ]; then
+            cp ~/qp/frontend/.env ~/qp/frontend/.env.backup
+          fi
+          
+          # Remove old files except .env
+          find ~/qp/frontend -mindepth 1 ! -name '.env' -exec rm -rf {} +
           
     - name: Copy files to server
       uses: appleboy/scp-action@master
@@ -51,8 +54,9 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "."
         target: "~/qp/frontend"
+        strip_components: 1
         
-    - name: Start application
+    - name: Restore .env and start application
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.VPS_HOST }}
@@ -60,5 +64,11 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd ~/qp/frontend
+          
+          # Restore .env file if backup exists
+          if [ -f .env.backup ]; then
+            mv .env.backup .env
+          fi
+          
           npm ci --production
           pm2 start npm --name qp-frontend -- start
