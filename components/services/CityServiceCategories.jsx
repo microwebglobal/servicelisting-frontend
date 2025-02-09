@@ -4,9 +4,9 @@ import { Card, CardHeader, CardImage, CardTitle } from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import Navbar from "@components/Navbar";
-import FeaturedCard from "@components/ui/featuredCard";
-import Footer from "@components/Footer";
+import Navbar from "@/components/Navbar";
+import FeaturedCard from "@/components/ui/featuredCard";
+import Footer from "@/components/Footer";
 
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
