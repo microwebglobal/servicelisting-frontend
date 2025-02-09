@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,23 +12,22 @@ export const SubCategoryForm = ({
   onClose,
   selectedData,
 }) => {
-  const categoryId = selectedData?.categoryId;
+  const [formData, setFormData] = useState({
+    name: data?.name || "",
+    slug: data?.slug || "",
+    display_order: data?.display_order || 0,
+    category_id: selectedData?.categoryId || "",
+  });
+  const [image, setImage] = useState();
 
-  if (!categoryId) {
+  // Validation check moved after Hooks
+  if (!selectedData?.categoryId) {
     return (
       <div className="p-4 text-red-500">
         Error: Category ID is required to create/edit a subcategory.
       </div>
     );
   }
-
-  const [formData, setFormData] = useState({
-    name: data?.name || "",
-    slug: data?.slug || "",
-    display_order: data?.display_order || 0,
-    category_id: categoryId,
-  });
-  const [image, setImage] = useState();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -165,11 +165,13 @@ export const SubCategoryForm = ({
       <div className="space-y-2">
         <Label htmlFor="image">Sub Category Icon</Label>
         {data?.icon_url && (
-          <div className="mb-2">
-            <img
+          <div className="mb-2 relative w-16 h-16">
+            <Image
               src={data.icon_url}
               alt="Current icon"
-              className="w-16 h-16 object-contain"
+              fill
+              className="object-contain"
+              sizes="(max-width: 64px) 100vw, 64px"
             />
           </div>
         )}

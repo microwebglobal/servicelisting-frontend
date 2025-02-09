@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Rating from "@mui/material/Rating";
@@ -26,11 +26,7 @@ const ServiceProviderSideBar = () => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchProviderData();
-  }, []);
-
-  const fetchProviderData = async () => {
+  const fetchProviderData = useCallback(async () => {
     try {
       const storedUser = localStorage.getItem("user");
       const user = storedUser ? JSON.parse(storedUser) : null;
@@ -47,7 +43,11 @@ const ServiceProviderSideBar = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchProviderData();
+  }, [fetchProviderData]);
 
   const handleLogout = async () => {
     setLoadingLogout(true);
@@ -215,7 +215,7 @@ const ServiceProviderSideBar = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to logout? You'll need to log in again to access your account.
+              Are you sure you want to logout? You&apos;ll need to log in again to access your account.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

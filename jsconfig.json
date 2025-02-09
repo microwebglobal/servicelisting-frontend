@@ -7,7 +7,9 @@
       "@src/*": ["./src/*"],
       "@utils/*": ["./utils/*"],
       "@hooks/*": ["./hooks/*"],
-      "@lib/*": ["./lib/*"]
+      "@lib/*": ["./lib/*"],
+      "@api/*": ["./api/*"],
+      "@styles/*": ["./styles/*"]
     }
   }
 }

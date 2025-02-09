@@ -4,7 +4,7 @@ import { toast } from "@hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { Input } from "@components/ui/input";
 import Select from "react-select";
-import { DeleteForeverOutlined } from "@node_modules/@mui/icons-material";
+import { DeleteForeverOutlined } from "@/node_modules/@mui/icons-material";
 import { providerAPI } from "@api/provider";
 import { serviceAPI } from "@/api/services";
 import { Delete, DotIcon, Edit, Eye, PlusCircle, Recycle } from "lucide-react";
@@ -226,7 +226,7 @@ const EmployeeFormModal = ({ employee, onSubmit, onClose }) => {
   );
 };
 
-const page = () => {
+const Page = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isEditFormOpen, setEditFormOpen] = useState(false);
@@ -350,4 +350,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

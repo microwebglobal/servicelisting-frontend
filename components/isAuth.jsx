@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const withAuth = (WrappedComponent, allowedRoles) => {
-  return (props) => {
+  const WithAuthComponent = (props) => {
     const { user, loading } = useAuth();
     const router = useRouter();
 
@@ -11,7 +11,7 @@ const withAuth = (WrappedComponent, allowedRoles) => {
       if (!loading && (!user || !allowedRoles.includes(user.role))) {
         router.push("/");
       }
-    }, [user, loading, allowedRoles, router]);
+    }, [user, loading, router]); 
 
     if (loading) {
       return <div>Loading...</div>;
@@ -21,6 +21,15 @@ const withAuth = (WrappedComponent, allowedRoles) => {
       <WrappedComponent {...props} />
     ) : null;
   };
+
+  WithAuthComponent.displayName = `WithAuth(${getDisplayName(WrappedComponent)})`;
+  
+  return WithAuthComponent;
 };
+
+// Helper function to get the display name of a component
+function getDisplayName(WrappedComponent) {
+  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+}
 
 export default withAuth;

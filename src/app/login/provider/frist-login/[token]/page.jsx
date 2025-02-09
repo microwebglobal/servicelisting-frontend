@@ -9,7 +9,7 @@ import { providerAPI } from "@api/provider";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
 
-const page = ({ params }) => {
+const Page = ({ params }) => {
   const [token, setToken] = useState(null);
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
@@ -174,4 +174,4 @@ const page = ({ params }) => {
   );
 };
 
-export default page;
+export default Page;
