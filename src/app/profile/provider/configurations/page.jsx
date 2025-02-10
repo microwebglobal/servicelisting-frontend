@@ -1,8 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { providerAPI } from "@api/provider";
+import { Button } from "@/components/ui/button";
 
 const page = () => {
+  const [provider, setProvider] = useState();
   const [availabilityHours, setAvailabilityHours] = useState({
     monday: {
       start: "09:00",
@@ -44,6 +46,7 @@ const page = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const user = storedUser ? JSON.parse(storedUser) : null;
+    setProvider(user);
     const fetchProviderData = async () => {
       try {
         const response = await providerAPI.getProviderByUserId(user.uId);
@@ -56,6 +59,17 @@ const page = () => {
 
     fetchProviderData();
   }, []);
+
+  const handleUpdate = async () => {
+    try {
+      await providerAPI.updateProviderAvailability(
+        provider?.providerId,
+        availabilityHours
+      );
+    } catch (error) {
+      console.error("Error updating avilability", error);
+    }
+  };
 
   const handleEditAvailability = (day, field, value) => {
     setAvailabilityHours((prev) => {
@@ -143,6 +157,10 @@ const page = () => {
             )
           )}
         </ul>
+
+        <Button className="mt-5" onClick={handleUpdate}>
+          Update Avilability
+        </Button>
       </div>
     </div>
   );

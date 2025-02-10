@@ -35,6 +35,6 @@ export const providerAPI = {
     api.put(`/providers/${employeeId}/employees`, data),
   addProviderEmployees: (providerId, data) =>
     api.post(`/providers/${providerId}/employees`, data),
-  updateProviderAvailability: (roviderId, data) =>
-    api.put(`/provider/availability/${roviderId}`, data),
+  updateProviderAvailability: (providerId, data) =>
+    api.put(`/provider/availability/${providerId}`, data),
 };
