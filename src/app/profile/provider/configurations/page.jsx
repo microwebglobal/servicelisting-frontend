@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { providerAPI } from "@api/provider";
 import { Button } from "@/components/ui/button";
+import { toast } from "@hooks/use-toast";
 
 const page = () => {
   const [provider, setProvider] = useState();
@@ -66,8 +67,18 @@ const page = () => {
         provider?.providerId,
         availabilityHours
       );
+      toast({
+        title: "Success!",
+        description: "Sucessfully Updated Availble hours",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Error updating avilability", error);
+      toast({
+        title: "Error",
+        description: "Error updating avilability",
+        variant: "destructive",
+      });
     }
   };
 
