@@ -1,9 +1,7 @@
 "use client";
 import { providerAPI } from "@/api/provider";
 import { serviceAPI } from "@/api/services";
-import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from "react";
-import { FaEdit } from "react-icons/fa";
+import React, { useEffect, useState, useCallback } from "react";
 
 const Page = () => {
   const [provider, setProvider] = useState(null);
@@ -13,7 +11,9 @@ const Page = () => {
     {}
   );
   const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
-  const [packagesByServiceType, setPackagesByServiceType] = useState([]);
+  const [servicesByServiceType, setServicesByServiceType] = useState({});
+  const [selectedServices, setSelectedServices] = useState({});
+  const [selectedServiceItems, setSelectedServiceItems] = useState({});
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -69,19 +69,25 @@ const Page = () => {
 
     if (isChecked) {
       try {
-        const response = await serviceAPI.getPackagesByType(serviceTypeId);
-        console.log(response.data.data);
-        setPackagesByServiceType((prevState) => ({
+        const response = await serviceAPI.getServices(serviceTypeId);
+
+        const serviceTypeName =
+          Object.values(serviceTypesBySubCategory)
+            .flat()
+            .find((type) => type.type_id === serviceTypeId)?.name || "";
+
+        setServicesByServiceType((prevState) => ({
           ...prevState,
-          [serviceTypeId]: response.data.data,
+          [serviceTypeId]: {
+            serviceTypeName,
+            services: response.data,
+          },
         }));
-        console.log(serviceTypesBySubCategory);
-        console.log(packagesByServiceType);
       } catch (error) {
         console.error("Error fetching packages:", error);
       }
     } else {
-      setPackagesByServiceType((prevState) => {
+      setServicesByServiceType((prevState) => {
         const newState = { ...prevState };
         delete newState[serviceTypeId];
         return newState;
@@ -89,8 +95,88 @@ const Page = () => {
     }
   };
 
-  const allServiceTypes = Object.values(serviceTypesBySubCategory).flat();
-  const allPackages = Object.values(packagesByServiceType).flat();
+  const handleServiceSelection = (serviceId, checked, serviceItems) => {
+    setSelectedServices((prev) => ({
+      ...prev,
+      [serviceId]: checked,
+    }));
+
+    setSelectedServiceItems((prev) => ({
+      ...prev,
+      [serviceId]: checked ? serviceItems.map((item) => item.item_id) : [],
+    }));
+  };
+
+  const handleServiceItemSelection = (
+    serviceId,
+    itemId,
+    checked,
+    totalItems
+  ) => {
+    setSelectedServiceItems((prev) => {
+      const updatedItems = checked
+        ? [...(prev[serviceId] || []), itemId]
+        : prev[serviceId]?.filter((id) => id !== itemId) || [];
+
+      const isServiceSelected = updatedItems.length === totalItems;
+
+      setSelectedServices((prev) => ({
+        ...prev,
+        [serviceId]: isServiceSelected,
+      }));
+
+      return {
+        ...prev,
+        [serviceId]: updatedItems,
+      };
+    });
+  };
+
+  const handleSubmit = async () => {
+    const response = providerCategories
+      .filter((category) =>
+        category.SubCategories.some((subCategory) =>
+          selectedSubCategories.includes(subCategory.sub_category_id)
+        )
+      )
+      .map((category) => {
+        const selectedSubCategory = category.SubCategories.find((subCategory) =>
+          selectedSubCategories.includes(subCategory.sub_category_id)
+        );
+
+        return {
+          id: category.category_id,
+          experience_years: 3,
+          is_primary: false,
+          services: Object.entries(selectedServices)
+            .filter(([serviceId, isSelected]) => isSelected)
+            .map(([serviceId]) => {
+              const service = Object.values(servicesByServiceType)
+                .flatMap((serviceType) => serviceType.services)
+                .find((pkg) => pkg.service_id === parseInt(serviceId));
+
+              return {
+                id: serviceId,
+                items: selectedServiceItems[serviceId]?.map((itemId) => {
+                  const item = service?.ServiceItems.find(
+                    (item) => item.item_id === itemId
+                  );
+                  return {
+                    id: itemId, // Item ID
+                  };
+                }),
+              };
+            }),
+        };
+      });
+
+    try {
+      await providerAPI.updateProviderCategory(provider?.providerId, response);
+    } catch (error) {
+      console.error();
+    }
+    console.log("Formatted Response:", response);
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -171,41 +257,82 @@ const Page = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         <div>
           <h2 className="text-2xl mt-12 font-semibold text-gray-800">
-            Available Packages{" "}
-            {selectedServiceTypes.length > 0 && (
-              <Button className="ml-10">
-                <FaEdit />
-                Create Custom Package
-              </Button>
-            )}
+            Available Services
           </h2>
           <div className="mt-8">
             {selectedServiceTypes.length > 0 ? (
               selectedServiceTypes.map((serviceTypeId) => (
                 <div key={serviceTypeId} className="mb-12">
                   <h3 className="text-xl font-bold text-gray-700 mb-4">
-                    {
-                      packagesByServiceType[serviceTypeId]?.[0]?.ServiceType
-                        ?.name
-                    }{" "}
-                    Packages
+                    {servicesByServiceType[serviceTypeId]?.serviceTypeName}{" "}
+                    Services
                   </h3>
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {packagesByServiceType[serviceTypeId]?.map((pkg) => (
-                      <div
-                        key={pkg.package_id}
-                        className="bg-white p-6 border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200"
-                      >
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-lg font-semibold text-gray-800">
-                            {pkg.name}
-                          </h4>
-                        </div>
-                      </div>
-                    ))}
+                    {servicesByServiceType[serviceTypeId]?.services.map(
+                      (pkg) => {
+                        const totalItems = pkg.ServiceItems.length;
+                        return (
+                          <div
+                            key={pkg.service_id}
+                            className="bg-white p-6 border border-gray-300 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 relative"
+                          >
+                            <div className="absolute top-4 right-4">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  selectedServices[pkg.service_id] || false
+                                }
+                                onChange={(e) =>
+                                  handleServiceSelection(
+                                    pkg.service_id,
+                                    e.target.checked,
+                                    pkg.ServiceItems
+                                  )
+                                }
+                                className="w-5 h-5 accent-blue-500"
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between mb-4">
+                              <h4 className="text-lg font-bold text-gray-900">
+                                {pkg.name}
+                              </h4>
+                            </div>
+
+                            <div className="border-t pt-3">
+                              {pkg.ServiceItems.map((item) => (
+                                <div
+                                  key={item.item_id}
+                                  className="flex items-center justify-between py-2"
+                                >
+                                  <p className="text-gray-800">{item.name}</p>
+                                  <input
+                                    type="checkbox"
+                                    checked={
+                                      selectedServiceItems[
+                                        pkg.service_id
+                                      ]?.includes(item.item_id) || false
+                                    }
+                                    onChange={(e) =>
+                                      handleServiceItemSelection(
+                                        pkg.service_id,
+                                        item.item_id,
+                                        e.target.checked,
+                                        totalItems
+                                      )
+                                    }
+                                    className="w-4 h-4 accent-green-500"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
                   </div>
                 </div>
               ))
@@ -217,18 +344,8 @@ const Page = () => {
             )}
           </div>
         </div>
-        <div>
-          <h2 className="text-2xl mt-12 font-semibold text-gray-800">
-            Available Services{" "}
-            {selectedServiceTypes.length > 0 && (
-              <Button className="ml-10">
-                <FaEdit />
-                Create Custom Service
-              </Button>
-            )}
-          </h2>
-        </div>
       </div>
+      <button onClick={handleSubmit}>Submit</button>
     </div>
   );
 };
