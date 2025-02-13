@@ -26,6 +26,27 @@ const Page = () => {
       try {
         const response = await providerAPI.getProviderByUserId(user.uId);
         setProviderCategories(response.data?.serviceCategories || []);
+
+        const initialSelectedSubCategories = new Set();
+        const initialSelectedServices = {};
+        const initialSelectedServiceItems = {};
+
+        response.data.providerCategories.forEach((pc) => {
+          initialSelectedSubCategories.add(pc.category_id);
+
+          initialSelectedServices[pc.service_id] = true;
+
+          if (pc.item_id) {
+            if (!initialSelectedServiceItems[pc.service_id]) {
+              initialSelectedServiceItems[pc.service_id] = [];
+            }
+            initialSelectedServiceItems[pc.service_id].push(pc.item_id);
+          }
+        });
+
+        setSelectedSubCategories(Array.from(initialSelectedSubCategories));
+        setSelectedServices(initialSelectedServices);
+        setSelectedServiceItems(initialSelectedServiceItems);
       } catch (error) {
         console.error("An error occurred while fetching data:", error);
       }
@@ -96,6 +117,11 @@ const Page = () => {
   };
 
   const handleServiceSelection = (serviceId, checked, serviceItems) => {
+    if (!serviceId) {
+      console.error("Invalid serviceId:", serviceId);
+      return;
+    }
+
     setSelectedServices((prev) => ({
       ...prev,
       [serviceId]: checked,
@@ -113,6 +139,11 @@ const Page = () => {
     checked,
     totalItems
   ) => {
+    if (!serviceId) {
+      console.error("Invalid serviceId:", serviceId);
+      return;
+    }
+
     setSelectedServiceItems((prev) => {
       const updatedItems = checked
         ? [...(prev[serviceId] || []), itemId]
@@ -120,8 +151,8 @@ const Page = () => {
 
       const isServiceSelected = updatedItems.length === totalItems;
 
-      setSelectedServices((prev) => ({
-        ...prev,
+      setSelectedServices((prevServices) => ({
+        ...prevServices,
         [serviceId]: isServiceSelected,
       }));
 
@@ -131,51 +162,70 @@ const Page = () => {
       };
     });
   };
+  useEffect(() => {
+    console.log("Selected Services:", selectedServices);
+    console.log("Selected Service Items:", selectedServiceItems);
+  }, [selectedServices, selectedServiceItems]);
 
   const handleSubmit = async () => {
-    const response = providerCategories
-      .filter((category) =>
-        category.SubCategories.some((subCategory) =>
-          selectedSubCategories.includes(subCategory.sub_category_id)
-        )
-      )
-      .map((category) => {
-        const selectedSubCategory = category.SubCategories.find((subCategory) =>
+    try {
+      const cleanedSelectedServices = { ...selectedServices };
+      delete cleanedSelectedServices.null;
+
+      const cleanedSelectedServiceItems = { ...selectedServiceItems };
+      delete cleanedSelectedServiceItems.null;
+
+      const existingProviderResponse = await providerAPI.getProviderByUserId(
+        provider.uId
+      );
+      const existingProviderData = existingProviderResponse.data;
+
+      const updatedProviderCategories = providerCategories.map((category) => {
+        const isModified = category.SubCategories.some((subCategory) =>
           selectedSubCategories.includes(subCategory.sub_category_id)
         );
 
-        return {
-          id: category.category_id,
-          experience_years: 3,
-          is_primary: false,
-          services: Object.entries(selectedServices)
-            .filter(([serviceId, isSelected]) => isSelected)
-            .map(([serviceId]) => {
-              const service = Object.values(servicesByServiceType)
-                .flatMap((serviceType) => serviceType.services)
-                .find((pkg) => pkg.service_id === parseInt(serviceId));
-
-              return {
-                id: serviceId,
-                items: selectedServiceItems[serviceId]?.map((itemId) => {
-                  const item = service?.ServiceItems.find(
-                    (item) => item.item_id === itemId
-                  );
-                  return {
-                    id: itemId, // Item ID
-                  };
-                }),
-              };
-            }),
-        };
+        if (isModified) {
+          return {
+            provider_id: provider.providerId,
+            category_id: category.category_id,
+            experience_years: 3,
+            is_primary: false,
+            services: Object.entries(cleanedSelectedServices)
+              .filter(([serviceId, isSelected]) => isSelected)
+              .map(([serviceId]) => ({
+                service_id: serviceId,
+                items: cleanedSelectedServiceItems[serviceId]?.map(
+                  (itemId) => ({
+                    item_id: itemId,
+                    price_adjustment: 0,
+                  })
+                ),
+              })),
+          };
+        } else {
+          const existingCategory = existingProviderData.providerCategories.find(
+            (pc) => pc.category_id === category.category_id
+          );
+          return (
+            existingCategory || {
+              provider_id: provider.providerId,
+              category_id: category.category_id,
+              experience_years: 0,
+              is_primary: false,
+              services: [],
+            }
+          );
+        }
       });
 
-    try {
-      await providerAPI.updateProviderCategory(provider?.providerId, response);
+      console.log("Updated provider categories:", updatedProviderCategories);
+      await providerAPI.updateProviderCategory(provider.providerId, {
+        categories: updatedProviderCategories,
+      });
     } catch (error) {
-      console.error();
+      console.error("Error updating provider categories:", error);
     }
-    console.log("Formatted Response:", response);
   };
 
   return (

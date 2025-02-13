@@ -28,7 +28,7 @@ const ServiceProviderLogin = () => {
       if (response.data.success) {
         login({
           email: response.data.user.email,
-          role: "service_provider",
+          role: response.data.user.role,
           uId: response.data.user.id,
           providerId: response.data.user.provider,
         });

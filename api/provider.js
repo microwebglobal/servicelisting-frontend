@@ -27,6 +27,8 @@ export const providerAPI = {
 
   // Service Provider Bookings
   getProviderBookings: (id) => api.get(`/provider/bookings/${id}`),
+  acceptProviderBookings: (bookingId, data) =>
+    api.put(`/booking/acceptence/${bookingId}`, data),
 
   // Service Provider Employee
   getProviderEmployees: (providerId) =>
