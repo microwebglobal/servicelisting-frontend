@@ -22,6 +22,7 @@ import {
   Clock,
   MapPin,
   User,
+  UserCheck,
 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
@@ -88,11 +89,15 @@ const BookingDetailsModal = ({ booking }) => {
                 {format(new Date(booking.booking_date), "PPP")}
               </p>
               <p>
-                <span className="font-medium">Time:</span>{" "}
+                <span className="font-medium">Start Time:</span>{" "}
                 {format(
                   new Date(`2000-01-01T${booking.start_time}`),
                   "hh:mm a"
                 )}
+              </p>
+              <p>
+                <span className="font-medium">End Time:</span>{" "}
+                {format(new Date(`2000-01-01T${booking.end_time}`), "hh:mm a")}
               </p>
               <p>
                 <span className="font-medium">Duration:</span>{" "}
@@ -106,6 +111,33 @@ const BookingDetailsModal = ({ booking }) => {
             </div>
           </Card>
         </div>
+
+        {booking?.employee && (
+          <Card className="p-4 space-y-3">
+            <h3 className="font-semibold flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Assigned Employee
+            </h3>
+            <div className="space-y-2 text-sm">
+              <p>
+                <span className="font-medium">Id:</span>{" "}
+                {booking.employee?.employee_id}
+              </p>
+              <p>
+                <span className="font-medium">Name:</span>{" "}
+                {booking.employee?.User?.name}
+              </p>
+              <p>
+                <span className="font-medium">Mobile:</span>{" "}
+                {booking.employee?.User?.mobile}
+              </p>
+              <p>
+                <span className="font-medium">Email:</span>{" "}
+                {booking.employee?.User?.email}
+              </p>
+            </div>
+          </Card>
+        )}
 
         <Card className="p-4 space-y-3">
           <h3 className="font-semibold flex items-center gap-2">
@@ -300,6 +332,7 @@ const Page = () => {
   const [availableEmployees, setAvailableEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [currentBookingId, setCurrentBookingId] = useState(null);
+  const [acceptedBookings, setAcceptedBookings] = useState(null);
   const [bookingRequests, setBookingRequests] = useState();
 
   useEffect(() => {
@@ -341,8 +374,13 @@ const Page = () => {
         if (Array.isArray(response.data)) {
           setBookings(response.data);
           const requestBookings = response.data.filter(
-            (booking) => booking.status === "confirmed"
+            (booking) => booking.status === "assigned"
           );
+
+          const acceptBookings = response.data.filter(
+            (booking) => booking.status === "accepted"
+          );
+          setAcceptedBookings(acceptBookings);
           setBookingRequests(requestBookings);
           setError(null);
         } else {
@@ -359,7 +397,7 @@ const Page = () => {
     if (providerId) {
       fetchBookings();
     }
-  }, [providerId]);
+  }, [providerId, showEmployeeModal]);
 
   const filteredBookings = bookings.filter((booking) => {
     const bookingDate = new Date(booking.booking_date);
@@ -382,22 +420,22 @@ const Page = () => {
     return <div className="text-center text-red-500 p-4">{error}</div>;
   }
 
-  const handleOrderAcceptence = async (booking_id) => {
+  const handleOrderAcceptence = async (booking) => {
     try {
       if (user.role === "business_service_provider") {
-        const employeesResponse = await providerAPI.getProviderEmployees(
-          providerId
+        const employeesResponse = await providerAPI.getAvailableEmployees(
+          providerId,
+          booking.booking_id,
+          booking.booking_date,
+          booking.start_time,
+          booking.end_time
         );
 
-        const activeEmployees = employeesResponse.data.filter(
-          (employee) => employee.status === "active"
-        );
-
-        setAvailableEmployees(activeEmployees);
-        setCurrentBookingId(booking_id);
+        setAvailableEmployees(employeesResponse.data.availableEmployees);
+        setCurrentBookingId(booking.booking_id);
         setShowEmployeeModal(true);
       } else {
-        await providerAPI.acceptProviderBookings(booking_id);
+        await providerAPI.acceptProviderBookings(booking.booking_id);
       }
     } catch (error) {
       console.error("Error handling booking acceptance:", error);
@@ -475,7 +513,7 @@ const Page = () => {
           <Card className="p-4">
             <h3 className="font-semibold mb-3">Recent Order Requests</h3>
             <div>
-              {bookingRequests.slice(0, 5).map((booking) => (
+              {bookingRequests.map((booking) => (
                 <div
                   key={booking.booking_id}
                   className="p-2 border last:border-b-0"
@@ -492,11 +530,12 @@ const Page = () => {
                   <p className="text-sm text-gray-600 mb-2">
                     {booking.customer?.name} - {booking.status}
                   </p>
-                  <Button
-                    onClick={() => handleOrderAcceptence(booking.booking_id)}
-                  >
-                    Accept Request
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button onClick={() => handleOrderAcceptence(booking)}>
+                      Accept
+                    </Button>
+                    <Button variant="destructive">Reject</Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -536,6 +575,30 @@ const Page = () => {
                   }
                 </span>
               </div>
+            </div>
+          </Card>
+          <Card className="p-4">
+            <h3 className="font-semibold mb-3">Accepted Orders</h3>
+            <div>
+              {acceptedBookings.map((booking) => (
+                <div
+                  key={booking.booking_id}
+                  className="p-2 border last:border-b-0"
+                >
+                  <p
+                    onClick={() => {
+                      setSelectedBooking(booking);
+                      setDialogOpen(true);
+                    }}
+                    className="font-medium"
+                  >
+                    Booking #{booking.booking_id}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {booking.customer?.name} - {booking.status}
+                  </p>
+                </div>
+              ))}
             </div>
           </Card>
         </div>

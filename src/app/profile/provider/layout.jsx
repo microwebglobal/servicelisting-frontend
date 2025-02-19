@@ -6,8 +6,11 @@ const layout = ({ children }) => {
   return (
     <div>
       <div className="flex">
-        <ServiceProviderSideBar />
-        <div className="flex-1">{children}</div>
+        <div className="fixed left-0 top-0 h-full w-64">
+          <ServiceProviderSideBar />
+        </div>
+
+        <div className="flex-1 ml-72">{children}</div>
       </div>
     </div>
   );

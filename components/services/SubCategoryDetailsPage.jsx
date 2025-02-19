@@ -124,6 +124,8 @@ export function SubCategoryDetailsPage({
           {
             id: item.item_id,
             type: type,
+            duration_hours: item.duration_hours,
+            duration_minutes: item.duration_minutes,
             name: item.name,
             price:
               type === "package_item"

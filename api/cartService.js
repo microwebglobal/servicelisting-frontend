@@ -5,30 +5,36 @@ import { format } from "date-fns";
 export const cartService = {
   addToCart: async (cartData) => {
     try {
-      const formattedDate = format(new Date(cartData.bookingDate), 'yyyy-MM-dd');
+      const formattedDate = format(
+        new Date(cartData.bookingDate),
+        "yyyy-MM-dd"
+      );
       const defaultLocation = {
-        type: 'Point',
-        coordinates: [0, 0]
+        type: "Point",
+        coordinates: [0, 0],
       };
 
       const formattedData = {
         cityId: cartData.cityId,
-        items: cartData.items.map(item => ({
+        items: cartData.items.map((item) => ({
           itemId: item.id,
-          itemType: item.type === "package_item" ? "package_item" : "service_item",
-          quantity: item.quantity || 1
+          duration_hours: item.duration_hours,
+          duration_minutes: item.duration_minutes,
+          itemType:
+            item.type === "package_item" ? "package_item" : "service_item",
+          quantity: item.quantity || 1,
         })),
         bookingDate: formattedDate,
         startTime: cartData.startTime,
         serviceAddress: cartData.serviceAddress || "",
         serviceLocation: cartData.coordinates || defaultLocation,
-        customerNotes: cartData.customerNotes || ""
+        customerNotes: cartData.customerNotes || "",
       };
-      
+
       const response = await api.post("/cart/add", formattedData);
       return response.data;
     } catch (error) {
-      console.error('Cart Error:', error.response?.data || error.message);
+      console.error("Cart Error:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Failed to add to cart");
     }
   },
@@ -46,11 +52,13 @@ export const cartService = {
     try {
       const response = await api.put("/cart/item", {
         itemId: itemData.itemId,
-        quantity: itemData.quantity
+        quantity: itemData.quantity,
       });
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to update cart item");
+      throw new Error(
+        error.response?.data?.message || "Failed to update cart item"
+      );
     }
   },
 
@@ -59,7 +67,7 @@ export const cartService = {
       const response = await api.put("/cart/tip", {
         tipAmount: tipData.tipAmount,
         subTotal: tipData.subTotal,
-        taxAmount: tipData.taxAmount
+        taxAmount: tipData.taxAmount,
       });
       return response.data;
     } catch (error) {
@@ -72,7 +80,9 @@ export const cartService = {
       const response = await api.post("/cart/checkout");
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to proceed to checkout");
+      throw new Error(
+        error.response?.data?.message || "Failed to proceed to checkout"
+      );
     }
   },
 
@@ -81,11 +91,13 @@ export const cartService = {
       const response = await api.post("/book/payment", {
         bookingId: paymentData.bookingId,
         amount: paymentData.amount,
-        paymentMethod: paymentData.paymentMethod
+        paymentMethod: paymentData.paymentMethod,
       });
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Payment processing failed");
+      throw new Error(
+        error.response?.data?.message || "Payment processing failed"
+      );
     }
   },
 
@@ -94,16 +106,22 @@ export const cartService = {
       const response = await api.get(`/booking/${bookingId}`);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to fetch booking");
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch booking"
+      );
     }
   },
 
   completeCashPayment: async (bookingId) => {
     try {
-      const response = await api.post(`/booking/${bookingId}/complete-cash-payment`);
+      const response = await api.post(
+        `/booking/${bookingId}/complete-cash-payment`
+      );
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to complete cash payment");
+      throw new Error(
+        error.response?.data?.message || "Failed to complete cash payment"
+      );
     }
   },
 
@@ -112,7 +130,9 @@ export const cartService = {
       const response = await api.get("/customer/booking");
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to fetch customer bookings");
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch customer bookings"
+      );
     }
-  }
+  },
 };
