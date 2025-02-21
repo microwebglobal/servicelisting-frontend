@@ -19,6 +19,7 @@ const Page = () => {
       try {
         const response = await cartService.getCustomerBookings();
         setBookingData(response);
+        console.log(response);
       } catch (error) {
         console.error("Error fetching booking data:", error);
       }

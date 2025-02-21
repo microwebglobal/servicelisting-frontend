@@ -169,9 +169,19 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
 
       if (mode === "edit" && data?.item_id) {
         await serviceAPI.updateServiceItem(data.item_id, payload);
+        toast({
+          title: "Success!",
+          description: "Service Item updated successfully!",
+          variant: "default",
+        });
       } else {
         console.log(payload);
         await serviceAPI.createServiceItem(payload);
+        toast({
+          title: "Success!",
+          description: "New Service Item Created successfully!",
+          variant: "default",
+        });
       }
       onClose();
     } catch (error) {
@@ -485,7 +495,7 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
       </div>
 
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
+        <div className="flex gap-5 items-center">
           <Label>Buffer Time</Label>
           <Button
             type="button"

@@ -1,9 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import Rating from "@mui/material/Rating";
-import { providerAPI } from "@api/provider";
 import { Button } from "@/components/ui/button";
 import { LogOut, Calendar, BookCheck, Settings, Loader2 } from "lucide-react";
 import { PeopleAltSharp } from "@mui/icons-material";
@@ -19,35 +16,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const ServiceProviderSideBar = () => {
-  const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const EmployeeSidebar = ({ profileData }) => {
   const [loadingLogout, setLoadingLogout] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const router = useRouter();
-
-  const fetchProviderData = useCallback(async () => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      const user = storedUser ? JSON.parse(storedUser) : null;
-
-      if (!user?.uId) {
-        router.push("/login/user");
-        return;
-      }
-
-      const response = await providerAPI.getProviderByUserId(user.uId);
-      setProfileData(response.data);
-    } catch (error) {
-      console.error("Error fetching provider data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
-
-  useEffect(() => {
-    fetchProviderData();
-  }, [fetchProviderData]);
 
   const handleLogout = async () => {
     setLoadingLogout(true);
@@ -79,38 +50,21 @@ const ServiceProviderSideBar = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen w-72 bg-white">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-      </div>
-    );
-  }
-
   const navigationItems = [
-    {
-      label: "Service Management",
-      icon: Calendar,
-      path: "/profile/provider/services",
-    },
     {
       label: "Orders",
       icon: BookCheck,
-      path: "/profile/provider/orders",
+      path: "#",
     },
-    ...(profileData?.business_type !== "individual"
-      ? [
-          {
-            label: "Employees",
-            icon: PeopleAltSharp,
-            path: "/profile/provider/employees",
-          },
-        ]
-      : []),
     {
-      label: "Configurations",
+      label: "Service Management",
+      icon: Calendar,
+      path: "##",
+    },
+    {
+      label: "Payments",
       icon: Settings,
-      path: "/profile/provider/configurations",
+      path: " ###",
     },
   ];
 
@@ -121,7 +75,7 @@ const ServiceProviderSideBar = () => {
         <div className="flex flex-col items-center mb-5">
           <div className="relative">
             <Image
-              src={profileData?.photo || "/assets/images/def_pro.webp"}
+              src={profileData?.User?.photo || "/assets/images/def_pro.webp"}
               alt="Provider Avatar"
               width={80}
               height={80}
@@ -146,21 +100,11 @@ const ServiceProviderSideBar = () => {
           </div>
 
           <h2 className="text-lg font-semibold text-gray-800 mt-3 text-center">
-            {profileData?.business_name || profileData?.User?.name}
+            {profileData?.User?.name}
           </h2>
           <p className="text-sm text-gray-500 capitalize">
-            {profileData?.business_type} Provider
+            {profileData?.ServiceProvider?.business_name}
           </p>
-          <div className="flex items-center gap-1 mt-2">
-            <Rating
-              name="half-rating-read"
-              defaultValue={4.5}
-              precision={0.5}
-              readOnly
-              size="small"
-            />
-            <p className="text-sm font-medium text-gray-800 ml-1">4.5</p>
-          </div>
         </div>
 
         {/* Contact Information */}
@@ -247,4 +191,4 @@ const ServiceProviderSideBar = () => {
   );
 };
 
-export default ServiceProviderSideBar;
+export default EmployeeSidebar;

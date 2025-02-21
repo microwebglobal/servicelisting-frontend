@@ -1,3 +1,5 @@
+"use client";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +24,17 @@ export const FormDialog = ({
   const { type, mode, item } = dialogState;
 
   console.log(item);
+
+  useEffect(() => {
+    if (type) {
+      document.body.style.pointerEvents = "none";
+    } else {
+      document.body.style.pointerEvents = "all";
+    }
+    return () => {
+      document.body.style.pointerEvents = "all";
+    };
+  }, [type]);
 
   const DIALOG_COMPONENTS = {
     category: CategoryForm,

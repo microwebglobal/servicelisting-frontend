@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import withAuth from "@components/isAuth";
 import ServiceProviderSideBar from "@components/serviceProvider/ServiceProviderSideBar";
 
 const layout = ({ children }) => {
@@ -16,4 +17,7 @@ const layout = ({ children }) => {
   );
 };
 
-export default layout;
+export default withAuth(layout, [
+  "service_provider",
+  "business_service_provider",
+]);

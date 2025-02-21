@@ -32,7 +32,12 @@ const ServiceProviderLogin = () => {
           uId: response.data.user.id,
           providerId: response.data.user.provider,
         });
-        router.push("/profile/provider");
+
+        if (response.data?.user?.role === "business_employee") {
+          router.push("/profile/business-employee");
+        } else {
+          router.push("/profile/provider");
+        }
       }
     } catch (error) {
       setError(error.response?.data?.message || "Invalid credentials");

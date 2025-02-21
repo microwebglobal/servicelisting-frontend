@@ -259,7 +259,17 @@ const Page = () => {
           selectedEmployee?.employee_id,
           data
         );
+        toast({
+          title: "Success!",
+          description: "Employee Successfully Updated!",
+          variant: "default",
+        });
       } catch (error) {
+        toast({
+          title: "Error",
+          description: "Error Updating Employee!",
+          variant: "destructive",
+        });
         console.error("Error Updating Employee", error);
       }
     } else {
@@ -268,7 +278,17 @@ const Page = () => {
           provider?.providerId,
           data
         );
+        toast({
+          title: "Success!",
+          description: "New Employee Added Successfully!",
+          variant: "default",
+        });
       } catch (error) {
+        toast({
+          title: "Error",
+          description: "Error Adding New Employee!",
+          variant: "destructive",
+        });
         console.error("Error Adding New Employee", error);
       }
     }
