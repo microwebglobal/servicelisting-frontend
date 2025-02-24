@@ -103,6 +103,7 @@ const AdminBookings = () => {
   const [bookingToCancel, setBookingToCancel] = useState(null);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchBookings();
@@ -131,7 +132,7 @@ const AdminBookings = () => {
         categoryIds
       );
       setServiceProviders(response);
-      response.data;
+      return response;
     } catch (error) {
       console.error("Error fetching service providers:", error);
       return [];
@@ -204,6 +205,15 @@ const AdminBookings = () => {
     { value: "week", label: "This Week" },
     { value: "month", label: "This Month" },
   ];
+
+  const filteredProviders = (booking) =>
+    serviceProviders.filter(
+      (provider) =>
+        (provider.User?.name || provider.business_name)
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) &&
+        provider.provider_id !== booking?.provider?.provider_id
+    );
 
   return (
     <Card className="w-full">
@@ -301,14 +311,18 @@ const AdminBookings = () => {
                   <TableCell>
                     {booking.status !== "cancelled" && (
                       <Select
-                        onOpenChange={() =>
-                          fetchServiceProviders(
-                            booking?.City?.city_id,
-                            booking?.BookingItems?.map(
-                              (item) => item.category_id
-                            ) || []
-                          )
-                        }
+                        onOpenChange={(open) => {
+                          if (open) {
+                            fetchServiceProviders(
+                              booking?.City?.city_id,
+                              booking?.BookingItems?.map(
+                                (item) => item.category_id
+                              ) || []
+                            );
+                          } else {
+                            setSearchQuery(""); // Clear search query when dropdown closes
+                          }
+                        }}
                         value={
                           booking?.provider?.provider_id
                             ? booking.provider.provider_id.toString()
@@ -328,6 +342,12 @@ const AdminBookings = () => {
                           <SelectValue placeholder="Assign Provider" />
                         </SelectTrigger>
                         <SelectContent>
+                          <Input
+                            placeholder="Search providers..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="mb-2"
+                          />
                           {booking?.provider?.provider_id && (
                             <SelectItem
                               value={booking.provider.provider_id.toString()}
@@ -337,7 +357,7 @@ const AdminBookings = () => {
                             </SelectItem>
                           )}
                           <SelectItem value="unassigned">Unassigned</SelectItem>
-                          {serviceProviders.map((provider) => (
+                          {filteredProviders(booking).map((provider) => (
                             <SelectItem
                               key={provider.provider_id}
                               value={provider.provider_id.toString()}

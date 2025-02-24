@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -16,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   Loader2,
   Calendar as CalendarIcon,
@@ -24,12 +24,21 @@ import {
   User,
   UserCheck,
 } from "lucide-react";
+import {
+  Calendar,
+  Views,
+  DateLocalizer,
+  momentLocalizer,
+} from "react-big-calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { providerAPI } from "@/api/provider";
 import { Button } from "@/components/ui/button";
+import moment from "moment";
+
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const BookingDetailsModal = ({ booking }) => {
   if (!booking) return null;
@@ -334,6 +343,9 @@ const Page = () => {
   const [currentBookingId, setCurrentBookingId] = useState(null);
   const [acceptedBookings, setAcceptedBookings] = useState(null);
   const [bookingRequests, setBookingRequests] = useState();
+  const [bookingDates, setBookingDates] = useState();
+
+  const localizer = momentLocalizer(moment);
 
   useEffect(() => {
     const fetchProviderId = async () => {
@@ -373,9 +385,17 @@ const Page = () => {
         const response = await providerAPI.getProviderBookings(providerId);
         if (Array.isArray(response.data)) {
           setBookings(response.data);
+          const formattedBookings = response.data.map((booking) => ({
+            id: booking.booking_id,
+            title: booking.booking_id,
+            start: new Date(`${booking.booking_date}T${booking.start_time}`),
+            end: new Date(`${booking.booking_date}T${booking.end_time}`),
+            details: booking,
+          }));
           const requestBookings = response.data.filter(
             (booking) => booking.status === "assigned"
           );
+          setBookingDates(formattedBookings);
 
           const acceptBookings = response.data.filter(
             (booking) => booking.status === "accepted"
@@ -543,12 +563,12 @@ const Page = () => {
         </div>
         <div className="space-y-4">
           <Card className="p-4">
-            <Calendar
+            {/* <CalendarUI
               mode="single"
               selected={selectedDate}
               onSelect={(date) => setSelectedDate(date || new Date())}
               className="rounded-md"
-            />
+            /> */}
           </Card>
           <Card className="p-4">
             <h3 className="font-semibold mb-3">Today's Summary</h3>
@@ -611,12 +631,12 @@ const Page = () => {
             </h2>
           </div>
 
-          <TimelineView
-            bookings={filteredBookings}
-            onSelectBooking={(booking) => {
-              setSelectedBooking(booking);
-              setDialogOpen(true);
-            }}
+          <Calendar
+            localizer={localizer}
+            events={bookingDates}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: 500 }}
           />
         </div>
       </div>
