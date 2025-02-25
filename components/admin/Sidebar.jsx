@@ -62,8 +62,8 @@ const Sidebar = () => {
       name: "Global Settings",
       subMenu: [
         {
-          name: "Service Time Gap Settings",
-          link: "/service-time-gap-settings",
+          name: "System Settings",
+          link: "/admin/system-settings",
         },
       ],
     },

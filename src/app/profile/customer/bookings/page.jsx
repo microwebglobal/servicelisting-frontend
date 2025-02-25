@@ -11,7 +11,7 @@ import BookingTimeline from "@components/booking/BookingTimeline";
 const Page = () => {
   const [bookingData, setBookingData] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("payment_pending");
+  const [selectedStatus, setSelectedStatus] = useState("confirmed");
   const router = useRouter();
 
   useEffect(() => {
@@ -65,10 +65,7 @@ const Page = () => {
               <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
                 <div className="text-center">
                   <p className="text-xl font-semibold text-gray-600">
-                    Loading bookings...
-                  </p>
-                  <p className="text-gray-500 mt-2">
-                    Please wait while we fetch your booking data
+                    No Bookings...
                   </p>
                 </div>
               </div>

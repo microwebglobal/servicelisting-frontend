@@ -35,8 +35,10 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import moment from "moment";
+import { differenceInSeconds, formatDistanceToNow } from "date-fns";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { Button } from "@/components/ui/button";
 
 const BookingDetailsModal = ({ booking }) => {
   if (!booking) return null;
@@ -238,12 +240,57 @@ const BookingDetailsModal = ({ booking }) => {
   );
 };
 
+const CountdownTimer = ({ targetDate }) => {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const difference = differenceInSeconds(targetDate, now);
+
+      if (difference > 0) {
+        return {
+          days: Math.floor(difference / (3600 * 24)),
+          hours: Math.floor((difference % (3600 * 24)) / 3600),
+          minutes: Math.floor((difference % 3600) / 60),
+          seconds: Math.floor(difference % 60),
+        };
+      }
+      return null;
+    };
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [targetDate]);
+
+  if (!timeLeft) return <div>Service time arrived!</div>;
+
+  return (
+    <div className="flex gap-2 items-center">
+      {timeLeft.days > 0 && <Badge variant="outline">{timeLeft.days}d</Badge>}
+      <Badge variant="outline">{timeLeft.hours}h</Badge>
+      <Badge variant="outline">{timeLeft.minutes}m</Badge>
+      <Badge variant="outline">{timeLeft.seconds}s</Badge>
+    </div>
+  );
+};
+
 const BusinessEmployeeProfile = () => {
   const [profileData, setProfileData] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [upcomingBookings, setUpcomingBookings] = useState([]);
+  const [latestBooking, setLatestBooking] = useState(null);
 
   const localizer = momentLocalizer(moment);
 
@@ -302,14 +349,79 @@ const BusinessEmployeeProfile = () => {
     setDialogOpen(true);
   };
 
+  useEffect(() => {
+    if (bookings.length > 0) {
+      const now = new Date();
+      const upcoming = bookings
+        .filter((b) => new Date(b.start) > now)
+        .sort((a, b) => new Date(a.start) - new Date(b.start));
+
+      setUpcomingBookings(upcoming);
+      setLatestBooking(upcoming[0] || null);
+    }
+  }, [bookings]);
+
+  const formatBookingTime = (date) => {
+    return format(date, "MMM dd, yyyy - hh:mm a");
+  };
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
       <EmployeeSidebar profileData={profileData} />
-      <div className="flex-1 p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          Order Schedule
-        </h2>
-        <div className="flex">
+      <div className="flex p-6 gap-10">
+        <div className="w-1/2">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            Upcoming Bookings
+          </h2>
+          {latestBooking && (
+            <Card className="mb-6 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold mb-3">Next Booking</h3>
+                  <p>Booking #{latestBooking.id}</p>
+                  <Button className="bg-green-300 text-black mt-2">
+                    Start
+                  </Button>
+                </div>
+                <div className="text-center">
+                  <CountdownTimer targetDate={new Date(latestBooking.start)} />
+                  <p className="text-sm text-gray-600 mt-2">
+                    {formatBookingTime(new Date(latestBooking.start))}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+          <Card className="p-4">
+            <div className="space-y-4">
+              {upcomingBookings.length > 0 ? (
+                upcomingBookings.map((booking) => (
+                  <div key={booking.id} className="border-b pb-4 last:border-0">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">
+                          Booking #{booking.details.booking_id}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {formatBookingTime(new Date(booking.start))}
+                        </p>
+                      </div>
+                      <Button>Cancel</Button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  No upcoming bookings
+                </p>
+              )}
+            </div>
+          </Card>
+        </div>
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            Order Schedule
+          </h2>
           <div className="bg-white shadow-lg rounded-lg p-4">
             <Calendar
               localizer={localizer}
