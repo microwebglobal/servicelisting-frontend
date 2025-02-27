@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
-import AddressSelect from "react-select";
+import CreatableSelect from "react-select/creatable";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Clock, MapPin, MessageSquare } from "lucide-react";
@@ -74,23 +73,23 @@ const BookingForm = ({ onBookingSubmit }) => {
     label: (
       <div>
         <span className="font-semibold capitalize">{addr.type}</span>
-
         <br />
         <span className="text-gray-500">
           {addr.line1},{addr.line2},{addr.city}, {addr.state} {addr.postal_code}
         </span>
       </div>
     ),
-
     value: `${addr.line1}, ${addr.line2 ? addr.line2 + ", " : ""}${
       addr.city
     }, ${addr.state} ${addr.postal_code}`,
   }));
 
-  const handleAddressChange = async (address) => {
+  const handleAddressChange = async (selectedOption) => {
     try {
+      const address = selectedOption ? selectedOption.value : "";
       handleInputChange("serviceAddress", address);
-      //TO DO: Add geocoding logic here
+
+      // TO DO: Add geocoding logic here
       const dummyCoordinates = {
         type: "Point",
         coordinates: [0, 0], // [longitude, latitude]
@@ -104,8 +103,6 @@ const BookingForm = ({ onBookingSubmit }) => {
         variant: "destructive",
       });
     }
-
-    console.log(bookingDetails);
   };
 
   const handleSubmit = async (e) => {
@@ -187,15 +184,12 @@ const BookingForm = ({ onBookingSubmit }) => {
                 Service Address
               </label>
 
-              <AddressSelect
+              <CreatableSelect
                 options={addressOptions}
-                onChange={(selectedOption) =>
-                  handleAddressChange(
-                    selectedOption ? selectedOption.value : ""
-                  )
-                }
-                placeholder="Select an address"
+                onChange={handleAddressChange}
+                placeholder="Select or enter an address"
                 isClearable
+                formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
               />
             </div>
 

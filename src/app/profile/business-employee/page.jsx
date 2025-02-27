@@ -36,9 +36,10 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import moment from "moment";
 import { differenceInSeconds, formatDistanceToNow } from "date-fns";
-
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Button } from "@/components/ui/button";
+import BookingStartModal from "@/components/business-employee/BookingStartModal";
+import { LoginAPI } from "@/api/login";
 
 const BookingDetailsModal = ({ booking }) => {
   if (!booking) return null;
@@ -291,6 +292,9 @@ const BusinessEmployeeProfile = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [latestBooking, setLatestBooking] = useState(null);
+  const [isStartModalOpen, setStartModalOpen] = useState(false);
+  const [selectedBookingForStart, setSelectedBookingForStart] = useState(null);
+  const [ongoingBookings, setOngoingBookings] = useState([]);
 
   const localizer = momentLocalizer(moment);
 
@@ -328,6 +332,7 @@ const BusinessEmployeeProfile = () => {
         details: booking,
       }));
       setBookings(formattedBookings);
+
       console.log("Formatted Bookings Data:", formattedBookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -347,6 +352,70 @@ const BusinessEmployeeProfile = () => {
   const handleEventSelect = (event) => {
     setSelectedBooking(event.details);
     setDialogOpen(true);
+  };
+
+  const handleStartBooking = async (booking) => {
+    try {
+      await providerAPI.sendBookingStartOtp({
+        bookingId: booking.id,
+        mobile: booking?.details?.customer?.mobile,
+      });
+      setSelectedBookingForStart(booking);
+      setStartModalOpen(true);
+    } catch (error) {
+      console.error("Error Sending Otp", error);
+    }
+  };
+
+  const handleConfirmStart = (booking) => {
+    const updatedUpcomingBookings = upcomingBookings.filter(
+      (b) => b.id !== booking.id
+    );
+    setUpcomingBookings(updatedUpcomingBookings);
+
+    setOngoingBookings((prev) => [
+      ...prev,
+      { ...booking, startTime: new Date() },
+    ]);
+  };
+
+  const handleStopBooking = async (booking) => {
+    try {
+      await providerAPI.updateBookingStatus({
+        bookingId: booking.id,
+        status: "completed",
+      });
+
+      const updatedOngoingBookings = ongoingBookings.filter(
+        (b) => b.id !== booking.id
+      );
+      setOngoingBookings(updatedOngoingBookings);
+    } catch (error) {
+      console.error("Error stopping booking:", error);
+    }
+  };
+
+  const Timer = ({ startTime }) => {
+    const [elapsedTime, setElapsedTime] = useState(0);
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const diff = differenceInSeconds(now, startTime);
+        setElapsedTime(diff);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }, [startTime]);
+
+    const formatTime = (seconds) => {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${hours}h ${minutes}m ${secs}s`;
+    };
+
+    return <span>{formatTime(elapsedTime)}</span>;
   };
 
   useEffect(() => {
@@ -379,7 +448,10 @@ const BusinessEmployeeProfile = () => {
                 <div>
                   <h3 className="font-semibold mb-3">Next Booking</h3>
                   <p>Booking #{latestBooking.id}</p>
-                  <Button className="bg-green-300 text-black mt-2">
+                  <Button
+                    className="bg-green-300 text-black mt-2"
+                    onClick={() => handleStartBooking(latestBooking)}
+                  >
                     Start
                   </Button>
                 </div>
@@ -417,6 +489,39 @@ const BusinessEmployeeProfile = () => {
               )}
             </div>
           </Card>
+          <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-4">
+            Ongoing Bookings
+          </h2>
+          <Card className="p-4">
+            <div className="space-y-4">
+              {ongoingBookings.length > 0 ? (
+                ongoingBookings.map((booking) => (
+                  <div key={booking.id} className="border-b pb-4 last:border-0">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">
+                          Booking #{booking.details.booking_id}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <Timer startTime={booking.startTime} />
+                        </p>
+                      </div>
+                      <Button
+                        className="bg-red-500 text-white"
+                        onClick={() => handleStopBooking(booking)}
+                      >
+                        Stop
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  No ongoing bookings
+                </p>
+              )}
+            </div>
+          </Card>
         </div>
         <div>
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -436,6 +541,13 @@ const BusinessEmployeeProfile = () => {
       </div>
       <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
         <BookingDetailsModal booking={selectedBooking} />
+      </Dialog>
+      <Dialog open={isStartModalOpen} onOpenChange={setStartModalOpen}>
+        <BookingStartModal
+          booking={selectedBookingForStart}
+          onConfirm={handleConfirmStart}
+          onClose={() => setStartModalOpen(false)}
+        />
       </Dialog>
     </div>
   );

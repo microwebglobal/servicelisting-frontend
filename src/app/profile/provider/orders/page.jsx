@@ -24,6 +24,7 @@ import {
   User,
   UserCheck,
 } from "lucide-react";
+import { differenceInSeconds, formatDistanceToNow } from "date-fns";
 import {
   Calendar,
   Views,
@@ -36,9 +37,76 @@ import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { providerAPI } from "@/api/provider";
 import { Button } from "@/components/ui/button";
+import BookingStartModal from "@/components/business-employee/BookingStartModal";
 import moment from "moment";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
+
+const CountdownTimer = ({ targetDate }) => {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const difference = differenceInSeconds(targetDate, now);
+
+      if (difference > 0) {
+        return {
+          days: Math.floor(difference / (3600 * 24)),
+          hours: Math.floor((difference % (3600 * 24)) / 3600),
+          minutes: Math.floor((difference % 3600) / 60),
+          seconds: Math.floor(difference % 60),
+        };
+      }
+      return null;
+    };
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [targetDate]);
+
+  if (!timeLeft) return <div>Service time arrived!</div>;
+
+  return (
+    <div className="flex gap-2 items-center">
+      {timeLeft.days > 0 && <Badge variant="outline">{timeLeft.days}d</Badge>}
+      <Badge variant="outline">{timeLeft.hours}h</Badge>
+      <Badge variant="outline">{timeLeft.minutes}m</Badge>
+      <Badge variant="outline">{timeLeft.seconds}s</Badge>
+    </div>
+  );
+};
+
+const Timer = ({ startTime }) => {
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diff = differenceInSeconds(now, startTime);
+      setElapsedTime(diff);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}h ${minutes}m ${secs}s`;
+  };
+
+  return <span>{formatTime(elapsedTime)}</span>;
+};
 
 const BookingDetailsModal = ({ booking }) => {
   if (!booking) return null;
@@ -267,67 +335,6 @@ const BookingDetailsModal = ({ booking }) => {
   );
 };
 
-const TimelineView = ({ bookings, onSelectBooking }) => {
-  const hours = Array.from({ length: 13 }, (_, i) => i + 8); // 8 AM to 8 PM
-
-  const getBookingsForHour = (hour) => {
-    return bookings.filter((booking) => {
-      const bookingHour = parseInt(booking.start_time.split(":")[0]);
-      return bookingHour === hour;
-    });
-  };
-
-  const getStatusColor = (status) => {
-    const statusColors = {
-      assigned: "bg-yellow-50 border-yellow-200 hover:bg-yellow-100",
-      completed: "bg-green-50 border-green-200 hover:bg-green-100",
-      cancelled: "bg-red-50 border-red-200 hover:bg-red-100",
-      pending: "bg-blue-50 border-blue-200 hover:bg-blue-100",
-    };
-    return (
-      statusColors[status] || "bg-gray-50 border-gray-200 hover:bg-gray-100"
-    );
-  };
-
-  return (
-    <div className="border rounded-lg divide-y">
-      {hours.map((hour) => (
-        <div key={hour} className="flex items-start p-4">
-          <div className="w-16 text-sm text-gray-500">
-            {format(new Date().setHours(hour, 0), "hh:mm a")}
-          </div>
-          <div className="flex-1 space-y-2">
-            {getBookingsForHour(hour).map((booking) => (
-              <div
-                key={booking.booking_id}
-                onClick={() => onSelectBooking(booking)}
-                className={`cursor-pointer p-3 rounded-lg border ${getStatusColor(
-                  booking.status
-                )}`}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium">{booking.customer?.name}</p>
-                    <p className="text-sm text-gray-600">
-                      {booking.BookingItems[0]?.serviceItem?.name}
-                    </p>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className={getStatusColor(booking.status)}
-                  >
-                    {booking.status}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const Page = () => {
   const [bookings, setBookings] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -344,6 +351,11 @@ const Page = () => {
   const [acceptedBookings, setAcceptedBookings] = useState(null);
   const [bookingRequests, setBookingRequests] = useState();
   const [bookingDates, setBookingDates] = useState();
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [latestBooking, setLatestBooking] = useState(null);
+  const [isStartModalOpen, setStartModalOpen] = useState(false);
+  const [selectedBookingForStart, setSelectedBookingForStart] = useState(null);
+  const [ongoingBookings, setOngoingBookings] = useState([]);
 
   const localizer = momentLocalizer(moment);
 
@@ -417,7 +429,24 @@ const Page = () => {
     if (providerId) {
       fetchBookings();
     }
-  }, [providerId, showEmployeeModal]);
+  }, [providerId, showEmployeeModal, showConfirmationModal]);
+
+  useEffect(() => {
+    if (bookings.length > 0) {
+      const now = new Date();
+      const upcoming = bookings
+        .filter((b) => new Date(`${b.booking_date}T${b.start_time}`) > now)
+        .sort(
+          (a, b) =>
+            new Date(`${a.booking_date}T${a.start_time}`) -
+            new Date(`${b.booking_date}T${b.start_time}`)
+        );
+
+      console.log("upcoming:", upcoming, bookings);
+
+      setLatestBooking(upcoming[0] || null);
+    }
+  }, [bookings]);
 
   const filteredBookings = bookings.filter((booking) => {
     const bookingDate = new Date(booking.booking_date);
@@ -442,24 +471,38 @@ const Page = () => {
 
   const handleOrderAcceptence = async (booking) => {
     try {
-      if (user.role === "business_service_provider") {
-        const employeesResponse = await providerAPI.getAvailableEmployees(
-          providerId,
-          booking.booking_id,
-          booking.booking_date,
-          booking.start_time,
-          booking.end_time
-        );
-
-        setAvailableEmployees(employeesResponse.data.availableEmployees);
-        setCurrentBookingId(booking.booking_id);
-        setShowEmployeeModal(true);
-      } else {
-        await providerAPI.acceptProviderBookings(booking.booking_id);
-      }
+      setSelectedBooking(booking);
+      setShowConfirmationModal(true);
     } catch (error) {
       console.error("Error handling booking acceptance:", error);
     }
+  };
+
+  const handleConfirmation = async () => {
+    try {
+      if (user.role === "business_service_provider") {
+        const employeesResponse = await providerAPI.getAvailableEmployees(
+          providerId,
+          selectedBooking.booking_id,
+          selectedBooking.booking_date,
+          selectedBooking.start_time,
+          selectedBooking.end_time
+        );
+
+        setAvailableEmployees(employeesResponse.data.availableEmployees);
+        setCurrentBookingId(selectedBooking.booking_id);
+        setShowEmployeeModal(true);
+      } else {
+        await providerAPI.acceptProviderBookings(selectedBooking.booking_id);
+      }
+    } catch (error) {
+      console.error("Error confirming booking:", error);
+    }
+    setShowConfirmationModal(false);
+  };
+
+  const formatBookingTime = (date) => {
+    return format(date, "MMM dd, yyyy - hh:mm a");
   };
 
   const handleEmployeeConfirmation = async () => {
@@ -480,6 +523,52 @@ const Page = () => {
       console.error("Error confirming booking:", error);
     }
   };
+
+  const handleStartBooking = async (booking) => {
+    console.log(booking);
+    try {
+      await providerAPI.sendBookingStartOtp({
+        bookingId: booking.booking_id,
+        mobile: booking?.customer?.mobile,
+      });
+      setSelectedBookingForStart(booking);
+      setStartModalOpen(true);
+    } catch (error) {
+      console.error("Error Sending Otp", error);
+    }
+  };
+
+  const handleConfirmStart = (booking) => {
+    setOngoingBookings((prev) => [
+      ...prev,
+      { ...booking, startTime: new Date() },
+    ]);
+  };
+
+  const ConfirmationModal = () => (
+    <Dialog
+      open={showConfirmationModal}
+      onOpenChange={setShowConfirmationModal}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Confirm Booking Acceptance</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <p>Are you sure you want to accept this booking?</p>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmationModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmation}>Confirm</Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 
   const EmployeeSelectionModal = () => (
     <Dialog open={showEmployeeModal} onOpenChange={setShowEmployeeModal}>
@@ -560,16 +649,74 @@ const Page = () => {
               ))}
             </div>
           </Card>
+
+          <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-4">
+            Ongoing Bookings
+          </h2>
+          <Card className="p-4">
+            <div className="space-y-4">
+              {ongoingBookings.length > 0 ? (
+                ongoingBookings.map((booking) => (
+                  <div
+                    key={booking.booking_id}
+                    className="border-b pb-4 last:border-0"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">
+                          Booking #{booking.booking_id}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <Timer startTime={booking.start_time} />
+                        </p>
+                      </div>
+                      <Button className="bg-red-500 text-white">Stop</Button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  No ongoing bookings
+                </p>
+              )}
+            </div>
+          </Card>
         </div>
         <div className="space-y-4">
-          <Card className="p-4">
-            {/* <CalendarUI
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => setSelectedDate(date || new Date())}
-              className="rounded-md"
-            /> */}
-          </Card>
+          {latestBooking && (
+            <Card className="mb-6 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold mb-3">Next Booking</h3>
+                  <p>Booking #{latestBooking.booking_id}</p>
+                  {user.role != "business_service_provider" && (
+                    <Button
+                      className="bg-green-300 text-black mt-2"
+                      onClick={() => handleStartBooking(latestBooking)}
+                    >
+                      Start
+                    </Button>
+                  )}
+                </div>
+                <div className="text-center">
+                  <CountdownTimer
+                    targetDate={
+                      new Date(
+                        `${latestBooking.booking_date}T${latestBooking.start_time}`
+                      )
+                    }
+                  />
+                  <p className="text-sm text-gray-600 mt-2">
+                    {formatBookingTime(
+                      new Date(
+                        `${latestBooking.booking_date}T${latestBooking.start_time}`
+                      )
+                    )}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
           <Card className="p-4">
             <h3 className="font-semibold mb-3">Today's Summary</h3>
             <div className="space-y-2 text-sm">
@@ -642,9 +789,17 @@ const Page = () => {
       </div>
 
       <EmployeeSelectionModal />
+      <ConfirmationModal />
 
       <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
         <BookingDetailsModal booking={selectedBooking} />
+      </Dialog>
+      <Dialog open={isStartModalOpen} onOpenChange={setStartModalOpen}>
+        <BookingStartModal
+          booking={selectedBookingForStart}
+          onConfirm={handleConfirmStart}
+          onClose={() => setStartModalOpen(false)}
+        />
       </Dialog>
     </div>
   );
