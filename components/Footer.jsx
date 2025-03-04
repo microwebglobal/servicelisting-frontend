@@ -1,59 +1,85 @@
-import React from "react";
-import { FaYoutube } from "react-icons/fa";
-import { FaInstagram } from "react-icons/fa";
-import { FaFacebook } from "react-icons/fa";
-import { FaTwitter } from "react-icons/fa6";
-import { IoMdMail } from "react-icons/io";
+import { motion } from "framer-motion";
+import { BiWorld } from "react-icons/bi";
+import { FaFacebook, FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <div>
-      <footer
-        className="bg-primary text-white py-10 px-12"
-        style={{ backgroundColor: "#5f60b9" }}
+    <footer className="text-white py-10 px-6 bg-[#5f60b9]">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1 }}
+          className="lg:col-span-1 md:col-span-2"
+        >
+          <h2 className="text-xl font-bold">[APP LOGO]</h2>
+          <p className="text-gray-300 mt-4">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
+            explicabo suscipit sunt fugiat odit quis tempore.
+          </p>
+          <div className="mt-4 flex gap-4 text-2xl">
+            {[FaFacebook, FaLinkedin, FaInstagram, FaTwitter, BiWorld].map(
+              (Icon, index) => (
+                <motion.a
+                  key={index}
+                  href="#"
+                  rel="noopener noreferrer"
+                  className="hover:text-green-400 transition duration-300"
+                  whileHover={{ scale: 1.2 }}
+                >
+                  <Icon />
+                </motion.a>
+              )
+            )}
+          </div>
+        </motion.div>
+
+        {[
+          {
+            title: "[App Name] Jobs",
+            items: ["Tearms", "Privacy", "Cookies", "Licenses", "Consulting"],
+          },
+          {
+            title: "Quick Links",
+            items: ["Home", "About Us", "Services", "Portfolio", "Contact"],
+          },
+          {
+            title: "Legal",
+            items: ["Tearms", "Privacy", "Cookies", "Licenses", "Consulting"],
+          },
+        ].map((section, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.3 * (index + 1) }}
+            className="md:w-full md:col-span-1"
+          >
+            <h2 className="text-xl font-bold">{section.title}</h2>
+            <ul className="mt-4 space-y-2">
+              {section.items.map((item, i) => (
+                <li
+                  key={i}
+                  className="hover:text-green-400 transition duration-300 cursor-pointer"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Footer Bottom */}
+      <motion.div
+        className="mt-10 text-gray-400 text-sm text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 1.2 }}
       >
-        <div className="flex justify-between items-start py-10 px-20">
-          <div className="w-1/4">
-            <h4 className="font-bold text-lg mb-2">[App Logo]</h4>
-            <p>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Dignissimos, omnis quo. Accusamus quo,
-            </p>
-            <div className="flex mt-3 gap-4 text-2xl">
-              <FaYoutube />
-              <FaInstagram />
-              <FaFacebook />
-              <FaTwitter />
-              <IoMdMail />
-            </div>
-          </div>
-          <div className="flex gap-20">
-            <div>
-              <h5 className="font-bold mb-5">Company</h5>
-              <ul className="space-y-2">
-                <li>About us</li>
-                <li>Services</li>
-                <li>Our Blog</li>
-                <li>Contact</li>
-              </ul>
-            </div>
-            <div>
-              <h5 className="font-bold mb-5">Legal</h5>
-              <ul className="space-y-2">
-                <li>Terms</li>
-                <li>Privacy</li>
-                <li>Cookies</li>
-                <li>License</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <hr />
-        <div className="mt-8 text-center">
-          ©2024 [Organization]. All rights reserved.
-        </div>
-      </footer>
-    </div>
+        &copy; {new Date().getFullYear()} [Organization] | All rights reserved
+      </motion.div>
+    </footer>
   );
 };
 
