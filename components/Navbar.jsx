@@ -51,7 +51,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className="bg-primary py-4 px-6 md:px-10 fixed w-full z-20"
+      className="bg-primary py-1 px-6 md:px-10 fixed w-full z-20"
       style={{ backgroundColor: "#5f60b9" }}
     >
       <div className="flex justify-between items-center">

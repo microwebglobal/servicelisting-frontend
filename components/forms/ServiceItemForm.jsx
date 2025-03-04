@@ -43,6 +43,8 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
         buffer_hours: time.buffer_hours,
         buffer_minutes: time.buffer_minutes,
       })) || [],
+    advance_percentage: data?.advance_percentage || 0,
+    is_home_visit: data?.is_home_visit || false,
   });
 
   useEffect(() => {
@@ -294,6 +296,51 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
           }
           required
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="base_price">Advance Percentage</Label>
+        <Input
+          id="advance_percentage"
+          type="number"
+          step="0.01"
+          min="0"
+          max="100"
+          placeholder="Advance Percentage"
+          value={formData.advance_percentage}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              advance_percentage: parseFloat(e.target.value),
+            })
+          }
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="base_price">Is Home Visit</Label>
+        <Select
+          value={formData.is_home_visit}
+          onValueChange={(value) =>
+            setFormData({
+              ...formData,
+              is_home_visit: value,
+            })
+          }
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Home Visit Or Not" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem key={true} value={true}>
+              True
+            </SelectItem>
+            <SelectItem key={false} value={false}>
+              False
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="flex justify-between">

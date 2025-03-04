@@ -104,8 +104,16 @@ export function ServiceList({ typeId, cityId, addToCart }) {
                         {item.description}
                       </p>
                     </div>
+
                     <div className="text-right">
-                      <div className="flex items-center gap-2">
+                      <div>
+                        {item.advance_percentage > 0 && (
+                          <span className="text-red-400 text-sm">
+                            {item.advance_percentage}% Advanced Payment Required
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 justify-end">
                         {item.SpecialPricings[0] ? (
                           <>
                             <span className="text-lg font-bold">
