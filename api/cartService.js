@@ -90,7 +90,7 @@ export const cartService = {
     try {
       const response = await api.post("/book/payment", {
         bookingId: paymentData.bookingId,
-        amount: paymentData.amount,
+        paymentType: paymentData.paymentType,
         paymentMethod: paymentData.paymentMethod,
       });
       return response.data;

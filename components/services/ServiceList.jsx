@@ -94,12 +94,14 @@ export function ServiceList({ typeId, cityId, addToCart }) {
                   key={item.item_id}
                   className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div
-                    className="flex justify-between items-start"
-                    onClick={() => openModal(item.overview)}
-                  >
+                  <div className="flex justify-between items-start">
                     <div>
-                      <h6 className="font-medium">{item.name}</h6>
+                      <h6
+                        className="font-medium"
+                        onClick={() => openModal(item.overview)}
+                      >
+                        {item.name}
+                      </h6>
                       <p className="text-sm text-gray-600 mt-1">
                         {item.description}
                       </p>
