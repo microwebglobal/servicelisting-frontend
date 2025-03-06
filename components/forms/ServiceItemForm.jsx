@@ -43,6 +43,11 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
         buffer_hours: time.buffer_hours,
         buffer_minutes: time.buffer_minutes,
       })) || [],
+    commitionRate:
+      data?.ServiceCommissions?.map((commition) => ({
+        city_id: commition.city_id,
+        rate: commition.commission_rate,
+      })) || [],
     advance_percentage: data?.advance_percentage || 0,
     is_home_visit: data?.is_home_visit || false,
   });
@@ -116,6 +121,29 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
     }));
   };
 
+  const addCommitionRate = () => {
+    setFormData((prev) => ({
+      ...prev,
+      commitionRate: [...prev.commitionRate, { city_id: "", rate: "" }],
+    }));
+  };
+
+  const removeCommitionRate = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      commitionRate: prev.commitionRate.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateCommitionRate = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      commitionRate: prev.commitionRate.map((rate, i) =>
+        i === index ? { ...rate, [field]: value } : rate
+      ),
+    }));
+  };
+
   const addBufferTime = () => {
     setFormData((prev) => ({
       ...prev,
@@ -167,6 +195,10 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
           buffer_hours: parseFloat(time.buffer_hours),
           buffer_minutes: parseFloat(time.buffer_minutes),
         })),
+        commitionRate: formData.commitionRate.map((commition) => ({
+          ...commition,
+          rate: parseFloat(commition.rate),
+        })),
       };
 
       if (mode === "edit" && data?.item_id) {
@@ -204,6 +236,10 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
 
   const isCitySelectedBuf = (cityId) => {
     return formData.bufferTime.some((time) => time.city_id === cityId);
+  };
+
+  const isCitySelectedComition = (cityId) => {
+    return formData.commitionRate.some((time) => time.city_id === cityId);
   };
 
   const handleDelete = async () => {
@@ -616,6 +652,69 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
               size="icon"
               className="mt-5"
               onClick={() => removeBufferTime(index)}
+            >
+              <Trash2 size={16} className="text-gray-500 hover:text-red-500" />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <Label>Commition Rates</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addCommitionRate}
+          >
+            <Plus size={16} className="mr-2" />
+            Add Commition Rate
+          </Button>
+        </div>
+
+        {formData.commitionRate.map((commition, index) => (
+          <div key={index} className="flex gap-4 items-start">
+            <div className="flex-1">
+              <Select
+                value={commition.city_id}
+                onValueChange={(value) =>
+                  updateCommitionRate(index, "city_id", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select City" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((city) =>
+                    !isCitySelectedComition(city.city_id) ||
+                    commition.city_id === city.city_id ? (
+                      <SelectItem key={city.city_id} value={city.city_id}>
+                        {city.name}
+                      </SelectItem>
+                    ) : null
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Rate"
+                value={commition.rate}
+                onChange={(e) =>
+                  updateCommitionRate(index, "rate", e.target.value)
+                }
+              />
+            </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => removeCommitionRate(index)}
             >
               <Trash2 size={16} className="text-gray-500 hover:text-red-500" />
             </Button>

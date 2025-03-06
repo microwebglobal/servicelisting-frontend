@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
-import { Wrench } from "lucide-react";
+import { AlertCircleIcon, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
 import Modal from "react-modal";
@@ -96,15 +96,23 @@ export function ServiceList({ typeId, cityId, addToCart }) {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h6
-                        className="font-medium"
-                        onClick={() => openModal(item.overview)}
-                      >
-                        {item.name}
-                      </h6>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {item.description}
-                      </p>
+                      <div>
+                        <h6
+                          className="font-medium"
+                          onClick={() => openModal(item.overview)}
+                        >
+                          {item.name}
+                        </h6>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {item.description}
+                        </p>
+                      </div>
+                      {item.is_home_visit && (
+                        <p className="text-sm text-red-400 flex items-center mt-8">
+                          <AlertCircleIcon className="mr-3 w-4" />
+                          You need to visit service provider to get an service
+                        </p>
+                      )}
                     </div>
 
                     <div className="text-right">
