@@ -74,7 +74,7 @@ const Home = () => {
               <SwiperSlide>
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
                   <Image
-                    src="/assets/images/herobg-2.jpg"
+                    src="/assets/images/herobg-5.jpg"
                     alt="Home Maintenance 1"
                     layout="fill"
                     objectFit="cover"
@@ -89,7 +89,7 @@ const Home = () => {
               <SwiperSlide>
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
                   <Image
-                    src="/assets/images/herobg-3.jpg"
+                    src="/assets/images/herobg-6.jpg"
                     alt="Home Maintenance 2"
                     layout="fill"
                     objectFit="cover"
@@ -103,7 +103,7 @@ const Home = () => {
               <SwiperSlide>
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
                   <Image
-                    src="/assets/images/herobg-4.jpg"
+                    src="/assets/images/herobg-7.jpg"
                     alt="Home Maintenance 3"
                     layout="fill"
                     objectFit="cover"
@@ -213,12 +213,12 @@ const Home = () => {
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2"
+          className=" ml-10 lg:w-1/2"
         >
           <Image
-            src="/assets/images/home_worker.png"
+            src="/assets/images/how_app_work.jpg"
             alt="Professional"
-            width={640}
+            width={440}
             height={418}
             className="w-full drop-shadow-lg rounded-xl"
           />
@@ -354,7 +354,7 @@ const Home = () => {
             className="w-full lg:w-1/2"
           >
             <Image
-              src="/assets/images/roofwork_home.png"
+              src="/assets/images/roof_work.jpg"
               alt="Professional"
               width={600}
               height={600}

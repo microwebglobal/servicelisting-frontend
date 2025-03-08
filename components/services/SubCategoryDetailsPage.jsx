@@ -102,7 +102,29 @@ export function SubCategoryDetailsPage({
   };
 
   const addToCart = (item, type) => {
-    console.log("item", item);
+    console.log("item", selectedItems);
+    // Check if any selected item is a home visit or non-home visit
+    const hasHomeVisitItem = selectedItems.some(
+      (i) => i.is_home_visit === true
+    );
+    const hasNonHomeVisitItem = selectedItems.some(
+      (i) => i.is_home_visit === false
+    );
+    const isNewItemHomeVisit = item.is_home_visit === true;
+
+    // Restrict adding items of different types (home visit vs. non-home visit)
+    if (
+      (hasHomeVisitItem && !isNewItemHomeVisit) ||
+      (hasNonHomeVisitItem && isNewItemHomeVisit)
+    ) {
+      toast({
+        title: "Selection Restriction",
+        description:
+          "You can only select either home visit or non-home visit items, not both.",
+        status: "error",
+      });
+      return;
+    }
 
     // If the item type is service_item, handle adding a single item
     if (type === "service_item") {
@@ -132,6 +154,7 @@ export function SubCategoryDetailsPage({
                 ? item.finalPrice
                 : item.SpecialPricings[0]?.special_price || item.base_price,
             quantity: 1,
+            is_home_visit: item.is_home_visit,
           },
         ]);
       }
@@ -167,6 +190,7 @@ export function SubCategoryDetailsPage({
               name: sec.item.name,
               price: sec.item.price,
               quantity: 1,
+              is_home_visit: item.is_home_visit,
             },
           ]);
         }

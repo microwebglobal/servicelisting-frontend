@@ -5,12 +5,13 @@ import { FaFacebook, FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";
 const Footer = () => {
   return (
     <footer className="text-white py-10 px-6 bg-[#5f60b9]">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-20 items-start">
+        {/* Left Section */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1 }}
-          className="lg:col-span-1 md:col-span-2"
+          className="md:col-span-1"
         >
           <h2 className="text-xl font-bold">[APP LOGO]</h2>
           <p className="text-gray-300 mt-4">
@@ -34,40 +35,66 @@ const Footer = () => {
           </div>
         </motion.div>
 
-        {[
-          {
-            title: "[App Name] Jobs",
-            items: ["Tearms", "Privacy", "Cookies", "Licenses", "Consulting"],
-          },
-          {
-            title: "Quick Links",
-            items: ["Home", "About Us", "Services", "Portfolio", "Contact"],
-          },
-          {
-            title: "Legal",
-            items: ["Tearms", "Privacy", "Cookies", "Licenses", "Consulting"],
-          },
-        ].map((section, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3 * (index + 1) }}
-            className="md:w-full md:col-span-1"
-          >
-            <h2 className="text-xl font-bold">{section.title}</h2>
-            <ul className="mt-4 space-y-2">
-              {section.items.map((item, i) => (
-                <li
-                  key={i}
-                  className="hover:text-green-400 transition duration-300 cursor-pointer"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        ))}
+        {/* Center & Right Sections */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 md:col-span-2">
+          {[
+            {
+              title: "[App Name] Jobs",
+              items: [
+                { name: "Terms", url: "/terms" },
+                { name: "Privacy", url: "/privacy-policy" },
+                { name: "Cookies", url: "/cookies" },
+                { name: "Licenses", url: "license" },
+                { name: "Consulting", url: "/consulting" },
+              ],
+            },
+            {
+              title: "Quick Links",
+              items: [
+                { name: "Home", url: "/" },
+                { name: "About Us", url: "/about" },
+                { name: "Services", url: "/services" },
+                { name: "Portfolio", url: "portfolio" },
+                { name: "Contact", url: "/contact" },
+              ],
+            },
+            {
+              title: "Legal",
+              items: [
+                { name: "Terms", url: "/terms" },
+                { name: "Privacy", url: "/privacy-policy" },
+                { name: "Cookies", url: "/cookies" },
+                { name: "Licenses", url: "license" },
+                { name: "Consulting", url: "/consulting" },
+              ],
+            },
+          ].map((section, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.3 * (index + 1) }}
+            >
+              <h2 className="text-xl font-bold">{section.title}</h2>
+              <ul className="mt-4 space-y-2">
+                {section.items.map((item, i) => (
+                  <li
+                    key={i}
+                    className="hover:text-green-400 transition duration-300 cursor-pointer"
+                  >
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {/* Footer Bottom */}

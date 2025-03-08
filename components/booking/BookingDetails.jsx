@@ -11,9 +11,9 @@ import {
 
 const BookingDetails = ({ booking }) => {
   const [expanded, setExpanded] = useState(false);
-  
+
   if (!booking) return null;
-  
+
   const payment = booking.BookingPayment || {};
 
   return (
@@ -93,10 +93,23 @@ const BookingDetails = ({ booking }) => {
 
       {/* Location Details */}
       <div>
+        {booking.BookingItems[0]?.serviceItem?.is_home_visit === true && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Shop Visit Location
+            </h3>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p>{booking?.provider?.business_name}</p>
+            </div>
+          </div>
+        )}
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
           Service Location
         </h3>
         <div className="bg-gray-50 rounded-lg p-4">
+          {booking.BookingItems[0]?.serviceItem?.is_home_visit === true && (
+            <p>{booking?.provider?.business_name}</p>
+          )}
           <p className="text-gray-800">{booking.service_address}</p>
         </div>
       </div>
