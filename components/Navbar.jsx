@@ -56,7 +56,9 @@ const Navbar = () => {
     >
       <div className="flex justify-between items-center">
         {/* Logo */}
-        <div className="font-bold text-lg text-white">[App Logo]</div>
+        <div className="font-bold text-lg text-white">
+          <Link href="/">QProz</Link>
+        </div>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">

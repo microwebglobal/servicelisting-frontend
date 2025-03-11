@@ -4,7 +4,7 @@ import { FaFacebook, FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="text-white py-10 px-6 bg-[#5f60b9]">
+    <footer className="text-white py-20 px-6 bg-[#5f60b9]">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-20 items-start">
         {/* Left Section */}
         <motion.div
@@ -39,13 +39,12 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 md:col-span-2">
           {[
             {
-              title: "[App Name] Jobs",
+              title: "QProz Jobs",
               items: [
                 { name: "Terms", url: "/terms" },
                 { name: "Privacy", url: "/privacy-policy" },
                 { name: "Cookies", url: "/cookies" },
                 { name: "Licenses", url: "license" },
-                { name: "Consulting", url: "/consulting" },
               ],
             },
             {
@@ -54,7 +53,6 @@ const Footer = () => {
                 { name: "Home", url: "/" },
                 { name: "About Us", url: "/about" },
                 { name: "Services", url: "/services" },
-                { name: "Portfolio", url: "portfolio" },
                 { name: "Contact", url: "/contact" },
               ],
             },
@@ -65,7 +63,6 @@ const Footer = () => {
                 { name: "Privacy", url: "/privacy-policy" },
                 { name: "Cookies", url: "/cookies" },
                 { name: "Licenses", url: "license" },
-                { name: "Consulting", url: "/consulting" },
               ],
             },
           ].map((section, index) => (
@@ -104,7 +101,7 @@ const Footer = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.2 }}
       >
-        &copy; {new Date().getFullYear()} [Organization] | All rights reserved
+        &copy; {new Date().getFullYear()} QProz | All rights reserved
       </motion.div>
     </footer>
   );

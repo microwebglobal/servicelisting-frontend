@@ -34,8 +34,11 @@ const SetLocation = ({ location, setLocation }) => {
     const place = autocompleteRef.current.getPlace();
     if (place?.geometry?.location) {
       const newLocation = {
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng(),
+        type: "point",
+        coordinates: [
+          place.geometry.location.lat(),
+          place.geometry.location.lng(),
+        ],
       };
       setLocation(newLocation);
       setSearchInput(place.formatted_address || "");
@@ -66,33 +69,43 @@ const SetLocation = ({ location, setLocation }) => {
           const { latitude, longitude } = position.coords;
           setSelectedLocation({ lat: latitude, lng: longitude });
           const newLocation = {
-            lat: selectedLocation.lat,
-            lng: selectedLocation.lng,
+            lat: latitude, // Use latitude and longitude directly
+            lng: longitude,
           };
           setLocation(newLocation);
 
           try {
             const response = await axios.get(
-              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCJtNNLCh343h9T1vBlno_a-6wrfSm_DMc`
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}`
             );
-            const place = response.data.results[0];
-            setSearchInput(place.formatted_address);
 
-            const addressComponents = place.address_components || [];
-            const getAddressComponent = (type) => {
-              const component = addressComponents.find((comp) =>
-                comp.types.includes(type)
-              );
-              return component ? component.long_name : "";
-            };
+            if (response.data.results && response.data.results.length > 0) {
+              const place = response.data.results[0];
 
-            setAddressDetails({
-              street: getAddressComponent("route"),
-              city: getAddressComponent("locality"),
-              state: getAddressComponent("administrative_area_level_1"),
-              country: getAddressComponent("country"),
-              postalCode: getAddressComponent("postal_code"),
-            });
+              if (place.formatted_address) {
+                setSearchInput(place.formatted_address);
+              } else {
+                console.warn("No formatted address found for this location.");
+              }
+
+              const addressComponents = place.address_components || [];
+              const getAddressComponent = (type) => {
+                const component = addressComponents.find((comp) =>
+                  comp.types.includes(type)
+                );
+                return component ? component.long_name : "";
+              };
+
+              setAddressDetails({
+                street: getAddressComponent("route"),
+                city: getAddressComponent("locality"),
+                state: getAddressComponent("administrative_area_level_1"),
+                country: getAddressComponent("country"),
+                postalCode: getAddressComponent("postal_code"),
+              });
+            } else {
+              console.warn("No results found for the given coordinates.");
+            }
           } catch (error) {
             console.error("Error fetching address from coordinates:", error);
           }

@@ -114,11 +114,13 @@ const IndividualProviderInquiryForm = () => {
       cities: selectedCities.map((city) => city.value),
       categories: selectedServiceCategories.map((cat) => cat.value),
       years_experience: 4,
-      location: {
-        type: "Point",
-        coordinates: [79.8612, 6.9271],
-      },
+      // location: {
+      //   type: "Point",
+      //   coordinates: [79.8612, 6.9271],
+      // },
     };
+
+    console.log(formDataToSend);
 
     try {
       await providerAPI.createEnquiry(formDataToSend);

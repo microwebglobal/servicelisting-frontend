@@ -13,6 +13,7 @@ import "swiper/css/navigation";
 import { Calendar, ListChecks, ShieldCheck } from "lucide-react";
 import ServiceCard from "@/components/home/ServiceCard";
 import CountUp from "react-countup";
+import { FaAppStore, FaGooglePay, FaGooglePlay } from "react-icons/fa";
 
 const Home = () => {
   const services = [
@@ -119,7 +120,7 @@ const Home = () => {
         {/* Content */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="mt-20 md:mt-32 sm:mt-20 z-10 px-4 md:px-10 text-center flex flex-col items-center justify-center mx-auto my-auto w-full max-w-4xl"
         >
@@ -136,7 +137,7 @@ const Home = () => {
           <CitySelector />
           <motion.button
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             className="mt-10 sm:mt-8 px-4 py-3 sm:px-6 sm:py-3 md:px-8 md:py-4 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
           >
@@ -149,7 +150,7 @@ const Home = () => {
         {/* Stats Section */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           className="absolute bottom-0 w-full py-4 sm:py-6 md:py-6 bg-white/90 backdrop-blur-md rounded-t-3xl shadow-md"
         >
@@ -211,7 +212,7 @@ const Home = () => {
         {/* Left Side - Image */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className=" ml-10 lg:w-1/2"
         >
@@ -227,12 +228,12 @@ const Home = () => {
         {/* Right Side - Steps */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="w-full lg:w-1/2 lg:mr-20"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-16 text-gray-900">
-            How does <span className="text-indigo-600">[App Name]</span> work?
+            How does <span className="text-indigo-600">QProz</span> work?
           </h2>
           <ul className="list-decimal pl-8 marker:text-indigo-600 marker:font-bold marker:text-3xl lg:marker:text-4xl marker:relative marker:top-2">
             {steps.map((step, index) => (
@@ -240,7 +241,7 @@ const Home = () => {
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: index * 0.3 }}
                   className="flex flex-col lg:flex-row gap-4 lg:gap-10 items-start"
                 >
@@ -267,7 +268,7 @@ const Home = () => {
       <section className="bg-gray-100 py-20 px-4 items-center justify-center text-center">
         <motion.h2
           initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center text-3xl md:text-4xl lg:text-5xl font-bold mb-10"
         >
@@ -277,7 +278,7 @@ const Home = () => {
           {/* First Row: Display 3 cards */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="grid grid-cols-3 md:grid-cols-5  gap-6"
           >
@@ -287,7 +288,7 @@ const Home = () => {
           </motion.div>
           <motion.button
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             className="mt-10 sm:mt-10 px-3 py-2 sm:px-5 sm:py-3 md:px-8 md:py-3 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
           >
@@ -300,14 +301,14 @@ const Home = () => {
       <section className="py-16 items-center justify-center bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA] px-4">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="flex flex-col lg:flex-row gap-10 lg:gap-20 max-w-6xl mx-auto"
         >
           <div className="w-full lg:w-1/2">
             <motion.h2
               initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               className="text-center text-3xl md:text-4xl lg:text-5xl font-bold mb-10"
             >
@@ -349,7 +350,7 @@ const Home = () => {
           </div>
           <motion.div
             initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="w-full lg:w-1/2"
           >
@@ -365,39 +366,48 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="text-center flex flex-col lg:flex-row justify-between bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2 lg:ml-16"
-        >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-left">
-            Download the <br />
-            mobile app today!
-          </h2>
-          <div className="flex gap-4 justify-start">
-            <button className="bg-black text-white px-6 py-2 rounded">
-              Google Play
-            </button>
-            <button className="bg-black text-white px-6 py-2 rounded">
-              App Store
-            </button>
-          </div>
-        </motion.div>
+      <section className="text-center flex flex-col lg:flex-row justify-between items-center bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-16 md:px-16">
         <motion.div
           initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2 "
+          className="w-full lg:w-1/2 mb-8 lg:mb-0"
         >
           <Image
-            src="/assets/images/homeowner_home.png"
+            src="/assets/images/download-app.jpg"
             alt="Professional"
             width={666}
             height={455}
-            className="w-full"
+            className="w-full rounded-3xl shadow-xl transition-transform transform hover:scale-105 duration-500"
           />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="w-full lg:w-1/2 lg:ml-24"
+        >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-left text-gray-900 leading-tight">
+            Download the <br />
+            mobile app today!
+          </h2>
+          <p className="text-lg text-left pr-10 md:text-xl text-gray-600 mb-6 leading-relaxed">
+            Experience seamless services at your fingertips. Get instant access,
+            connect with top professionals, and manage everything
+            effortlessly—all in one place.
+          </p>
+
+          <div className="flex mt-10 gap-4 justify-center lg:justify-start">
+            <button className="bg-black text-white px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
+              <FaGooglePlay />
+              Google Play
+            </button>
+            <button className="bg-black text-white px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
+              <FaAppStore />
+              App Store
+            </button>
+          </div>
         </motion.div>
       </section>
 
