@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@components/Navbar";
 import Image from "next/image";
 import Footer from "@components/Footer";
@@ -13,9 +13,45 @@ import "swiper/css/navigation";
 import { Calendar, ListChecks, ShieldCheck } from "lucide-react";
 import ServiceCard from "@/components/home/ServiceCard";
 import CountUp from "react-countup";
+import { useToast } from "@/hooks/use-toast";
 import { FaAppStore, FaGooglePay, FaGooglePlay } from "react-icons/fa";
+import { serviceAPI } from "@/api/services";
 
 const Home = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const { toast } = useToast();
+  // Fetch categories
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const categoriesResponse = await serviceAPI.getAllCategories();
+        const sortedCategories = [...categoriesResponse.data].sort(
+          (a, b) => a.display_order - b.display_order
+        );
+
+        setCategories(sortedCategories);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("Failed to load data");
+        toast({
+          title: "Error",
+          description: "Failed to load data. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [toast]);
+
   const services = [
     "Plumbing",
     "Carpentry",
@@ -122,9 +158,9 @@ const Home = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mt-20 md:mt-32 sm:mt-20 z-10 px-4 md:px-10 text-center flex flex-col items-center justify-center mx-auto my-auto w-full max-w-4xl"
+          className="mt-20 md:mt-32 sm:mt-28 z-10 px-4 md:px-10 text-center flex flex-col items-center justify-center mx-auto my-auto w-full max-w-4xl"
         >
-          <h1 className="text-2xl  sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-4 sm:mb-6 drop-shadow-lg">
+          <h1 className="text-3xl  sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-4 sm:mb-6 drop-shadow-lg">
             Book Trusted Professionals <br /> In Just a Click!
           </h1>
           <p className="mb-10 sm:mb-10 text-gray-200 text-sm sm:text-base md:text-lg">
@@ -136,10 +172,15 @@ const Home = () => {
           {/* Search Bar */}
           <CitySelector />
           <motion.button
+            onClick={() =>
+              document
+                .getElementById("services-section")
+                .scrollIntoView({ behavior: "smooth" })
+            }
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-10 sm:mt-8 px-4 py-3 sm:px-6 sm:py-3 md:px-8 md:py-4 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
+            className="mt-10 sm:mt-8 px-3 py-4 sm:px-3 sm:py-2 md:px-8 md:py-4 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
           >
             View all services
           </motion.button>
@@ -152,57 +193,68 @@ const Home = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="absolute bottom-0 w-full py-4 sm:py-6 md:py-6 bg-white/90 backdrop-blur-md rounded-t-3xl shadow-md"
+          className="absolute bottom-0 w-full py-10 md:py-0 bg-white/90 backdrop-blur-md rounded-t-3xl shadow-md"
         >
-          <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6 lg:space-x-10 xl:space-x-20 text-black text-sm sm:text-base md:text-lg">
-            <h3 className="text-center">
-              <span className="block font-bold text-xl sm:text-2xl md:text-3xl text-blue-600 mb-1 sm:mb-2">
-                <CountUp
-                  start={0}
-                  end={2400}
-                  duration={2.75}
-                  separator=" "
-                  suffix=" +"
-                />
-              </span>
-              JOBS COMPLETED
-            </h3>
-            <h3 className="text-center">
-              <span className="block font-bold text-xl sm:text-2xl md:text-3xl text-blue-600 mb-1 sm:mb-2">
-                <CountUp
-                  start={0}
-                  end={52}
-                  duration={3.75}
-                  separator=" "
-                  suffix=" +"
-                />
-              </span>
-              EXPERTS
-            </h3>
-            <h3 className="text-center">
-              <span className="block font-bold text-xl sm:text-2xl md:text-3xl text-blue-600 mb-1 sm:mb-2">
-                <CountUp
-                  start={0}
-                  end={96}
-                  duration={2.75}
-                  separator=" "
-                  suffix=" %"
-                />
-              </span>
-              RATED THEIR PRO PERFECT
-            </h3>
-            <h3 className="text-center">
-              <span className="block font-bold text-xl sm:text-2xl md:text-3xl text-blue-600 mb-1 sm:mb-2">
-                <CountUp
-                  start={0}
-                  end={32}
-                  duration={3.75}
-                  separator=" "
-                  suffix=" +"
-                />
-              </span>
-              SERVICE CATEGORIES
-            </h3>
+          <div className="p-2 lg:flex grid grid-cols-2 sm:flex-row md:grid md:grid-cols-2 md:grid-rows-2 justify-center items-center py-4 gap-5 md:space-y-0 md:space-x-6 lg:space-x-10 xl:space-x-20 text-black text-sm sm:text-base md:text-lg">
+            <div className="flex justify-center">
+              <h3 className="text-center">
+                <span className="block font-bold text-xl md:text-4xl text-blue-600 ">
+                  <CountUp
+                    start={0}
+                    end={2400}
+                    duration={2.75}
+                    separator=" "
+                    suffix=" +"
+                  />
+                </span>
+                JOBS COMPLETED
+              </h3>
+            </div>
+
+            <div className="flex justify-center">
+              <h3 className="text-center">
+                <span className="block font-bold text-xl md:text-4xl text-blue-600 mb-1 sm:mb-2">
+                  <CountUp
+                    start={0}
+                    end={52}
+                    duration={3.75}
+                    separator=" "
+                    suffix=" +"
+                  />
+                </span>
+                EXPERTS
+              </h3>
+            </div>
+
+            <div className="flex justify-center">
+              <h3 className="text-center">
+                <span className="block font-bold text-xl md:text-4xl text-blue-600 mb-1 ">
+                  <CountUp
+                    start={0}
+                    end={96}
+                    duration={2.75}
+                    separator=" "
+                    suffix=" %"
+                  />
+                </span>
+                RATED THEIR PRO PERFECT
+              </h3>
+            </div>
+
+            <div className="flex justify-center">
+              <h3 className="text-center">
+                <span className="block font-bold text-xl md:text-4xl text-blue-600 mb-1 sm:mb-2">
+                  <CountUp
+                    start={0}
+                    end={32}
+                    duration={3.75}
+                    separator=" "
+                    suffix=" +"
+                  />
+                </span>
+                SERVICE CATEGORIES
+              </h3>
+            </div>
           </div>
         </motion.div>
       </section>
@@ -210,12 +262,7 @@ const Home = () => {
       {/* Steps Section */}
       <section className="flex flex-col lg:flex-row gap-10 lg:gap-20 justify-between items-center py-16 bg-gradient-to-b from-gray-50 to-white px-4">
         {/* Left Side - Image */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className=" ml-10 lg:w-1/2"
-        >
+        <div className="lg:w-1/2">
           <Image
             src="/assets/images/how_app_work.jpg"
             alt="Professional"
@@ -223,7 +270,7 @@ const Home = () => {
             height={418}
             className="w-full drop-shadow-lg rounded-xl"
           />
-        </motion.div>
+        </div>
 
         {/* Right Side - Steps */}
         <motion.div
@@ -232,7 +279,7 @@ const Home = () => {
           transition={{ duration: 0.8 }}
           className="w-full lg:w-1/2 lg:mr-20"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-16 text-gray-900">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-16 text-gray-900 p-3">
             How does <span className="text-indigo-600">QProz</span> work?
           </h2>
           <ul className="list-decimal pl-8 marker:text-indigo-600 marker:font-bold marker:text-3xl lg:marker:text-4xl marker:relative marker:top-2">
@@ -241,7 +288,7 @@ const Home = () => {
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  whileInView={{ opacity: 1, y: 0, x: 0 }}
                   transition={{ duration: 0.8, delay: index * 0.3 }}
                   className="flex flex-col lg:flex-row gap-4 lg:gap-10 items-start"
                 >
@@ -255,7 +302,7 @@ const Home = () => {
                     <span className="font-bold text-xl text-gray-900">
                       {step.title}
                     </span>
-                    <p className="text-gray-600">{step.description}</p>
+                    <p className="text-gray-600 pr-5">{step.description}</p>
                   </div>
                 </motion.div>
               </li>
@@ -265,7 +312,10 @@ const Home = () => {
       </section>
 
       {/* Services Section */}
-      <section className="bg-gray-100 py-20 px-4 items-center justify-center text-center">
+      <section
+        id="services-section"
+        className="bg-gray-100 py-20 px-4 items-center justify-center text-center"
+      >
         <motion.h2
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -282,8 +332,8 @@ const Home = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="grid grid-cols-3 md:grid-cols-5  gap-6"
           >
-            {services.slice(0, 10).map((serv, index) => (
-              <ServiceCard key={index} />
+            {categories.slice(0, 10).map((serv, index) => (
+              <ServiceCard key={index} name={serv.name} icon={serv.icon_url} />
             ))}
           </motion.div>
           <motion.button
@@ -348,12 +398,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="w-full lg:w-1/2"
-          >
+          <div className="w-full lg:w-1/2">
             <Image
               src="/assets/images/roof_work.jpg"
               alt="Professional"
@@ -361,18 +406,13 @@ const Home = () => {
               height={600}
               className="w-full rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
             />
-          </motion.div>
+          </div>
         </motion.div>
       </section>
 
       {/* CTA Section */}
-      <section className="text-center flex flex-col lg:flex-row justify-between items-center bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-16 md:px-16">
-        <motion.div
-          initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2 mb-8 lg:mb-0"
-        >
+      <motion.section className="text-center flex flex-col lg:flex-row justify-between items-center bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-16 md:px-16">
+        <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
           <Image
             src="/assets/images/download-app.jpg"
             alt="Professional"
@@ -380,7 +420,7 @@ const Home = () => {
             height={455}
             className="w-full rounded-3xl shadow-xl transition-transform transform hover:scale-105 duration-500"
           />
-        </motion.div>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -409,7 +449,7 @@ const Home = () => {
             </button>
           </div>
         </motion.div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <Footer />

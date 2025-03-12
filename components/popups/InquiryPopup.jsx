@@ -9,6 +9,10 @@ import {
 const InquiryPopup = ({ inquiry }) => {
   if (!inquiry) return null;
 
+  const lat = inquiry.primary_location.coordinates[0];
+  const lng = inquiry.primary_location.coordinates[1];
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
+
   return (
     <div className="w-full max-w-2xl p-2 ">
       {/* Header */}
@@ -106,10 +110,15 @@ const InquiryPopup = ({ inquiry }) => {
             <FaMapMarkerAlt className="text-gray-600 text-xl" />
             <h3 className="text-lg font-semibold text-gray-700">Location</h3>
           </div>
-          <p className="text-sm text-gray-700 mt-2">
-            {inquiry.primary_location.coordinates[1]},{" "}
-            {inquiry.primary_location.coordinates[0]}
-          </p>
+          <div className="mt-3 w-full h-52 rounded-lg overflow-hidden shadow-md">
+            <iframe
+              className="w-full h-full"
+              src={`https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${lat},${lng}`}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
         </div>
       )}
 

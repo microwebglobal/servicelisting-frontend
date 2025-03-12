@@ -69,8 +69,8 @@ const SetLocation = ({ location, setLocation }) => {
           const { latitude, longitude } = position.coords;
           setSelectedLocation({ lat: latitude, lng: longitude });
           const newLocation = {
-            lat: latitude, // Use latitude and longitude directly
-            lng: longitude,
+            type: "point",
+            coordinates: [latitude, longitude],
           };
           setLocation(newLocation);
 
@@ -123,8 +123,8 @@ const SetLocation = ({ location, setLocation }) => {
 
   return (
     <>
-      <div>
-        <div className="flex gap-3 mb-4">
+      <div className="flex gap-3 mb-4">
+        <div className="flex-grow">
           <Autocomplete
             onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
             onPlaceChanged={handlePlaceChanged}
@@ -134,21 +134,20 @@ const SetLocation = ({ location, setLocation }) => {
           >
             <input
               type="text"
-              className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Search for a location"
-              style={{ width: "350px" }}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
           </Autocomplete>
-
-          <button
-            className="px-4 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition"
-            onClick={handleCurrentLocation}
-          >
-            <FaLocationCrosshairs />
-          </button>
         </div>
+
+        <button
+          className=" sm:mt-0 sm:w-auto px-4 py-3 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition"
+          onClick={handleCurrentLocation}
+        >
+          <FaLocationCrosshairs />
+        </button>
       </div>
     </>
   );

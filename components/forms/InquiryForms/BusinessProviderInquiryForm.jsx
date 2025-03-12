@@ -4,8 +4,10 @@ import Select from "react-select";
 import { serviceAPI } from "@/api/services";
 import { providerAPI } from "@/api/provider";
 import { AlertCircle } from "lucide-react";
+import SetLocation from "@components/SetLocation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "@hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const BusinessProviderInquiryForm = () => {
   const [formData, setFormData] = useState({
@@ -17,11 +19,7 @@ const BusinessProviderInquiryForm = () => {
     gender: "", // Authorized Person Gender
     business_type: "sole_proprietorship",
     website: "",
-    location: {
-      type: "Point",
-      coordinates: [0, 0],
-    },
-    address: "", // New field for full address
+    location: "",
     categories: [],
     no_of_employee: "",
   });
@@ -33,6 +31,8 @@ const BusinessProviderInquiryForm = () => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
+
+  const router = useRouter();
 
   const businessTypes = [
     { value: "sole_proprietorship", label: "Sole Proprietorship" },
@@ -75,20 +75,8 @@ const BusinessProviderInquiryForm = () => {
   };
 
   const validateStep1 = () => {
-    if (
-      !formData.business_name ||
-      !formData.name ||
-      !formData.email ||
-      !formData.mobile ||
-      !formData.address
-    ) {
+    if (!formData.business_name || !formData.name || !formData.mobile) {
       setError("Please fill in all required fields");
-      return false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError("Please enter a valid email address");
       return false;
     }
 
@@ -102,6 +90,10 @@ const BusinessProviderInquiryForm = () => {
   };
 
   const validateStep2 = () => {
+    if (!formData.categories || !formData.no_of_employee || !formData.email) {
+      setError("Please fill in all required fields");
+      return false;
+    }
     if (!formData.categories || formData.categories.length === 0) {
       setError("Please select at least one service category");
       return false;
@@ -109,6 +101,12 @@ const BusinessProviderInquiryForm = () => {
 
     if (!formData.no_of_employee) {
       setError("Please enter the number of employees");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
       return false;
     }
 
@@ -163,6 +161,8 @@ const BusinessProviderInquiryForm = () => {
         description: "Your inquiry was submitted successfully.",
         variant: "default",
       });
+
+      router.push("/registration/sucess");
       // Reset form
       setFormData({
         type: "business",
@@ -276,18 +276,6 @@ const BusinessProviderInquiryForm = () => {
             </div>
 
             <div>
-              <label className="block mb-2">Business Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-              />
-            </div>
-
-            <div>
               <label className="block mb-2">Authorized Person Contact</label>
               <input
                 type="tel"
@@ -323,14 +311,25 @@ const BusinessProviderInquiryForm = () => {
             </div>
 
             <div>
-              <label className="block mb-2">Business Address</label>
-              <textarea
-                name="address"
-                value={formData.address}
+              <label className="block mb-2">Business Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 required
                 className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2">Business Location</label>
+              <SetLocation
+                location={formData.location}
+                setLocation={(newLocation) =>
+                  setFormData({ ...formData, location: newLocation })
+                }
+                required
               />
             </div>
             <div>
@@ -358,7 +357,7 @@ const BusinessProviderInquiryForm = () => {
               />
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-between mt-10">
               <button
                 type="button"
                 onClick={handlePreviousStep}

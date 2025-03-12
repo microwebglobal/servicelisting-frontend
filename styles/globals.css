@@ -112,7 +112,12 @@
     backface-visibility: hidden;
   }
 
-  .group:hover .group-hover\:rotate-y-180 {
+  /* Ensure the front and back sides behave correctly */
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .group-hover\:rotate-y-180 {
     transform: rotateY(180deg);
   }
 }
