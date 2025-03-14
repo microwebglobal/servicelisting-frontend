@@ -41,6 +41,7 @@ import BookingStartModal from "@/components/business-employee/BookingStartModal"
 import moment from "moment";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import ProviderBookingEditModel from "@/components/business-employee/ProviderBookingEditModel";
 
 const CountdownTimer = ({ targetDate }) => {
   const [timeLeft, setTimeLeft] = useState({
@@ -163,18 +164,27 @@ const BookingDetailsModal = ({ booking }) => {
             <div className="space-y-2 text-sm">
               <p>
                 <span className="font-medium">Date:</span>{" "}
-                {format(new Date(booking.booking_date), "PPP")}
+                {booking?.booking_date
+                  ? format(new Date(booking.booking_date), "PPP")
+                  : "No Date Available"}
               </p>
               <p>
                 <span className="font-medium">Start Time:</span>{" "}
-                {format(
-                  new Date(`2000-01-01T${booking.start_time}`),
-                  "hh:mm a"
-                )}
+                {booking?.start_time
+                  ? format(
+                      new Date(`2000-01-01T${booking.start_time}`),
+                      "hh:mm a"
+                    )
+                  : "No Date Available"}
               </p>
               <p>
                 <span className="font-medium">End Time:</span>{" "}
-                {format(new Date(`2000-01-01T${booking.end_time}`), "hh:mm a")}
+                {booking?.end_time
+                  ? format(
+                      new Date(`2000-01-01T${booking.end_time}`),
+                      "hh:mm a"
+                    )
+                  : "No Date Available"}
               </p>
               <p>
                 <span className="font-medium">Duration:</span>{" "}
@@ -356,6 +366,7 @@ const Page = () => {
   const [isStartModalOpen, setStartModalOpen] = useState(false);
   const [selectedBookingForStart, setSelectedBookingForStart] = useState(null);
   const [ongoingBookings, setOngoingBookings] = useState([]);
+  const [isBookingEdit, setIsBookingEdit] = useState(false);
 
   const localizer = momentLocalizer(moment);
 
@@ -412,6 +423,12 @@ const Page = () => {
           const acceptBookings = response.data.filter(
             (booking) => booking.status === "accepted"
           );
+
+          const ongingBookings = response.data.filter(
+            (booking) => booking.status === "in_progress"
+          );
+
+          setOngoingBookings(ongingBookings);
           setAcceptedBookings(acceptBookings);
           setBookingRequests(requestBookings);
           setError(null);
@@ -671,6 +688,12 @@ const Page = () => {
                         </p>
                       </div>
                       <Button className="bg-red-500 text-white">Stop</Button>
+                      <Button
+                        className="bg-red-500 text-white"
+                        onClick={() => setIsBookingEdit(true)}
+                      >
+                        Edit
+                      </Button>
                     </div>
                   </div>
                 ))
@@ -793,6 +816,12 @@ const Page = () => {
 
       <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
         <BookingDetailsModal booking={selectedBooking} />
+      </Dialog>
+      <Dialog open={isBookingEdit} onOpenChange={setIsBookingEdit}>
+        <ProviderBookingEditModel
+          booking={ongoingBookings[0]}
+          onClose={() => setIsBookingEdit(false)}
+        />
       </Dialog>
       <Dialog open={isStartModalOpen} onOpenChange={setStartModalOpen}>
         <BookingStartModal

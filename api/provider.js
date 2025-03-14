@@ -31,6 +31,9 @@ export const providerAPI = {
     api.put(`/booking/acceptence/${bookingId}`, data),
   sendBookingStartOtp: (data) => api.post("/booking/send-otp", data),
   bookingStartVerify: (data) => api.post("/booking/verify-otp", data),
+  stopOngoingBooking: (bookingId) => api.get(`/booking/stop/${bookingId}`),
+  sendBookingEditOtp: (data) => api.post("/booking/edit/send-otp", data),
+  bookingEditVerify: (data) => api.post("/booking/edit/verify-otp", data),
 
   // Service Provider Employee
   getProviderEmployees: (providerId) =>

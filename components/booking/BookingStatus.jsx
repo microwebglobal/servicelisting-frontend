@@ -5,7 +5,7 @@ const statuses = [
   { name: "Pending", value: "payment_pending" },
   { name: "Confirmed", value: "confirmed" },
   { name: "Assigned", value: "assigned" },
-  { name: "In Progress", value: "accepted" },
+  { name: "In Progress", value: "in_progress" },
   { name: "Completed", value: "completed" },
   { name: "Cancelled", value: "cancelled" },
   { name: "Refunded", value: "refunded" },

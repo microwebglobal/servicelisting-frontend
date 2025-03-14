@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Calendar, BookCheck, Settings, Loader2 } from "lucide-react";
 import { PeopleAltSharp } from "@mui/icons-material";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +20,8 @@ import {
 const EmployeeSidebar = ({ profileData }) => {
   const [loadingLogout, setLoadingLogout] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
+  const router = useRouter();
 
   const handleLogout = async () => {
     setLoadingLogout(true);
@@ -54,7 +57,7 @@ const EmployeeSidebar = ({ profileData }) => {
     {
       label: "Orders",
       icon: BookCheck,
-      path: "#",
+      path: "/",
     },
     {
       label: "Service Management",
