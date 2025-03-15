@@ -20,7 +20,7 @@ jobs:
         echo "NEXT_PUBLIC_API_ENDPOINT=https://${{ secrets.API_DOMAIN }}" >> .env
         
     - name: Install dependencies
-      run: npm ci
+      run: npm install
       
     - name: Build application
       run: npm run build
