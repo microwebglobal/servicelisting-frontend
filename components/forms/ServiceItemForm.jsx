@@ -22,6 +22,8 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
     description: data?.description || "",
     overview: data?.overview || "",
     base_price: data?.base_price || "",
+    duration_hours: data?.duration_hours || "",
+    duration_minutes: data?.duration_minutes || "",
     service_id: selectedData?.serviceId || data?.service_id,
     cityPricing:
       data?.CitySpecificPricings?.map((pricing) => ({
@@ -35,11 +37,26 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
         start_date: pricing.start_date,
         end_date: pricing.end_date,
       })) || [],
+    bufferTime:
+      data?.CitySpecificBuffertimes?.map((time) => ({
+        city_id: time.city_id,
+        buffer_hours: time.buffer_hours,
+        buffer_minutes: time.buffer_minutes,
+      })) || [],
+    commitionRate:
+      data?.ServiceCommissions?.map((commition) => ({
+        city_id: commition.city_id,
+        rate: commition.commission_rate,
+      })) || [],
+    advance_percentage: data?.advance_percentage || 0,
+    is_home_visit: data?.is_home_visit || false,
   });
 
   useEffect(() => {
     fetchCities();
   }, []);
+
+  console.log(data);
 
   const fetchCities = async () => {
     try {
@@ -104,6 +121,59 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
     }));
   };
 
+  const addCommitionRate = () => {
+    setFormData((prev) => ({
+      ...prev,
+      commitionRate: [...prev.commitionRate, { city_id: "", rate: "" }],
+    }));
+  };
+
+  const removeCommitionRate = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      commitionRate: prev.commitionRate.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateCommitionRate = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      commitionRate: prev.commitionRate.map((rate, i) =>
+        i === index ? { ...rate, [field]: value } : rate
+      ),
+    }));
+  };
+
+  const addBufferTime = () => {
+    setFormData((prev) => ({
+      ...prev,
+      bufferTime: [
+        ...prev.bufferTime,
+        {
+          city_id: "",
+          buffer_hours: "",
+          buffer_minutes: "",
+        },
+      ],
+    }));
+  };
+
+  const updateBufferTime = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      bufferTime: prev.bufferTime.map((time, i) =>
+        i === index ? { ...time, [field]: value } : time
+      ),
+    }));
+  };
+
+  const removeBufferTime = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      bufferTime: prev.bufferTime.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -120,13 +190,32 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
           ...pricing,
           special_price: parseFloat(pricing.special_price),
         })),
+        bufferTime: formData.bufferTime.map((time) => ({
+          ...time,
+          buffer_hours: parseFloat(time.buffer_hours),
+          buffer_minutes: parseFloat(time.buffer_minutes),
+        })),
+        commitionRate: formData.commitionRate.map((commition) => ({
+          ...commition,
+          rate: parseFloat(commition.rate),
+        })),
       };
 
       if (mode === "edit" && data?.item_id) {
         await serviceAPI.updateServiceItem(data.item_id, payload);
+        toast({
+          title: "Success!",
+          description: "Service Item updated successfully!",
+          variant: "default",
+        });
       } else {
         console.log(payload);
         await serviceAPI.createServiceItem(payload);
+        toast({
+          title: "Success!",
+          description: "New Service Item Created successfully!",
+          variant: "default",
+        });
       }
       onClose();
     } catch (error) {
@@ -143,6 +232,14 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
     return formData.specialPricing.some(
       (pricing) => pricing.city_id === cityId
     );
+  };
+
+  const isCitySelectedBuf = (cityId) => {
+    return formData.bufferTime.some((time) => time.city_id === cityId);
+  };
+
+  const isCitySelectedComition = (cityId) => {
+    return formData.commitionRate.some((time) => time.city_id === cityId);
   };
 
   const handleDelete = async () => {
@@ -196,7 +293,7 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
         <Input
@@ -235,6 +332,86 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
           }
           required
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="base_price">Advance Percentage</Label>
+        <Input
+          id="advance_percentage"
+          type="number"
+          step="0.01"
+          min="0"
+          max="100"
+          placeholder="Advance Percentage"
+          value={formData.advance_percentage}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              advance_percentage: parseFloat(e.target.value),
+            })
+          }
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="base_price">Is Home Visit</Label>
+        <Select
+          value={formData.is_home_visit}
+          onValueChange={(value) =>
+            setFormData({
+              ...formData,
+              is_home_visit: value,
+            })
+          }
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Home Visit Or Not" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem key={true} value={true}>
+              True
+            </SelectItem>
+            <SelectItem key={false} value={false}>
+              False
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex justify-between">
+        <div>
+          <Label htmlFor="base_price">Duration Hours</Label>
+          <Input
+            type="number"
+            min="0"
+            value={formData.duration_hours}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                duration_hours: parseInt(e.target.value) || 0,
+              })
+            }
+            required
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="base_price">Duration Minutes</Label>
+          <Input
+            type="number"
+            min="0"
+            max="59"
+            value={formData.duration_minutes}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                duration_minutes: parseInt(e.target.value) || 0,
+              })
+            }
+            required
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -393,6 +570,151 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
               size="icon"
               className="mt-5"
               onClick={() => removeSpecialPricing(index)}
+            >
+              <Trash2 size={16} className="text-gray-500 hover:text-red-500" />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-5 items-center">
+          <Label>Buffer Time</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addBufferTime}
+          >
+            <Plus size={16} className="mr-2" />
+            Add Buffer Time
+          </Button>
+        </div>
+
+        {formData.bufferTime.map((time, index) => (
+          <div key={index} className="flex gap-4 items-start">
+            <div className="flex-1 w-64 mt-5">
+              <Select
+                value={time.city_id}
+                onValueChange={(value) =>
+                  updateBufferTime(index, "city_id", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select City" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((city) =>
+                    !isCitySelectedBuf(city.city_id) ||
+                    time.city_id === city.city_id ? (
+                      <SelectItem key={city.city_id} value={city.city_id}>
+                        {city.name}
+                      </SelectItem>
+                    ) : null
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <label className="block ml-2 text-sm font-medium text-gray-700">
+                Buffer Hours
+              </label>
+              <Input
+                type="number"
+                step="1"
+                min="0"
+                placeholder="Buffer Hours"
+                value={time.buffer_hours}
+                onChange={(e) =>
+                  updateBufferTime(index, "buffer_hours", e.target.value)
+                }
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block ml-2 text-sm font-medium text-gray-700">
+                Buffer Minutes
+              </label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Buffer Minutes"
+                value={time.buffer_minutes}
+                onChange={(e) =>
+                  updateBufferTime(index, "buffer_minutes", e.target.value)
+                }
+              />
+            </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="mt-5"
+              onClick={() => removeBufferTime(index)}
+            >
+              <Trash2 size={16} className="text-gray-500 hover:text-red-500" />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <Label>Commition Rates</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addCommitionRate}
+          >
+            <Plus size={16} className="mr-2" />
+            Add Commition Rate
+          </Button>
+        </div>
+
+        {formData.commitionRate.map((commition, index) => (
+          <div key={index} className="flex gap-4 items-start">
+            <div className="flex-1">
+              <Select
+                value={commition.city_id}
+                onValueChange={(value) =>
+                  updateCommitionRate(index, "city_id", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select City" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((city) =>
+                    !isCitySelectedComition(city.city_id) ||
+                    commition.city_id === city.city_id ? (
+                      <SelectItem key={city.city_id} value={city.city_id}>
+                        {city.name}
+                      </SelectItem>
+                    ) : null
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Rate"
+                value={commition.rate}
+                onChange={(e) =>
+                  updateCommitionRate(index, "rate", e.target.value)
+                }
+              />
+            </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => removeCommitionRate(index)}
             >
               <Trash2 size={16} className="text-gray-500 hover:text-red-500" />
             </Button>

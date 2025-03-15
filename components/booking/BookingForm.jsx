@@ -1,80 +1,119 @@
-import React, { useState, useCallback } from 'react';
-import { format } from 'date-fns';
-import { Calendar } from '@/components/ui/calendar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Clock, MapPin, MessageSquare } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect, useCallback } from "react";
+import { format } from "date-fns";
+import CreatableSelect from "react-select/creatable";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Clock, MapPin, MessageSquare } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { profileAPI } from "@/api/profile";
 
 const BookingForm = ({ onBookingSubmit }) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [savedAddresses, setSavedAddress] = useState([]);
   const [bookingDetails, setBookingDetails] = useState({
     bookingDate: new Date(),
-    startTime: '',
-    serviceAddress: '',
+    startTime: "",
+    serviceAddress: "",
     coordinates: {
-      type: 'Point',
-      coordinates: [0, 0] // Default coordinates
+      type: "Point",
+      coordinates: [0, 0], // Default coordinates
     },
-    customerNotes: ''
+    customerNotes: "",
   });
-  const [validationError, setValidationError] = useState('');
+  const [validationError, setValidationError] = useState("");
 
   const generateTimeSlots = useCallback(() => {
     const slots = [];
     const startHour = 11;
     const endHour = 20;
-    
+
     for (let hour = startHour; hour <= endHour; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
+      slots.push(`${hour.toString().padStart(2, "0")}:00`);
       if (hour !== endHour) {
-        slots.push(`${hour.toString().padStart(2, '0')}:30`);
+        slots.push(`${hour.toString().padStart(2, "0")}:30`);
       }
     }
     return slots;
   }, []);
 
   const handleInputChange = (field, value) => {
-    setBookingDetails(prev => ({
+    setBookingDetails((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    setValidationError('');
+    setValidationError("");
   };
 
-  const handleAddressChange = async (address) => {
+  useEffect(() => {
+    const fetchUserAddresses = async () => {
+      try {
+        const response = await profileAPI.getAddresses();
+        setSavedAddress(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("error fetching user addresses", error);
+      }
+    };
+
+    fetchUserAddresses();
+  }, []);
+
+  const addressOptions = savedAddresses.map((addr) => ({
+    label: (
+      <div>
+        <span className="font-semibold capitalize">{addr.type}</span>
+        <br />
+        <span className="text-gray-500">
+          {addr.line1},{addr.line2},{addr.city}, {addr.state} {addr.postal_code}
+        </span>
+      </div>
+    ),
+    value: `${addr.line1}, ${addr.line2 ? addr.line2 + ", " : ""}${
+      addr.city
+    }, ${addr.state} ${addr.postal_code}`,
+  }));
+
+  const handleAddressChange = async (selectedOption) => {
     try {
-      handleInputChange('serviceAddress', address);
-//TO DO: Add geocoding logic here
+      const address = selectedOption ? selectedOption.value : "";
+      handleInputChange("serviceAddress", address);
+
+      // TO DO: Add geocoding logic here
       const dummyCoordinates = {
-        type: 'Point',
-        coordinates: [0, 0]  // [longitude, latitude]
+        type: "Point",
+        coordinates: [0, 0], // [longitude, latitude]
       };
-      handleInputChange('coordinates', dummyCoordinates);
+      handleInputChange("coordinates", dummyCoordinates);
     } catch (error) {
-      console.error('Geocoding error:', error);
+      console.error("Geocoding error:", error);
       toast({
-        title: 'Location Error',
-        description: 'Failed to get location coordinates. Please try again.',
-        variant: 'destructive'
+        title: "Location Error",
+        description: "Failed to get location coordinates. Please try again.",
+        variant: "destructive",
       });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!bookingDetails.startTime) {
-      setValidationError('Please select a time slot');
+      setValidationError("Please select a time slot");
       return;
     }
     if (!bookingDetails.serviceAddress.trim()) {
-      setValidationError('Please enter service address');
+      setValidationError("Please enter service address");
       return;
     }
 
@@ -82,14 +121,15 @@ const BookingForm = ({ onBookingSubmit }) => {
       setIsSubmitting(true);
       await onBookingSubmit({
         ...bookingDetails,
-        serviceLocation: bookingDetails.coordinates
+        serviceLocation: bookingDetails.coordinates,
       });
     } catch (error) {
-      console.error('Booking error:', error);
+      console.error("Booking error:", error);
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to process your booking. Please try again.',
-        variant: 'destructive'
+        title: "Error",
+        description:
+          error.message || "Failed to process your booking. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -113,7 +153,7 @@ const BookingForm = ({ onBookingSubmit }) => {
               <Calendar
                 mode="single"
                 selected={bookingDetails.bookingDate}
-                onSelect={(date) => handleInputChange('bookingDate', date)}
+                onSelect={(date) => handleInputChange("bookingDate", date)}
                 disabled={(date) => date < new Date()}
                 className="rounded-md border"
               />
@@ -121,8 +161,8 @@ const BookingForm = ({ onBookingSubmit }) => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Select Time Slot</label>
-              <Select 
-                onValueChange={(value) => handleInputChange('startTime', value)}
+              <Select
+                onValueChange={(value) => handleInputChange("startTime", value)}
                 value={bookingDetails.startTime}
               >
                 <SelectTrigger>
@@ -143,10 +183,13 @@ const BookingForm = ({ onBookingSubmit }) => {
                 <MapPin className="h-4 w-4" />
                 Service Address
               </label>
-              <Input
-                placeholder="Enter complete service address"
-                value={bookingDetails.serviceAddress}
-                onChange={(e) => handleAddressChange(e.target.value)}
+
+              <CreatableSelect
+                options={addressOptions}
+                onChange={handleAddressChange}
+                placeholder="Select or enter an address"
+                isClearable
+                formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
               />
             </div>
 
@@ -158,7 +201,9 @@ const BookingForm = ({ onBookingSubmit }) => {
               <Textarea
                 placeholder="Any special instructions for the service provider..."
                 value={bookingDetails.customerNotes}
-                onChange={(e) => handleInputChange('customerNotes', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("customerNotes", e.target.value)
+                }
                 rows={3}
               />
             </div>
@@ -170,12 +215,8 @@ const BookingForm = ({ onBookingSubmit }) => {
             </Alert>
           )}
 
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Processing...' : 'Confirm Booking'}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Processing..." : "Confirm Booking"}
           </Button>
         </CardContent>
       </Card>

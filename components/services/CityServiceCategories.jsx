@@ -109,10 +109,10 @@ export function CityServiceCategories({ cityName = "" }) {
   }
 
   return (
-    <div>
+    <div className="min-h-screen">
       <Navbar />
-      <div className="min-h-screen bg-gray-50 p-20">
-        <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20">
+      <div className=" bg-gray-50 p-20">
+        <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20 mt-14">
           <div className="w-full lg:w-2/5">
             <h1 className="text-4xl font-bold mb-2 capitalize">
               Services in {cityName}, India

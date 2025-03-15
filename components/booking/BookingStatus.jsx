@@ -8,7 +8,7 @@ const statuses = [
   { name: "In Progress", value: "in_progress" },
   { name: "Completed", value: "completed" },
   { name: "Cancelled", value: "cancelled" },
-  { name: "Refunded", value: "refunded" }
+  { name: "Refunded", value: "refunded" },
 ];
 
 const BookingStatus = ({ onStatusChange }) => {

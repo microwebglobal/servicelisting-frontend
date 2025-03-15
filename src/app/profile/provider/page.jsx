@@ -159,4 +159,7 @@ const Page = () => {
   );
 };
 
-export default withAuth(Page, ["service_provider"]);
+export default withAuth(Page, [
+  "service_provider",
+  "business_service_provider",
+]);

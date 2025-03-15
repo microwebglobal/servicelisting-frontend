@@ -11,8 +11,6 @@ import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import OfferCard from "@/components/ui/offerCard";
-import { Height } from "@mui/icons-material";
 
 export function CategoryDetailsPage({ cityName, categorySlug }) {
   const [category, setCategory] = useState(null);
@@ -33,7 +31,6 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
         setLoading(true);
         setError(null);
 
-        // Get category details with city name
         const categoryResponse = await serviceAPI.getCategoryBySlug(
           categorySlug,
           cityName
@@ -52,7 +49,6 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
 
         setCategory(category);
 
-        // Get subcategories for this category
         const subCategoriesResponse = await serviceAPI.getSubCategories(
           category.category_id
         );
@@ -88,108 +84,93 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-6xl mx-auto text-center py-8">
-          <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4">Loading category details...</p>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-8">
+        <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full"></div>
+        <p className="mt-4 text-lg text-gray-700">
+          Loading category details...
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-6xl mx-auto text-center py-8 text-red-600">
-          <h2 className="text-xl">{error}</h2>
-          <Button variant="ghost" className="mt-4" onClick={handleBack}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back to Categories
-          </Button>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-8">
+        <h2 className="text-xl text-red-600">{error}</h2>
+        <Button variant="ghost" className="mt-4" onClick={handleBack}>
+          <ChevronLeft className="mr-2 h-4 w-4" />
+          Back to Categories
+        </Button>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-6xl mx-auto">
-          <Button variant="ghost" className="mb-4" onClick={handleBack}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back to Categories
-          </Button>
+    <div className="min-h-screen bg-gray-50 p-6 md:p-10">
+      <div className="max-w-6xl mx-auto">
+        <Button variant="ghost" className="mb-4" onClick={handleBack}>
+          <ChevronLeft className="mr-2 h-4 w-4" />
+          Back to Categories
+        </Button>
 
-          <h1 className="text-4xl font-bold mb-10">
-            {category?.name} in {cityName}
-          </h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6">
+          {category?.name} in {cityName}
+        </h1>
 
+        <div className="flex justify-center">
           <img
             src={process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url}
             crossOrigin="anonymous"
-            alt="card_image"
-            className="w-full h-64 object-cover rounded-lg shadow-lg mb-8"
+            alt="Category Image"
+            className="w-full md:w-3/4 lg:w-2/3 h-64 object-cover rounded-xl shadow-lg"
           />
+        </div>
 
-          <h2 className="text-3xl font-semibold mb-4 text-center">
-            What is {category?.name}?
-          </h2>
-          <div className="text-lg text-gray-700 text-center mb-20">
-            <p>
-              {category?.name} is an essential part of daily life in {cityName}.
-              Whether you're looking for professional services, products, or
-              local offers, this category encompasses everything you need. From
-              reliable service providers to unique offerings, we’ve gathered all
-              the top choices for you.
-            </p>
-            <p className="mt-4">
-              Explore each subcategory below and dive into the available
-              services designed to suit your specific needs.
-            </p>
-          </div>
+        <h2 className="text-2xl md:text-3xl font-semibold mt-8 text-center">
+          What is {category?.name}?
+        </h2>
+        <p className="text-lg text-gray-700 text-center max-w-4xl mx-auto mt-4 leading-relaxed">
+          {category?.name} is an essential part of daily life in {cityName}.
+          Whether you're looking for professional services, products, or local
+          offers, this category encompasses everything you need. Explore each
+          subcategory below to find what suits your needs.
+        </p>
 
-          <div className="grid grid-cols-4 gap-6">
-            {subCategories.length === 0 ? (
-              <div className="text-center py-8 text-gray-600">
-                No subcategories available for this category
-              </div>
-            ) : (
-              subCategories.map((subCategory) => (
-                <Card
-                  key={subCategory.sub_category_id}
-                  className="cursor-pointer hover:shadow-md transition-shadow duration-300"
-                  onClick={() => handleSubCategoryClick(subCategory.slug)}
-                >
-                  <CardImage
-                    src={
-                      process.env.NEXT_PUBLIC_API_ENDPOINT +
-                      subCategory.icon_url
-                    }
-                    crossOrigin="anonymous"
-                    alt="card_image"
-                    style={{
-                      height: "200px",
-                      objectFit: "cover",
-                      width: "100%",
-                    }}
-                  />
-
-                  <CardHeader>
-                    <CardTitle className="text-xl hover:text-indigo-600 transition-colors">
-                      {subCategory.name}
-                    </CardTitle>
-                    {subCategory.description && (
-                      <CardContent className="pt-2 px-0">
-                        <p className="text-gray-600">
-                          {subCategory.description}
-                        </p>
-                      </CardContent>
-                    )}
-                  </CardHeader>
-                </Card>
-              ))
-            )}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
+          {subCategories.length === 0 ? (
+            <div className="text-center col-span-full text-gray-600">
+              No subcategories available for this category.
+            </div>
+          ) : (
+            subCategories.map((subCategory) => (
+              <Card
+                key={subCategory.sub_category_id}
+                className="cursor-pointer hover:shadow-xl transition-shadow duration-300 rounded-xl"
+                onClick={() => handleSubCategoryClick(subCategory.slug)}
+              >
+                <CardImage
+                  src={
+                    process.env.NEXT_PUBLIC_API_ENDPOINT + subCategory.icon_url
+                  }
+                  crossOrigin="anonymous"
+                  alt="Subcategory Image"
+                  className="w-full h-48 object-cover rounded-t-xl"
+                />
+                <CardHeader className="p-4">
+                  <CardTitle className="text-lg md:text-xl font-medium text-indigo-700 hover:text-indigo-500 transition-colors">
+                    {subCategory.name}
+                  </CardTitle>
+                  {subCategory.description && (
+                    <CardContent className="pt-2">
+                      <p className="text-gray-600 text-sm">
+                        {subCategory.description}
+                      </p>
+                    </CardContent>
+                  )}
+                </CardHeader>
+              </Card>
+            ))
+          )}
         </div>
       </div>
     </div>

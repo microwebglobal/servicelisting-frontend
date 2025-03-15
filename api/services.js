@@ -5,6 +5,8 @@ export const serviceAPI = {
   // Categories
   getCategories: (cityId) => api.get(`/categories?city_id=${cityId}`),
   getAllCategories: () => api.get("/categories/all"),
+  getCategoryById: (catId, cityId) =>
+    api.get(`/categories/${catId}?cityId=${cityId}`),
   getCategoryBySlug: (slug, cityName) =>
     api.get(`/categories/slugs/${slug}?city=${cityName}`),
   createCategory: (data) =>
@@ -20,7 +22,6 @@ export const serviceAPI = {
       },
     }),
   deleteCategory: (id) => api.delete(`/categories/${id}`),
-
 
   // SubCategories
   getSubCategories: (categoryId) =>

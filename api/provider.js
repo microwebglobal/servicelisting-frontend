@@ -27,6 +27,13 @@ export const providerAPI = {
 
   // Service Provider Bookings
   getProviderBookings: (id) => api.get(`/provider/bookings/${id}`),
+  acceptProviderBookings: (bookingId, data) =>
+    api.put(`/booking/acceptence/${bookingId}`, data),
+  sendBookingStartOtp: (data) => api.post("/booking/send-otp", data),
+  bookingStartVerify: (data) => api.post("/booking/verify-otp", data),
+  stopOngoingBooking: (bookingId) => api.get(`/booking/stop/${bookingId}`),
+  sendBookingEditOtp: (data) => api.post("/booking/edit/send-otp", data),
+  bookingEditVerify: (data) => api.post("/booking/edit/verify-otp", data),
 
   // Service Provider Employee
   getProviderEmployees: (providerId) =>
@@ -35,6 +42,28 @@ export const providerAPI = {
     api.put(`/providers/${employeeId}/employees`, data),
   addProviderEmployees: (providerId, data) =>
     api.post(`/providers/${providerId}/employees`, data),
-  updateProviderAvailability: (roviderId, data) =>
-    api.put(`/provider/availability/${roviderId}`, data),
+  updateProviderAvailability: (providerId, data) =>
+    api.put(`/provider/availability/${providerId}`, data),
+  getEmployeeByUserId: () => api.get(`/user/employee`),
+  getEmployeeBookings: (employeeId) =>
+    api.get(`/employee/bookings/${employeeId}`),
+  getAvailableEmployees: (
+    providerId,
+    booking_id,
+    bookingDate,
+    startTime,
+    endTime
+  ) =>
+    api.get(`/available/${providerId}/employees`, {
+      params: {
+        booking_id,
+        bookingDate,
+        start_time: startTime,
+        end_time: endTime,
+      },
+    }),
+
+  //service provider categories
+  updateProviderCategory: (providerId, data) =>
+    api.put(`/providers/${providerId}/categories`, data),
 };

@@ -52,14 +52,16 @@ export function BookingPage({
         cityId: cityId,
         items: selectedItems.map((item) => ({
           id: item.id,
+          duration_hours: item.duration_hours,
+          duration_minutes: item.duration_minutes,
           type: item.type,
-          quantity: item.quantity || 1
+          quantity: item.quantity || 1,
         })),
         bookingDate: format(bookingDetails.bookingDate, "yyyy-MM-dd"),
         startTime: bookingDetails.startTime,
         serviceAddress: bookingDetails.serviceAddress,
         serviceLocation: bookingDetails.serviceLocation,
-        customerNotes: bookingDetails.customerNotes || ""
+        customerNotes: bookingDetails.customerNotes || "",
       };
 
       console.log("Submitting cart data:", cartData);
@@ -70,7 +72,8 @@ export function BookingPage({
       console.error("Booking error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create booking. Please try again.",
+        description:
+          error.message || "Failed to create booking. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -79,7 +82,8 @@ export function BookingPage({
   };
 
   const totalAmount = selectedItems.reduce((sum, item) => {
-    const price = typeof item.price === "string" ? parseFloat(item.price) : item.price;
+    const price =
+      typeof item.price === "string" ? parseFloat(item.price) : item.price;
     const quantity = item.quantity || 1;
     return sum + price * quantity;
   }, 0);
@@ -129,7 +133,7 @@ export function BookingPage({
             </Card>
 
             <div className="mt-8">
-              <BookingForm 
+              <BookingForm
                 onBookingSubmit={handleBookingSubmit}
                 loading={loading}
               />

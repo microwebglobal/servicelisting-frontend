@@ -59,7 +59,7 @@ export const useServiceManagement = (cityId) => {
       setIsLoading(true);
       try {
         const response = await serviceAPI.getPackagesByType(typeId);
-        setPackages(response.data);
+        setPackages(response.data.data);
       } finally {
         setIsLoading(false);
       }
@@ -77,7 +77,7 @@ export const useServiceManagement = (cityId) => {
       setIsLoading(true);
       try {
         const response = await serviceAPI.getSectionsByPackage(packageId);
-        setPackageSections(response.data);
+        setPackageSections(response.data.data);
       } finally {
         setIsLoading(false);
       }
@@ -86,7 +86,7 @@ export const useServiceManagement = (cityId) => {
       setIsLoading(true);
       try {
         const response = await serviceAPI.getItemsbySection(sectionId);
-        setSectionItems(response.data);
+        setSectionItems(response.data.data);
       } finally {
         setIsLoading(false);
       }
@@ -167,9 +167,7 @@ export const useServiceManagement = (cityId) => {
   };
 
   useEffect(() => {
-    
-      fetchFunctions.categories();
-    
+    fetchFunctions.categories();
   }, []);
 
   return {

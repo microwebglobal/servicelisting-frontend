@@ -5,9 +5,11 @@ import Select from "react-select";
 import { providerAPI } from "@api/provider";
 import SetLocation from "@components/SetLocation";
 import { toast } from "@hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const IndividualProviderInquiryForm = () => {
   const [step, setStep] = useState(1);
+
   const [formData, setFormData] = useState({
     type: "individual",
     name: "",
@@ -30,6 +32,8 @@ const IndividualProviderInquiryForm = () => {
     []
   );
   const [errors, setErrors] = useState({});
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -114,11 +118,9 @@ const IndividualProviderInquiryForm = () => {
       cities: selectedCities.map((city) => city.value),
       categories: selectedServiceCategories.map((cat) => cat.value),
       years_experience: 4,
-      location: {
-        type: "Point",
-        coordinates: [79.8612, 6.9271],
-      },
     };
+
+    console.log(formDataToSend);
 
     try {
       await providerAPI.createEnquiry(formDataToSend);
@@ -128,6 +130,7 @@ const IndividualProviderInquiryForm = () => {
         description: "Your inquiry was submitted successfully.",
         variant: "default",
       });
+      router.push("/registration/sucess");
     } catch (error) {
       console.error(error);
       const errorMessage =

@@ -32,7 +32,7 @@ const ServiceProviderSideBar = () => {
       const user = storedUser ? JSON.parse(storedUser) : null;
 
       if (!user?.uId) {
-        router.push('/login/user');
+        router.push("/login/user");
         return;
       }
 
@@ -54,16 +54,15 @@ const ServiceProviderSideBar = () => {
     try {
       // Clear local storage
       localStorage.clear();
-      
       // Clear any auth cookies if using them
       document.cookie.split(";").forEach((cookie) => {
         document.cookie = cookie
           .replace(/^ +/, "")
           .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
       });
-      
+
       // Redirect to login
-      router.push('/login');
+      router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -74,7 +73,7 @@ const ServiceProviderSideBar = () => {
 
   const formatDate = (dateString) => {
     try {
-      return format(new Date(dateString), 'MMMM dd, yyyy');
+      return format(new Date(dateString), "MMMM dd, yyyy");
     } catch {
       return dateString;
     }
@@ -92,23 +91,27 @@ const ServiceProviderSideBar = () => {
     {
       label: "Service Management",
       icon: Calendar,
-      path: "/profile/provider/services"
+      path: "/profile/provider/services",
     },
     {
       label: "Orders",
       icon: BookCheck,
-      path: "/profile/provider/orders"
+      path: "/profile/provider/orders",
     },
-    {
-      label: "Employees",
-      icon: PeopleAltSharp,
-      path: "/profile/provider/employees"
-    },
+    ...(profileData?.business_type !== "individual"
+      ? [
+          {
+            label: "Employees",
+            icon: PeopleAltSharp,
+            path: "/profile/provider/employees",
+          },
+        ]
+      : []),
     {
       label: "Configurations",
       icon: Settings,
-      path: "/profile/provider/configurations"
-    }
+      path: "/profile/provider/configurations",
+    },
   ];
 
   return (
@@ -141,7 +144,7 @@ const ServiceProviderSideBar = () => {
               </div>
             )}
           </div>
-          
+
           <h2 className="text-lg font-semibold text-gray-800 mt-3 text-center">
             {profileData?.business_name || profileData?.User?.name}
           </h2>
@@ -164,7 +167,9 @@ const ServiceProviderSideBar = () => {
         <div className="bg-gray-50 p-4 rounded-xl space-y-4">
           <div>
             <p className="text-sm font-semibold text-gray-700">Email</p>
-            <p className="text-sm text-gray-600 break-words">{profileData?.User?.email}</p>
+            <p className="text-sm text-gray-600 break-words">
+              {profileData?.User?.email}
+            </p>
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-700">Contact</p>
@@ -194,19 +199,21 @@ const ServiceProviderSideBar = () => {
         </nav>
 
         {/* Logout Button */}
-        <Button
-          variant="destructive"
-          className="w-full mt-10"
-          onClick={() => setShowLogoutDialog(true)}
-          disabled={loadingLogout}
-        >
-          {loadingLogout ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <LogOut className="mr-2 h-4 w-4" />
-          )}
-          Logout
-        </Button>
+        <div className="justify-end">
+          <Button
+            variant="destructive"
+            className="w-full mt-10"
+            onClick={() => setShowLogoutDialog(true)}
+            disabled={loadingLogout}
+          >
+            {loadingLogout ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <LogOut className="mr-2 h-4 w-4" />
+            )}
+            Logout
+          </Button>
+        </div>
       </div>
 
       {/* Logout Confirmation Dialog */}
@@ -215,17 +222,22 @@ const ServiceProviderSideBar = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to logout? You&apos;ll need to log in again to access your account.
+              Are you sure you want to logout? You&apos;ll need to log in again
+              to access your account.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={loadingLogout}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogCancel disabled={loadingLogout}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
               onClick={handleLogout}
               disabled={loadingLogout}
               className="bg-red-500 hover:bg-red-600"
             >
-              {loadingLogout && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loadingLogout && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Logout
             </AlertDialogAction>
           </AlertDialogFooter>

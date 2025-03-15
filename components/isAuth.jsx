@@ -11,7 +11,7 @@ const withAuth = (WrappedComponent, allowedRoles) => {
       if (!loading && (!user || !allowedRoles.includes(user.role))) {
         router.push("/");
       }
-    }, [user, loading, router]); 
+    }, [user, loading, router]);
 
     if (loading) {
       return <div>Loading...</div>;
@@ -22,14 +22,16 @@ const withAuth = (WrappedComponent, allowedRoles) => {
     ) : null;
   };
 
-  WithAuthComponent.displayName = `WithAuth(${getDisplayName(WrappedComponent)})`;
-  
+  WithAuthComponent.displayName = `WithAuth(${getDisplayName(
+    WrappedComponent
+  )})`;
+
   return WithAuthComponent;
 };
 
 // Helper function to get the display name of a component
 function getDisplayName(WrappedComponent) {
-  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+  return WrappedComponent.displayName || WrappedComponent.name || "Component";
 }
 
 export default withAuth;

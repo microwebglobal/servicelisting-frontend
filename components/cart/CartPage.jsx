@@ -1,15 +1,15 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { cartService } from '@/api/cartService';
-import { Loader2, Minus, Plus, Trash2 } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { cartService } from "@/api/cartService";
+import { Loader2, Minus, Plus, Trash2 } from "lucide-react";
 
 const formatCurrency = (value) => {
-  const num = typeof value === 'string' ? parseFloat(value) : value;
-  return isNaN(num) ? '0.00' : num.toFixed(2);
+  const num = typeof value === "string" ? parseFloat(value) : value;
+  return isNaN(num) ? "0.00" : num.toFixed(2);
 };
 
 export default function Cart() {
@@ -29,9 +29,9 @@ export default function Cart() {
       setCart(cartData);
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive'
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -45,9 +45,9 @@ export default function Cart() {
       await fetchCart();
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive'
+        variant: "destructive",
       });
     } finally {
       setUpdating(false);
@@ -61,13 +61,13 @@ export default function Cart() {
       if (response?.booking?.booking_id) {
         router.push(`/payment/${response.booking.booking_id}`);
       } else {
-        throw new Error('No booking ID received');
+        throw new Error("No booking ID received");
       }
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive'
+        variant: "destructive",
       });
     } finally {
       setUpdating(false);
@@ -86,7 +86,7 @@ export default function Cart() {
     return (
       <div className="text-center py-8">
         <p className="text-gray-500 mb-4">Your cart is empty</p>
-        <Button onClick={() => router.push('/services')}>
+        <Button onClick={() => router.push("/services")}>
           Browse Services
         </Button>
       </div>
@@ -104,16 +104,26 @@ export default function Cart() {
         <CardContent>
           <div className="space-y-4">
             {cart.BookingItems.map((item) => (
-              <div key={item.item_id} className="flex items-center justify-between p-4 border rounded">
+              <div
+                key={item.item_id}
+                className="flex items-center justify-between p-4 border rounded"
+              >
                 <div>
                   <h3 className="font-medium">{item.name}</h3>
-                  <p className="text-sm text-gray-500">₹{formatCurrency(item.unit_price)}</p>
+                  <p className="text-sm text-gray-500">
+                    ₹{formatCurrency(item.unit_price)}
+                  </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updateQuantity(item.item_id, Math.max(0, item.quantity - 1))}
+                    onClick={() =>
+                      updateQuantity(
+                        item.item_id,
+                        Math.max(0, item.quantity - 1)
+                      )
+                    }
                     disabled={updating}
                   >
                     <Minus className="h-4 w-4" />
@@ -122,7 +132,9 @@ export default function Cart() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updateQuantity(item.item_id, item.quantity + 1)}
+                    onClick={() =>
+                      updateQuantity(item.item_id, item.quantity + 1)
+                    }
                     disabled={updating}
                   >
                     <Plus className="h-4 w-4" />
@@ -158,6 +170,10 @@ export default function Cart() {
                 <span>Total</span>
                 <span>₹{formatCurrency(payment.total_amount)}</span>
               </div>
+              <div className="flex justify-between font-bold text-lg pt-2">
+                <span>Advance Amount</span>
+                <span>₹{formatCurrency(payment.advance_payment)}</span>
+              </div>
             </div>
 
             <div className="pt-4">
@@ -169,7 +185,7 @@ export default function Cart() {
                 {updating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  'Proceed to Payment'
+                  "Proceed to Payment"
                 )}
               </Button>
             </div>

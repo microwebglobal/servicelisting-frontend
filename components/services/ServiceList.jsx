@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
-import { Wrench } from "lucide-react";
+import { AlertCircleIcon, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
 import Modal from "react-modal";
@@ -94,18 +94,36 @@ export function ServiceList({ typeId, cityId, addToCart }) {
                   key={item.item_id}
                   className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div
-                    className="flex justify-between items-start"
-                    onClick={() => openModal(item.overview)}
-                  >
+                  <div className="flex justify-between items-start">
                     <div>
-                      <h6 className="font-medium">{item.name}</h6>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {item.description}
-                      </p>
+                      <div>
+                        <h6
+                          className="font-medium"
+                          onClick={() => openModal(item.overview)}
+                        >
+                          {item.name}
+                        </h6>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {item.description}
+                        </p>
+                      </div>
+                      {item.is_home_visit && (
+                        <p className="text-sm text-red-400 flex items-center mt-8">
+                          <AlertCircleIcon className="mr-3 w-4" />
+                          You need to visit service provider to get an service
+                        </p>
+                      )}
                     </div>
+
                     <div className="text-right">
-                      <div className="flex items-center gap-2">
+                      <div>
+                        {item.advance_percentage > 0 && (
+                          <span className="text-red-400 text-sm">
+                            {item.advance_percentage}% Advanced Payment Required
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 justify-end">
                         {item.SpecialPricings[0] ? (
                           <>
                             <span className="text-lg font-bold">

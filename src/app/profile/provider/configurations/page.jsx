@@ -1,8 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { providerAPI } from "@api/provider";
+import { Button } from "@/components/ui/button";
+import { toast } from "@hooks/use-toast";
 
 const page = () => {
+  const [provider, setProvider] = useState();
   const [availabilityHours, setAvailabilityHours] = useState({
     monday: {
       start: "09:00",
@@ -44,6 +47,7 @@ const page = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const user = storedUser ? JSON.parse(storedUser) : null;
+    setProvider(user);
     const fetchProviderData = async () => {
       try {
         const response = await providerAPI.getProviderByUserId(user.uId);
@@ -56,6 +60,27 @@ const page = () => {
 
     fetchProviderData();
   }, []);
+
+  const handleUpdate = async () => {
+    try {
+      await providerAPI.updateProviderAvailability(
+        provider?.providerId,
+        availabilityHours
+      );
+      toast({
+        title: "Success!",
+        description: "Sucessfully Updated Availble hours",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error updating avilability", error);
+      toast({
+        title: "Error",
+        description: "Error updating avilability",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleEditAvailability = (day, field, value) => {
     setAvailabilityHours((prev) => {
@@ -143,6 +168,10 @@ const page = () => {
             )
           )}
         </ul>
+
+        <Button className="mt-5" onClick={handleUpdate}>
+          Update Avilability
+        </Button>
       </div>
     </div>
   );
