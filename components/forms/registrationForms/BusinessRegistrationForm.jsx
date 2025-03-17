@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import { toast } from "@hooks/use-toast";
+import { useRouter } from "next/navigation";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const BusinessRegistrationForm = ({ previousData }) => {
   console.log(previousData);
@@ -67,6 +69,8 @@ const BusinessRegistrationForm = ({ previousData }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -249,6 +253,8 @@ const BusinessRegistrationForm = ({ previousData }) => {
           description: "Your registration was submitted successfully.",
           variant: "default",
         });
+
+        router.push("/registration/sucess");
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -757,6 +763,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
         <CardTitle>Complete Your Business Registration</CardTitle>
       </CardHeader>
       <CardContent>
+        {loading && (
+          <LoadingScreen message={"IRegistration Application Submitting...."} />
+        )}
         <div className="flex justify-between mb-8">
           {[1, 2, 3, 4, 5].map((i) => (
             <div

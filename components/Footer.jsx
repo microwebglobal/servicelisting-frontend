@@ -13,10 +13,11 @@ const Footer = () => {
           transition={{ duration: 1 }}
           className="md:col-span-1"
         >
-          <h2 className="text-xl font-bold">[APP LOGO]</h2>
+          <h2 className="text-xl font-bold">QProz</h2>
           <p className="text-gray-300 mt-4">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
-            explicabo suscipit sunt fugiat odit quis tempore.
+            Your trusted partner for seamless and efficient solutions. We
+            specialize in delivering high-quality services tailored to your
+            needs.
           </p>
           <div className="mt-4 flex gap-4 text-2xl">
             {[FaFacebook, FaLinkedin, FaInstagram, FaTwitter, BiWorld].map(
@@ -43,8 +44,6 @@ const Footer = () => {
               items: [
                 { name: "Terms", url: "/terms" },
                 { name: "Privacy", url: "/privacy-policy" },
-                { name: "Cookies", url: "/cookies" },
-                { name: "Licenses", url: "license" },
               ],
             },
             {
@@ -61,8 +60,6 @@ const Footer = () => {
               items: [
                 { name: "Terms", url: "/terms" },
                 { name: "Privacy", url: "/privacy-policy" },
-                { name: "Cookies", url: "/cookies" },
-                { name: "Licenses", url: "license" },
               ],
             },
           ].map((section, index) => (

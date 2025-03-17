@@ -14,6 +14,7 @@ import Modal from "react-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { providerAPI } from "@api/provider";
 import InquiryPopup from "@components/popups/InquiryPopup";
+import { toast } from "@hooks/use-toast";
 
 const InquiryManager = () => {
   const [inquirys, setInqirys] = useState([]);
@@ -24,6 +25,11 @@ const InquiryManager = () => {
   const [sortDate, setSortDate] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [tabIndex, setTabIndex] = useState(0);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
 
   const handleOpenModal = (inquiry) => {
     setIsOpen(true);
@@ -32,6 +38,25 @@ const InquiryManager = () => {
 
   const handleCloseModal = () => {
     setIsOpen(false);
+  };
+
+  const openConfirmModal = (inquiry) => {
+    setSelectedInquiry(inquiry);
+    setConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModalOpen(false);
+  };
+
+  const openRejectModal = (inquiry) => {
+    setSelectedInquiry(inquiry);
+    setRejectModalOpen(true);
+  };
+
+  const closeRejectModal = () => {
+    setRejectModalOpen(false);
+    setRejectReason("");
   };
 
   useEffect(() => {
@@ -49,17 +74,31 @@ const InquiryManager = () => {
     fetchInquirys();
   }, []);
 
-  const handleApprove = async (inquiry) => {
+  const handleApprove = async () => {
     try {
-      await providerAPI.approveEnquiry(inquiry.enquiry_id);
+      setIsApproving(true);
+      await providerAPI.approveEnquiry(selectedInquiry.enquiry_id);
       const updatedInquiries = inquirys.map((item) =>
-        item.enquiry_id === inquiry.enquiry_id
+        item.enquiry_id === selectedInquiry.enquiry_id
           ? { ...item, status: "approved" }
           : item
       );
       setInqirys(updatedInquiries);
+      setConfirmModalOpen(false);
+      toast({
+        title: "Success!",
+        description: "Service Provider Inquiry Approved Sucessfully!",
+        variant: "default",
+      });
     } catch (error) {
       console.error("error in inquiry approve", error);
+      toast({
+        title: "Error",
+        description: "Failed to approve Inquiry!",
+        variant: "destructive",
+      });
+    } finally {
+      setIsApproving(false);
     }
   };
 
@@ -105,6 +144,45 @@ const InquiryManager = () => {
     filterInquiries();
     console.log(tabIndex);
   }, [tabIndex, businessTypeFilter, sortDate, selectedDate, inquirys]);
+
+  const handleReject = async () => {
+    if (!rejectReason.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a rejection reason!",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsRejecting(true);
+      await providerAPI.rejectEnquiry(selectedInquiry.enquiry_id, {
+        reason: rejectReason,
+      });
+      const updatedInquiries = inquirys.map((item) =>
+        item.enquiry_id === selectedInquiry.enquiry_id
+          ? { ...item, status: "rejected" }
+          : item
+      );
+      setInqirys(updatedInquiries);
+      closeRejectModal();
+      toast({
+        title: "Success!",
+        description: "Inquiry rejected successfully!",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error rejecting inquiry", error);
+      toast({
+        title: "Error",
+        description: "Failed to reject inquiry!",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRejecting(false);
+    }
+  };
 
   return (
     <div>
@@ -163,10 +241,7 @@ const InquiryManager = () => {
             </TableHeader>
             <TableBody>
               {filteredInquiries.map((inquiry) => (
-                <TableRow
-                  key={inquiry.enquiry_id}
-                  onClick={() => handleOpenModal(inquiry)}
-                >
+                <TableRow key={inquiry.enquiry_id}>
                   <TableCell>{inquiry.User.name}</TableCell>
                   <TableCell>{inquiry.User.role}</TableCell>
                   <TableCell>{inquiry.business_type}</TableCell>
@@ -187,17 +262,40 @@ const InquiryManager = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      {inquiry.status === "pending" && (
-                        <>
-                          <Button
-                            onClick={() => handleApprove(inquiry)}
-                            variant="outline"
-                          >
-                            Approve
-                          </Button>
-                          <Button variant="destructive">Reject</Button>
-                        </>
-                      )}
+                      <>
+                        {inquiry.status === "pending" && (
+                          <>
+                            <Button
+                              variant="default"
+                              onClick={() => handleOpenModal(inquiry)}
+                            >
+                              View Details
+                            </Button>
+                            <Button
+                              onClick={() => openConfirmModal(inquiry)}
+                              variant="outline"
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={() => openRejectModal(inquiry)}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                        {inquiry.status === "approved" && (
+                          <>
+                            <Button
+                              variant="default"
+                              onClick={() => handleOpenModal(inquiry)}
+                            >
+                              View Details
+                            </Button>
+                          </>
+                        )}
+                      </>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -205,6 +303,37 @@ const InquiryManager = () => {
             </TableBody>
           </Table>
         </CardContent>
+
+        {/* Confirm Modal */}
+        <Modal
+          isOpen={confirmModalOpen}
+          onRequestClose={closeConfirmModal}
+          ariaHideApp={false}
+          className="m-10 bg-white p-8 rounded-lg shadow-xl w-96 max-w-lg"
+          overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
+        >
+          <div className="space-y-4">
+            <p>Are you sure you want to approve this inquiry?</p>
+            <div className="flex space-x-4">
+              <Button
+                className="flex-1"
+                onClick={handleApprove}
+                disabled={isApproving}
+              >
+                {isApproving ? "Approving..." : "Confirm"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={closeConfirmModal}
+                disabled={isApproving}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </Modal>
 
         {/* Modal */}
         <Modal
@@ -216,6 +345,43 @@ const InquiryManager = () => {
           overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
         >
           <InquiryPopup inquiry={selectedInquiry} />
+        </Modal>
+
+        {/* Reject Modal */}
+        <Modal
+          isOpen={rejectModalOpen}
+          onRequestClose={closeRejectModal}
+          ariaHideApp={false}
+          className="m-10 bg-white p-8 rounded-lg shadow-xl w-96 max-w-lg"
+          overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
+        >
+          <div className="space-y-4">
+            <p>Enter a reason for rejecting this inquiry:</p>
+            <textarea
+              className="w-full p-2 border border-gray-300 rounded"
+              rows="3"
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+            />
+            <div className="flex space-x-4">
+              <Button
+                className="flex-1"
+                onClick={handleReject}
+                disabled={isRejecting}
+              >
+                {isRejecting ? "Rejecting..." : "Confirm"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={closeRejectModal}
+                disabled={isRejecting}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
         </Modal>
       </Card>
     </div>

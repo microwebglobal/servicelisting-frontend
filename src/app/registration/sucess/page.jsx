@@ -37,7 +37,8 @@ const SuccessPage = () => {
 
         <p className="text-lg text-gray-600 mt-4 max-w-xl">
           Your inquiry has been submitted successfully. Our team will review it
-          and get back to you soon. Thank you for reaching out!
+          and get back to you soon via provided email. Thank you for reaching
+          out!
         </p>
 
         <div className="mt-8 flex flex-wrap gap-4 justify-center">

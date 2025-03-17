@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import { LoginAPI } from "@/api/login";
 import { useAuth } from "@src/context/AuthContext";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +14,6 @@ const AdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
-
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -40,6 +40,8 @@ const AdminLogin = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      {isLoading && <LoadingScreen message={"Logging...."} />}
+
       <div className="bg-white flex gap-14 p-10 rounded-lg shadow-md pr-20">
         <Image
           src="/assets/images/reg_img.png"
@@ -93,7 +95,7 @@ const AdminLogin = () => {
             onClick={handleLogin}
             disabled={isLoading || !email || !password}
           >
-            {isLoading ? "Logging in..." : "Login"}
+            Login
           </button>
         </div>
       </div>

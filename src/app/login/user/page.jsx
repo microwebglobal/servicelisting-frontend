@@ -74,17 +74,37 @@ const CustomerLogin = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white flex gap-14 p-10 rounded-lg shadow-md pr-20">
-        <Image
-          src="/assets/images/reg_img.png"
-          alt="Customer Login"
-          width={500}
-          height={100}
-          className="border-solid border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
-        />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+      <div className="bg-white flex flex-col lg:flex-row gap-8 p-6 sm:p-10 rounded-xl shadow-lg w-full max-w-5xl">
+        {/* Image Section */}
+        <div className="flex justify-center w-full lg:w-1/2">
+          <Image
+            src="/assets/images/become-provider.jpg"
+            alt="Coming Soon"
+            width={600}
+            height={400}
+            className="rounded-lg shadow-md object-cover w-full max-w-sm sm:max-w-md lg:max-w-none"
+          />
+        </div>
 
-        <div className="ml-14 w-96">
+        {/* Text Section */}
+        <div className="w-full lg:w-1/2 text-center lg:text-left flex flex-col justify-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+            We will be available soon...
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            Our team is working hard to bring you an amazing experience. Stay
+            tuned for updates and exciting features coming your way!
+          </p>
+          <p className="mt-5 text-sm text-gray-500">
+            If you have any questions, feel free to contact us at{" "}
+            <span className="font-semibold text-indigo-500">
+              support@qproz.com
+            </span>
+          </p>
+        </div>
+
+        {/* <div className="ml-14 w-96">
           <h2 className="text-3xl font-semibold text-center mb-2">
             Welcome Back!
           </h2>
@@ -150,7 +170,7 @@ const CustomerLogin = () => {
               </button>
             </>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

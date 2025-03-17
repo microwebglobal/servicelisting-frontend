@@ -52,20 +52,6 @@ const Home = () => {
     fetchData();
   }, [toast]);
 
-  const services = [
-    "Plumbing",
-    "Carpentry",
-    "Saloon",
-    "Home",
-    "Service1",
-    "Service2",
-    "Service3",
-    "Service4",
-    "Service5",
-    "Service6",
-    "Service7",
-  ];
-
   const steps = [
     {
       title: "Book Your Service",
@@ -94,83 +80,82 @@ const Home = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative h-screen flex flex-col items-center text-center text-white pt-16 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 -z-10 h-4/6 mt-28 flex justify-center md:px-4 ">
-          <div className="w-full h-full max-w-[1350px] mx-4 ">
-            <Swiper
-              modules={[Autoplay, Pagination]}
-              spaceBetween={10}
-              slidesPerView={1}
-              autoplay={{ delay: 3000, disableOnInteraction: false }}
-              pagination={{ clickable: true }}
-              loop
-              className="w-full h-full rounded-3xl shadow-lg overflow-hidden"
-            >
-              {/* Slide 1 */}
-              <SwiperSlide>
-                <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                  <Image
-                    src="/assets/images/herobg-5.jpg"
-                    alt="Home Maintenance 1"
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-3xl"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-black opacity-30 rounded-3xl"></div>
-                </div>
-              </SwiperSlide>
+      <section className="relative mt-10 h-screen flex flex-col justify-center items-center text-white overflow-hidden">
+        {/* Background Image Slider */}
+        <div className="absolute inset-0 -z-10 w-full h-full">
+          <Swiper
+            modules={[Autoplay, Pagination]}
+            spaceBetween={10}
+            slidesPerView={1}
+            autoplay={{ delay: 3000, disableOnInteraction: false }}
+            pagination={{ clickable: true }}
+            loop
+            className="w-full h-full"
+          >
+            {/* Slide 1 */}
+            <SwiperSlide>
+              <div className="relative w-full h-full">
+                <Image
+                  src="/assets/images/herobg-5.jpg"
+                  alt="Home Maintenance 1"
+                  layout="fill"
+                  objectFit="cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+              </div>
+            </SwiperSlide>
 
-              {/* Slide 2 */}
-              <SwiperSlide>
-                <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                  <Image
-                    src="/assets/images/herobg-6.jpg"
-                    alt="Home Maintenance 2"
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-3xl"
-                  />
-                  <div className="absolute inset-0 bg-black opacity-30 rounded-3xl"></div>
-                </div>
-              </SwiperSlide>
+            {/* Slide 2 */}
+            <SwiperSlide>
+              <div className="relative w-full h-full">
+                <Image
+                  src="/assets/images/herobg-6.jpg"
+                  alt="Home Maintenance 2"
+                  layout="fill"
+                  objectFit="cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+              </div>
+            </SwiperSlide>
 
-              {/* Slide 3 */}
-              <SwiperSlide>
-                <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                  <Image
-                    src="/assets/images/herobg-7.jpg"
-                    alt="Home Maintenance 3"
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-3xl"
-                  />
-                  <div className="absolute inset-0 bg-black opacity-30 rounded-3xl"></div>
-                </div>
-              </SwiperSlide>
-            </Swiper>
-          </div>
+            {/* Slide 3 */}
+            <SwiperSlide>
+              <div className="relative w-full h-full">
+                <Image
+                  src="/assets/images/herobg-7.jpg"
+                  alt="Home Maintenance 3"
+                  layout="fill"
+                  objectFit="cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+              </div>
+            </SwiperSlide>
+          </Swiper>
         </div>
 
-        {/* Content */}
+        {/* Content Section */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mt-20 md:mt-32 sm:mt-28 z-10 px-4 md:px-10 text-center flex flex-col items-center justify-center mx-auto my-auto w-full max-w-4xl"
+          className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 py-8 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-24 sm:pb-32 md:pb-40"
         >
-          <h1 className="text-3xl  sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-4 sm:mb-6 drop-shadow-lg">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6 drop-shadow-lg">
             Book Trusted Professionals <br /> In Just a Click!
           </h1>
-          <p className="mb-10 sm:mb-10 text-gray-200 text-sm sm:text-base md:text-lg">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque est
-            ab impedit officiis autem aliquam quia suscipit laboriosam ipsam,
-            quod nam quidem, dolorum sit minima accusamus debitis exercitationem
-            quo quasi.
+          <p className="mb-6 sm:mb-8 md:mb-10 text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
+            Discover a world of trusted professionals ready to transform your
+            home with top-notch services tailored to your needs. Simply search
+            your city below to explore the services available in your area and
+            start your hassle-free booking journey today!
           </p>
+
           {/* Search Bar */}
-          <CitySelector />
+          <div className="w-full max-w-md">
+            <CitySelector />
+          </div>
+
           <motion.button
             onClick={() =>
               document
@@ -180,80 +165,46 @@ const Home = () => {
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-10 sm:mt-8 px-3 py-4 sm:px-3 sm:py-2 md:px-8 md:py-4 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
+            className="mt-6 sm:mt-8 px-6 sm:px-8 py-3 sm:py-4 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
           >
             View all services
           </motion.button>
         </motion.div>
-
-        {/* CTA Button */}
 
         {/* Stats Section */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="absolute bottom-0 w-full py-10 md:py-0 bg-white/90 backdrop-blur-md rounded-t-3xl shadow-md"
+          className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white bg-opacity-90 rounded-t-3xl shadow-md"
         >
-          <div className="p-2 lg:flex grid grid-cols-2 sm:flex-row md:grid md:grid-cols-2 md:grid-rows-2 justify-center items-center py-4 gap-5 md:space-y-0 md:space-x-6 lg:space-x-10 xl:space-x-20 text-black text-sm sm:text-base md:text-lg">
-            <div className="flex justify-center">
-              <h3 className="text-center">
-                <span className="block font-bold text-xl md:text-4xl text-blue-600 ">
-                  <CountUp
-                    start={0}
-                    end={2400}
-                    duration={2.75}
-                    separator=" "
-                    suffix=" +"
-                  />
-                </span>
-                JOBS COMPLETED
-              </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-black text-sm sm:text-base md:text-lg px-4 sm:px-8">
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
+                <CountUp start={0} end={2400} duration={2.75} suffix=" +" />
+              </span>
+              <p className="text-xs sm:text-sm">JOBS COMPLETED</p>
             </div>
 
-            <div className="flex justify-center">
-              <h3 className="text-center">
-                <span className="block font-bold text-xl md:text-4xl text-blue-600 mb-1 sm:mb-2">
-                  <CountUp
-                    start={0}
-                    end={52}
-                    duration={3.75}
-                    separator=" "
-                    suffix=" +"
-                  />
-                </span>
-                EXPERTS
-              </h3>
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
+                <CountUp start={0} end={52} duration={3.75} suffix=" +" />
+              </span>
+              <p className="text-xs sm:text-sm">EXPERTS</p>
             </div>
 
-            <div className="flex justify-center">
-              <h3 className="text-center">
-                <span className="block font-bold text-xl md:text-4xl text-blue-600 mb-1 ">
-                  <CountUp
-                    start={0}
-                    end={96}
-                    duration={2.75}
-                    separator=" "
-                    suffix=" %"
-                  />
-                </span>
-                RATED THEIR PRO PERFECT
-              </h3>
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
+                <CountUp start={0} end={96} duration={2.75} suffix=" %" />
+              </span>
+              <p className="text-xs sm:text-sm">RATED THEIR PRO PERFECT</p>
             </div>
 
-            <div className="flex justify-center">
-              <h3 className="text-center">
-                <span className="block font-bold text-xl md:text-4xl text-blue-600 mb-1 sm:mb-2">
-                  <CountUp
-                    start={0}
-                    end={32}
-                    duration={3.75}
-                    separator=" "
-                    suffix=" +"
-                  />
-                </span>
-                SERVICE CATEGORIES
-              </h3>
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
+                <CountUp start={0} end={32} duration={3.75} suffix=" +" />
+              </span>
+              <p className="text-xs sm:text-sm">SERVICE CATEGORIES</p>
             </div>
           </div>
         </motion.div>
@@ -365,9 +316,11 @@ const Home = () => {
               Trusted Professionals for <br /> Your Home Services
             </motion.h2>
             <p className="text-gray-600 mb-8 text-lg">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Repudiandae sunt, eligendi quam consequuntur voluptatibus minus
-              voluptatem dolorum nemo aliquid reiciendis.
+              Finding reliable professionals for your home services has never
+              been easier. Our team of skilled experts is committed to
+              delivering top-quality solutions tailored to your needs. Whether
+              you require repairs, installations, or maintenance, we ensure a
+              seamless and stress-free experience.
             </p>
             <div className="flex flex-col lg:flex-row gap-12">
               <div>

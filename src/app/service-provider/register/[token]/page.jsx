@@ -7,7 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import IndividualRegistrationForm from "@components/forms/registrationForms/IndividualRegistrationForm";
 import BusinessRegistrationForm from "@components/forms/registrationForms/BusinessRegistrationForm";
 import { providerAPI } from "@api/provider";
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Page = ({ params }) => {
   const [token, setToken] = useState(null);
@@ -38,10 +38,12 @@ const Page = ({ params }) => {
         setTokenData({
           enquiry_id: decodedToken.eid,
           user_id: decodedToken.uid,
-          business_type: decodedToken.t === 'b' ? 'business' : 'individual'
+          business_type: decodedToken.t === "b" ? "business" : "individual",
         });
       } catch (error) {
-        setError("Invalid registration link. Please check your email for the correct link.");
+        setError(
+          "Invalid registration link. Please check your email for the correct link."
+        );
         console.error("Error decoding token:", error);
       }
     }
@@ -54,14 +56,20 @@ const Page = ({ params }) => {
       try {
         setLoading(true);
         const response = await providerAPI.getEnquiryById(tokenData.enquiry_id);
-        
+
         if (response.data) {
           // Check enquiry status
-          if (response.data.status === 'completed') {
-            setError("This registration has already been completed. Please contact support if you need assistance.");
+          if (response.data.status === "completed") {
+            setError(
+              "This registration has already been completed. Please contact support if you need assistance."
+            );
             setInquiries(null);
-          } else if (new Date() > new Date(response.data.registration_link_expires)) {
-            setError("This registration link has expired. Please request a new one.");
+          } else if (
+            new Date() > new Date(response.data.registration_link_expires)
+          ) {
+            setError(
+              "This registration link has expired. Please request a new one."
+            );
             setInquiries(null);
           } else {
             setInquiries(response.data);
@@ -70,7 +78,9 @@ const Page = ({ params }) => {
         }
       } catch (error) {
         console.error("Error fetching inquiries", error);
-        setError("Unable to load registration details. Please try again later.");
+        setError(
+          "Unable to load registration details. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
@@ -82,7 +92,7 @@ const Page = ({ params }) => {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       );
@@ -100,9 +110,9 @@ const Page = ({ params }) => {
     if (!inquiries) return null;
 
     switch (tokenData.business_type) {
-      case 'business':
+      case "business":
         return <BusinessRegistrationForm previousData={inquiries} />;
-      case 'individual':
+      case "individual":
         return <IndividualRegistrationForm previousData={inquiries} />;
       default:
         return (
@@ -117,21 +127,28 @@ const Page = ({ params }) => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white flex flex-col lg:flex-row gap-28 p-8 rounded-lg shadow-md m-20 w-full">
-          <div className="flex justify-center items-center w-1/2">
-            <Image
-              src="/assets/images/reg_img.png"
-              alt="Registration Illustration"
-              width={800}
-              height={500}
-              className="border-2 border-gray-600 rounded-2xl border-opacity-25 p-5"
-            />
-          </div>
-          <div className="flex flex-col justify-center w-1/3">
-            {renderContent()}
+      <div className="mt-12 flex-1 bg-gray-50 py-12">
+        <div className="container mx-auto px-4">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
+            {/* Image Section with Blurred Background */}
+            <div className="lg:w-1/2 relative">
+              {/* Blurred Background */}
+              <div
+                className="absolute inset-0 bg-cover bg-center backdrop-blur-2xl"
+                style={{
+                  backgroundImage: "url('/assets/images/become-provider.jpg')",
+                }}
+              ></div>
+            </div>
+            {/* Form Section */}
+            <div className="lg:w-1/2 p-8 flex flex-col justify-center">
+              <h1 className="text-3xl font-bold text-gray-900 mb-6">
+                Complete Your Registration
+              </h1>
+              <div className="space-y-6">{renderContent()}</div>
+            </div>
           </div>
         </div>
       </div>
