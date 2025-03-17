@@ -8,6 +8,7 @@ import SetLocation from "@components/SetLocation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const BusinessProviderInquiryForm = () => {
   const [formData, setFormData] = useState({
@@ -31,6 +32,7 @@ const BusinessProviderInquiryForm = () => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -154,6 +156,7 @@ const BusinessProviderInquiryForm = () => {
     };
 
     try {
+      setIsLoading(true);
       const response = await providerAPI.createEnquiry(formDataToSend);
 
       toast({
@@ -203,6 +206,7 @@ const BusinessProviderInquiryForm = () => {
       }
     } finally {
       setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -214,6 +218,9 @@ const BusinessProviderInquiryForm = () => {
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+      {isLoading && (
+        <LoadingScreen message={"Inquiry Application Submitting...."} />
       )}
       <form onSubmit={handleSubmit}>
         {step === 1 && (

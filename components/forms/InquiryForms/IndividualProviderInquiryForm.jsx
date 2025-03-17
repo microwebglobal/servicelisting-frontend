@@ -6,6 +6,7 @@ import { providerAPI } from "@api/provider";
 import SetLocation from "@components/SetLocation";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const IndividualProviderInquiryForm = () => {
   const [step, setStep] = useState(1);
@@ -32,6 +33,7 @@ const IndividualProviderInquiryForm = () => {
     []
   );
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -123,6 +125,7 @@ const IndividualProviderInquiryForm = () => {
     console.log(formDataToSend);
 
     try {
+      setIsLoading(true);
       await providerAPI.createEnquiry(formDataToSend);
       console.log("Final Form Data:", formDataToSend);
       toast({
@@ -141,11 +144,16 @@ const IndividualProviderInquiryForm = () => {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="max-w-2xl mx-auto">
+      {isLoading && (
+        <LoadingScreen message={"Inquiry Application Submitting...."} />
+      )}
       <form onSubmit={handleSubmit}>
         {/* Step 1: General Information */}
         {step === 1 && (

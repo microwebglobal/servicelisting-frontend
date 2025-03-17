@@ -446,7 +446,14 @@ const Page = () => {
     if (providerId) {
       fetchBookings();
     }
-  }, [providerId, showEmployeeModal, showConfirmationModal]);
+  }, [
+    providerId,
+    isBookingEdit,
+    isDialogOpen,
+    isStartModalOpen,
+    showEmployeeModal,
+    showConfirmationModal,
+  ]);
 
   useEffect(() => {
     if (bookings.length > 0) {
@@ -680,7 +687,13 @@ const Page = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">
+                        <p
+                          onClick={() => {
+                            setSelectedBooking(booking);
+                            setDialogOpen(true);
+                          }}
+                          className="font-medium"
+                        >
                           Booking #{booking.booking_id}
                         </p>
                         <p className="text-sm text-gray-600">

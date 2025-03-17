@@ -19,10 +19,6 @@ const Sidebar = () => {
           name: "Inquiry Applications",
           link: "/admin/inquiry",
         },
-        {
-          name: "Accepted Returned Applications",
-          link: "/accepted-returned-applications",
-        },
       ],
     },
     {

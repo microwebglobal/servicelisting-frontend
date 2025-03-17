@@ -90,7 +90,7 @@ const CitySelector = () => {
       <div className="flex items-center">
         <input
           type="text"
-          className="p-3 w-full border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition-all duration-300"
+          className="p-3 h-1/2 w-full border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition-all duration-300"
           placeholder={placeholder}
           value={searchTerm}
           onChange={handleSearch}

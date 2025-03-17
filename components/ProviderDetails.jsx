@@ -704,188 +704,190 @@ const ProviderDetails = ({
               </div>
             </div>
 
-            <div className="mt-8">
-              <div className="flex justify-between mb-2">
-                <h2 className="text-xl font-bold text-gray-800">
-                  Service Provider Employees
-                </h2>
+            {serviceProvider.business_type === "business" && (
+              <div className="mt-8">
+                <div className="flex justify-between mb-2">
+                  <h2 className="text-xl font-bold text-gray-800">
+                    Service Provider Employees
+                  </h2>
 
-                <button
-                  type="button"
-                  onClick={handleAddEmployee}
-                  className="bg-black flex space-x-2 text-white px-2 py-1 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300"
-                >
-                  <PlusCircle />
-                  <span>Add Employee</span>
-                </button>
-              </div>
-              <hr className="mb-6 border-gray-300" />
+                  <button
+                    type="button"
+                    onClick={handleAddEmployee}
+                    className="bg-black flex space-x-2 text-white px-2 py-1 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300"
+                  >
+                    <PlusCircle />
+                    <span>Add Employee</span>
+                  </button>
+                </div>
+                <hr className="mb-6 border-gray-300" />
 
-              <div className="p-6">
-                <div className="grid  grid-cols-2 gap-6">
-                  {employeeData.map((emp, index) => (
-                    <div
-                      key={index}
-                      className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 justify-between w-64"
-                    >
-                      <div className="flex justify-between items-center mb-4 bg-black p-3 rounded-t-xl">
-                        <h3 className="text-lg font-semibold text-white">
-                          {emp?.User?.name || "New Employee"}
-                        </h3>
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(index)}
-                          className="text-red-600 hover:text-red-800 transition-all"
-                        >
-                          <DeleteForeverOutlined />
-                        </button>
-                      </div>
-
-                      <div className="flex flex-col gap-4 p-6">
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Employee Name
-                          </label>
-                          <input
-                            type="text"
-                            name="name"
-                            placeholder="Name"
-                            value={emp?.User?.name || ""}
-                            onChange={(e) =>
-                              handleEmployeeChange(e, emp.employee_id)
-                            }
-                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                          />
-                        </div>
-                        <div>
-                          <div className="flex gap-5">
-                            <label className="block text-sm font-medium mb-2">
-                              Employee Email
-                            </label>
-                            <span
-                              className={`text-xs ${
-                                emp?.User?.email_verified
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              }`}
-                            >
-                              {emp?.User?.email_verified
-                                ? "Verified"
-                                : "Not Verified"}
-                            </span>
-                          </div>
-                          <input
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            value={emp?.User?.email || ""}
-                            onChange={(e) =>
-                              handleEmployeeChange(e, emp.employee_id)
-                            }
-                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Employee Mobile
-                          </label>
-                          <input
-                            type="text"
-                            name="mobile"
-                            placeholder="Mobile"
-                            value={emp?.User?.mobile || ""}
-                            onChange={(e) =>
-                              handleEmployeeChange(e, emp.employee_id)
-                            }
-                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Employee Role
-                          </label>
-                          <input
-                            type="text"
-                            name="role"
-                            placeholder="Role"
-                            value={emp.role || ""}
-                            onChange={(e) =>
-                              handleEmployeeChange(e, emp.employee_id)
-                            }
-                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                          />
-                        </div>{" "}
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Employee Qualification
-                          </label>
-                          <input
-                            type="text"
-                            name="qualification"
-                            placeholder="Qualification"
-                            value={emp.qualification || ""}
-                            onChange={(e) =>
-                              handleEmployeeChange(e, emp.employee_id)
-                            }
-                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Yers Experiance
-                          </label>
-                          <input
-                            type="number"
-                            name="years_experience"
-                            placeholder="Years of Experience"
-                            value={emp.years_experience || 0}
-                            onChange={(e) =>
-                              handleEmployeeChange(e, emp.employee_id)
-                            }
-                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Gender
-                          </label>
-                          <select
-                            name="gender"
-                            value={emp?.User?.gender || ""}
-                            onChange={(e) =>
-                              handleEmployeeChange(e, emp.employee_id)
-                            }
-                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                <div className="p-6">
+                  <div className="grid  grid-cols-2 gap-6">
+                    {employeeData.map((emp, index) => (
+                      <div
+                        key={index}
+                        className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 justify-between w-64"
+                      >
+                        <div className="flex justify-between items-center mb-4 bg-black p-3 rounded-t-xl">
+                          <h3 className="text-lg font-semibold text-white">
+                            {emp?.User?.name || "New Employee"}
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={() => handleRemove(index)}
+                            className="text-red-600 hover:text-red-800 transition-all"
                           >
-                            <option value="" disabled>
-                              Select Gender
-                            </option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                          </select>
+                            <DeleteForeverOutlined />
+                          </button>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Birth Date
-                          </label>
-                          <input
-                            type="date"
-                            name="dob"
-                            placeholder="Date of Birth"
-                            value={emp?.User?.dob || ""}
-                            onChange={(e) =>
-                              handleEmployeeChange(e, emp.employee_id)
-                            }
-                            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                          />
+
+                        <div className="flex flex-col gap-4 p-6">
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Employee Name
+                            </label>
+                            <input
+                              type="text"
+                              name="name"
+                              placeholder="Name"
+                              value={emp?.User?.name || ""}
+                              onChange={(e) =>
+                                handleEmployeeChange(e, emp.employee_id)
+                              }
+                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                          </div>
+                          <div>
+                            <div className="flex gap-5">
+                              <label className="block text-sm font-medium mb-2">
+                                Employee Email
+                              </label>
+                              <span
+                                className={`text-xs ${
+                                  emp?.User?.email_verified
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {emp?.User?.email_verified
+                                  ? "Verified"
+                                  : "Not Verified"}
+                              </span>
+                            </div>
+                            <input
+                              type="email"
+                              name="email"
+                              placeholder="Email"
+                              value={emp?.User?.email || ""}
+                              onChange={(e) =>
+                                handleEmployeeChange(e, emp.employee_id)
+                              }
+                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Employee Mobile
+                            </label>
+                            <input
+                              type="text"
+                              name="mobile"
+                              placeholder="Mobile"
+                              value={emp?.User?.mobile || ""}
+                              onChange={(e) =>
+                                handleEmployeeChange(e, emp.employee_id)
+                              }
+                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Employee Role
+                            </label>
+                            <input
+                              type="text"
+                              name="role"
+                              placeholder="Role"
+                              value={emp.role || ""}
+                              onChange={(e) =>
+                                handleEmployeeChange(e, emp.employee_id)
+                              }
+                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                          </div>{" "}
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Employee Qualification
+                            </label>
+                            <input
+                              type="text"
+                              name="qualification"
+                              placeholder="Qualification"
+                              value={emp.qualification || ""}
+                              onChange={(e) =>
+                                handleEmployeeChange(e, emp.employee_id)
+                              }
+                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Yers Experiance
+                            </label>
+                            <input
+                              type="number"
+                              name="years_experience"
+                              placeholder="Years of Experience"
+                              value={emp.years_experience || 0}
+                              onChange={(e) =>
+                                handleEmployeeChange(e, emp.employee_id)
+                              }
+                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Gender
+                            </label>
+                            <select
+                              name="gender"
+                              value={emp?.User?.gender || ""}
+                              onChange={(e) =>
+                                handleEmployeeChange(e, emp.employee_id)
+                              }
+                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            >
+                              <option value="" disabled>
+                                Select Gender
+                              </option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Birth Date
+                            </label>
+                            <input
+                              type="date"
+                              name="dob"
+                              placeholder="Date of Birth"
+                              value={emp?.User?.dob || ""}
+                              onChange={(e) =>
+                                handleEmployeeChange(e, emp.employee_id)
+                              }
+                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <Button
               type="submit"
