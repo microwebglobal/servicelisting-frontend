@@ -18,7 +18,7 @@ jobs:
       run: |
         echo "NEXT_PUBLIC_API_URL=https://${{ secrets.API_DOMAIN }}/api" >> .env
         echo "NEXT_PUBLIC_API_ENDPOINT=https://${{ secrets.API_DOMAIN }}" >> .env
-        echo "NEXT_PUBLIC_GOOGLE_MAP_API_KEY=https://${{ secrets.MAPS_API }}" >> .env
+        echo "NEXT_PUBLIC_GOOGLE_MAP_API_KEY=${{ secrets.MAPS_API }}" >> .env
         
         
     - name: Install dependencies
