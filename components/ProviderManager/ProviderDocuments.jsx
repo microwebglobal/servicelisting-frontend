@@ -24,23 +24,19 @@ const ProviderDocuments = ({ provider, onCloseDialog }) => {
               <span className="font-medium">{doc.verification_status}</span>
             </p>
             <a
-              href={doc.document_url}
+              href={
+                process.env.NEXT_PUBLIC_API_ENDPOINT + "/" + doc.document_url
+              }
               target="_blank"
+              crossOrigin="anonymous"
               rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
+              className="text-blue-500 hover:underline mt-2"
             >
               View Document
             </a>
           </li>
         ))}
       </ul>
-
-      <button
-        onClick={onCloseDialog}
-        className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-      >
-        Close
-      </button>
     </div>
   );
 };

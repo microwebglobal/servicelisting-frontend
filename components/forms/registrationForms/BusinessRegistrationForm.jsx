@@ -521,7 +521,19 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
   const renderDocuments = () => (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Documents</h2>
+      <div className="flex flex-col md:flex-row items-center justify-between ">
+        <h2 className="text-3xl font-semibold mb-4 md:mb-0">Documents</h2>
+
+        <a
+          href={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/files/1737979417230-employee_insurance_docs.pdf`}
+          download
+          target="_blank"
+          className="inline-block px-4 py-1 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
+        >
+          Download Agreement
+        </a>
+      </div>
+
       <div className="space-y-4">
         <div>
           <label className="block mb-2">Business Registration Document*</label>

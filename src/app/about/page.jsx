@@ -5,8 +5,10 @@ import Image from "next/image";
 import { FaUsers, FaMoneyBillWave, FaClock } from "react-icons/fa";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
+  const router = useRouter();
   return (
     <>
       <Navbar />
@@ -44,10 +46,16 @@ const Page = () => {
               transition={{ duration: 1.2 }}
               className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <button className="bg-indigo-500 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+              <button
+                className="bg-indigo-500 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+                onClick={() => router.push("/services")}
+              >
                 Explore Services
               </button>
-              <button className="bg-white text-indigo-500 hover:text-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+              <button
+                className="bg-white text-indigo-500 hover:text-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+                onClick={() => router.push("/registration/provider")}
+              >
                 Become a Service Partner
               </button>
             </motion.div>
@@ -274,10 +282,16 @@ const Page = () => {
             transition={{ duration: 1.2 }}
             className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <button className="bg-white text-black hover:text-indigo-500 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+            <button
+              className="bg-white text-black hover:text-indigo-500 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+              onClick={() => router.push("/services")}
+            >
               Explore Services
             </button>
-            <button className="bg-gray-100 text-black hover:text-indigo-500 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+            <button
+              className="bg-gray-100 text-black hover:text-indigo-500 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+              onClick={() => router.push("/registration/provider")}
+            >
               Become a Service Partner
             </button>
           </motion.div>

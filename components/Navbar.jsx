@@ -84,7 +84,7 @@ const Navbar = () => {
               whileTap={{ scale: 0.95 }}
             >
               <Link
-                href={`/${item.toLowerCase()}`}
+                href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
                 className="text-white font-semibold"
               >
                 {item}

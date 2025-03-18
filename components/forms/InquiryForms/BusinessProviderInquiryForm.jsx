@@ -360,6 +360,19 @@ const BusinessProviderInquiryForm = () => {
                 value={selectedServiceCategories}
                 onChange={handleCategoryChange}
                 className="basic-multi-select"
+                styles={{
+                  control: (base, state) => ({
+                    ...base,
+                    backgroundColor: "#f3f4f6",
+                    borderRadius: "0.375rem",
+                    border: state.isFocused ? "2px solid #3b82f6" : "none",
+                    boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    color: "#6b7280",
+                  }),
+                }}
                 classNamePrefix="select"
               />
             </div>
