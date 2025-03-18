@@ -10,7 +10,7 @@ const Page = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-gray-100 text-gray-900 pt-20">
+      <div className="bg-gray-100 text-gray-900 pt-20 overflow-hidden">
         {/* Hero Section */}
         <section
           className="relative w-full min-h-screen flex flex-col justify-center items-center text-center bg-cover bg-center"
@@ -105,7 +105,6 @@ const Page = () => {
               </p>
             </motion.div>
 
-            {/* Image */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -194,7 +193,7 @@ const Page = () => {
                 style={{
                   backgroundImage: `url(${process.img})`,
                   height: "300px",
-                }} // Adjust height as needed
+                }}
               >
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center px-6">
                   <h4 className="text-xl font-bold text-white">
@@ -209,7 +208,6 @@ const Page = () => {
         {/* Our Story */}
         <section className="py-20 px-6 md:px-16 bg-white">
           <div className="flex flex-col-reverse md:flex-row items-center gap-10">
-            {/* Image */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -225,7 +223,6 @@ const Page = () => {
               />
             </motion.div>
 
-            {/* Text Content */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}

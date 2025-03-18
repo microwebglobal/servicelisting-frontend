@@ -45,6 +45,7 @@ const Navbar = () => {
     } else if (userInfo?.role === "admin") {
       router.push("/admin");
     }
+    setIsMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -54,6 +55,14 @@ const Navbar = () => {
     };
     checkLoginStatus();
   }, []);
+
+  useEffect(() => {
+    const handleRouteChange = () => setIsMobileMenuOpen(false);
+    router.events?.on("routeChangeComplete", handleRouteChange);
+    return () => {
+      router.events?.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router]);
 
   return (
     <>
@@ -68,29 +77,20 @@ const Navbar = () => {
 
         {/* Navigation Links (Centered) */}
         <div className="hidden md:flex items-center gap-6 flex-grow justify-center">
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Link href="/" className=" text-white font-semibold">
-              Home
-            </Link>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Link href="/about" className=" text-white font-semibold">
-              About
-            </Link>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Link
-              href="#services-section"
-              className=" text-white font-semibold"
+          {["Home", "About", "Services", "Contact"].map((item, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
             >
-              Services
-            </Link>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-            <Link href="/contact" className=" text-white font-semibold">
-              Contact
-            </Link>
-          </motion.div>
+              <Link
+                href={`/${item.toLowerCase()}`}
+                className="text-white font-semibold"
+              >
+                {item}
+              </Link>
+            </motion.div>
+          ))}
         </div>
 
         {/* Authentication / Registration Buttons (Right Side) */}
@@ -98,7 +98,7 @@ const Navbar = () => {
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/registration/provider"
-              className=" text-white border-2 border-white px-4 py-1 rounded-2xl font-semibold"
+              className="text-white border-2 border-white px-4 py-1 rounded-2xl font-semibold"
             >
               Register as Professional
             </Link>
@@ -150,44 +150,60 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-primary text-white absolute top-16 left-0 w-full shadow-lg p-5"
+            className="md:hidden bg-[#5f60b9] text-white absolute top-16 left-0 w-full shadow-lg p-5 flex flex-col gap-4"
           >
+            {["Home", "About", "Services", "Contact"].map((item, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  href={`/${item.toLowerCase()}`}
+                  className="block py-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item}
+                </Link>
+              </motion.div>
+            ))}
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="/"
-                className="block py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
+                href="/registration/provider"
+                className="text-white border-2 border-white px-4 py-1 my-2 rounded-2xl font-semibold"
               >
-                Home
+                Register as Professional
               </Link>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/about"
-                className="block py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About Us
+            {!isLoggedInState ? (
+              <Link href="/login/user">
+                <button className="bg-white text-indigo-500 px-3 py-1 my-2 rounded-lg font-semibold">
+                  Login
+                </button>
               </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/services"
-                className="block py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
+            ) : (
+              <div
+                className="relative p-2"
+                onMouseEnter={() => setShowLogout(true)}
+                onMouseLeave={() => setShowLogout(false)}
               >
-                Services
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/contact"
-                className="block py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Contact Us
-              </Link>
-            </motion.div>
+                <div
+                  className="rounded-full w-10 h-10 bg-gray-200 flex items-center justify-center cursor-pointer"
+                  onClick={handleNavigate}
+                ></div>
+                {showLogout && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute top-12 right-0 bg-gray-800 text-white p-2 rounded-md cursor-pointer"
+                    onClick={() => setConfirmLogout(true)}
+                  >
+                    Logout
+                  </motion.div>
+                )}
+              </div>
+            )}
           </motion.div>
         )}
       </nav>
