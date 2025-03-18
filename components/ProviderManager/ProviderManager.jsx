@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import ProviderDetails from "@components/ProviderDetails";
+import ProviderDocuments from "./ProviderDocuments";
 
 const getDisplayValue = (value, defaultValue = "N/A") => {
   if (Array.isArray(value)) {
@@ -53,6 +54,7 @@ const ProviderManager = () => {
   const [filteredProviders, setFilteredProviders] = useState([]);
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDocDialogOpen, setDocIsDialogOpen] = useState(false);
   const [businessTypeFilter, setBusinessTypeFilter] = useState("");
   const [sortDate, setSortDate] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
@@ -293,6 +295,15 @@ const ProviderManager = () => {
                         variant="outline"
                         onClick={() => {
                           setSelectedProvider(provider);
+                          setDocIsDialogOpen(true);
+                        }}
+                      >
+                        Docs
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedProvider(provider);
                           setIsDialogOpen(true);
                         }}
                       >
@@ -330,7 +341,33 @@ const ProviderManager = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDocDialogOpen} onOpenChange={setDocIsDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <div className="flex gap-10">
+              <DialogTitle className="font-bold text-3xl">
+                Provider Documents
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          {selectedProvider && (
+            <ProviderDocuments
+              provider={selectedProvider}
+              onCloseDialog={() => setIsDialogOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setIsEditing(false);
+          }
+        }}
+      >
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <div className="flex gap-10">
@@ -348,7 +385,10 @@ const ProviderManager = () => {
             <ProviderDetails
               provider={selectedProvider}
               isEditing={isEditing}
-              onCloseDialog={() => setIsDialogOpen(false)}
+              onCloseDialog={() => {
+                setIsDialogOpen(false);
+                setIsEditing(false);
+              }}
               onUpdateProvider={handleUpdateProvider}
             />
           )}

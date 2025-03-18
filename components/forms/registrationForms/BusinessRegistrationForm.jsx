@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const BusinessRegistrationForm = ({ previousData }) => {
-  console.log(previousData);
   const [formData, setFormData] = useState({
     // Pre-filled data from enquiry (non-editable)
     enquiry_id: previousData?.enquiry_id || "",
@@ -48,6 +47,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
       designation: "",
       phone: "",
       whatsapp_number: "",
+      email: "",
       service_category: "",
       experience: "",
     }),
@@ -197,7 +197,6 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form data:", formData);
 
     if (!validateStep(step)) {
       return;
@@ -244,8 +243,6 @@ const BusinessRegistrationForm = ({ previousData }) => {
         variant: "default",
       });
 
-      console.log(response);
-
       if (response?.provider_id) {
         // Handle success
         toast({
@@ -253,15 +250,16 @@ const BusinessRegistrationForm = ({ previousData }) => {
           description: "Your registration was submitted successfully.",
           variant: "default",
         });
-
-        router.push("/registration/sucess");
       }
+
+      router.push("/service-provider/register/sucess");
     } catch (error) {
       console.error("Registration error:", error);
 
       setErrors(error.response?.data?.validation || {});
 
       const errorMessage =
+        error.response?.data?.details ||
         error.response?.data?.message ||
         error.message ||
         "Registration failed. Please try again.";
@@ -489,6 +487,16 @@ const BusinessRegistrationForm = ({ previousData }) => {
                 </p>
               )}
             </div>
+            <input
+              type="email"
+              value={employee.email}
+              required
+              onChange={(e) =>
+                handleEmployeeChange(index, "email", e.target.value)
+              }
+              placeholder="Email"
+              className="p-2 border rounded w-full"
+            />
             <input
               type="tel"
               value={employee.whatsapp_number}
@@ -764,7 +772,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
       </CardHeader>
       <CardContent>
         {loading && (
-          <LoadingScreen message={"IRegistration Application Submitting...."} />
+          <LoadingScreen message={"Registration Application Submitting...."} />
         )}
         <div className="flex justify-between mb-8">
           {[1, 2, 3, 4, 5].map((i) => (

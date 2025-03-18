@@ -3,6 +3,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import Select from "react-select";
 import { toast } from "@hooks/use-toast";
+import { useRouter } from "next/navigation";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const IndividualRegistrationForm = ({ previousData }) => {
   const [formData, setFormData] = useState({
@@ -90,6 +92,8 @@ const IndividualRegistrationForm = ({ previousData }) => {
     { label: "Hindi", value: "hindi" },
     { label: "Tamil", value: "tamil" },
   ];
+
+  const router = useRouter();
 
   useEffect(() => {
     if (previousData?.enquiry_id) {
@@ -238,7 +242,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
       });
 
       const singleFiles = [
-        { fieldName: "logo", fieldType: "id_proof" }, 
+        { fieldName: "logo", fieldType: "id_proof" },
         { fieldName: "id_proof", fieldType: "id_proof" },
         { fieldName: "aadhar", fieldType: "aadhar" },
         { fieldName: "pan", fieldType: "pan" },
@@ -247,7 +251,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
         { fieldName: "service_certificate", fieldType: "service_certificate" },
         { fieldName: "insurance", fieldType: "insurance" },
         { fieldName: "agreement", fieldType: "agreement" },
-        { fieldName: "terms_acceptance", fieldType: "terms_acceptance" }
+        { fieldName: "terms_acceptance", fieldType: "terms_acceptance" },
       ];
 
       singleFiles.forEach((file) => {
@@ -266,6 +270,8 @@ const IndividualRegistrationForm = ({ previousData }) => {
         description: "Your registration was submitted successfully.",
         variant: "default",
       });
+
+      router.push("/service-provider/register/sucess");
 
       const providerId = response?.provider_id || response?.data?.provider_id;
 
@@ -292,9 +298,11 @@ const IndividualRegistrationForm = ({ previousData }) => {
     } catch (error) {
       console.error("Registration error:", error);
       const errorMessage =
+        error.response?.data?.details ||
         error.response?.data?.message ||
         error.message ||
         "Registration failed. Please try again.";
+
       toast({
         title: "Error",
         description: errorMessage,
@@ -382,6 +390,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
               languages_spoken: selectedOptions.map((lan) => lan.value),
             }));
           }}
+          placeholder="Languages Spoken"
           required
         />
 
@@ -640,6 +649,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
         <CardTitle>Service Provider Registration</CardTitle>
       </CardHeader>
       <CardContent>
+        {loading && (
+          <LoadingScreen message={"Registration Application Submitting...."} />
+        )}
         <div className="flex justify-between mb-8">
           {[1, 2, 3, 4].map((i) => (
             <div
