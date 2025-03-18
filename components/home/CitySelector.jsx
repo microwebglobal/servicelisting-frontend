@@ -97,13 +97,7 @@ const CitySelector = () => {
           onFocus={() => setShowDropdown(true)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
         />
-        <button
-          className="px-4 py-4 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition ml-4 shadow-md hover:shadow-lg"
-          onClick={() => {
-            // Add logic for detecting user's location
-            alert("Detecting your location...");
-          }}
-        >
+        <button className="px-4 py-4 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition ml-4 shadow-md hover:shadow-lg">
           <FaLocationCrosshairs />
         </button>
       </div>
@@ -142,7 +136,7 @@ const CitySelector = () => {
                 transition={{ duration: 0.2 }}
                 className="px-4 py-2 text-gray-500"
               >
-                No results found
+                We Will Be Avilable Soon...
               </motion.li>
             )}
           </motion.ul>

@@ -16,11 +16,19 @@ import CountUp from "react-countup";
 import { useToast } from "@/hooks/use-toast";
 import { FaAppStore, FaGooglePay, FaGooglePlay } from "react-icons/fa";
 import { serviceAPI } from "@/api/services";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { SparklesIcon } from "lucide-react";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { toast } = useToast();
   // Fetch categories
@@ -291,6 +299,7 @@ const Home = () => {
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
+            onClick={() => setIsOpen(true)}
             className="mt-10 sm:mt-10 px-3 py-2 sm:px-5 sm:py-3 md:px-8 md:py-3 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
           >
             View all services
@@ -403,6 +412,39 @@ const Home = () => {
           </div>
         </motion.div>
       </motion.section>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-md text-center bg-white/90 backdrop-blur-md shadow-lg rounded-2xl p-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col items-center"
+          >
+            <div className="bg-indigo-500 p-3 rounded-full shadow-md">
+              <SparklesIcon className="text-white w-8 h-8" />
+            </div>
+
+            <DialogHeader className="mt-4">
+              <DialogTitle className="text-2xl font-bold text-gray-800">
+                Coming Soon...
+              </DialogTitle>
+            </DialogHeader>
+
+            <p className="text-gray-600 mt-2 text-lg">
+              We're working hard to bring you great services. Stay tuned for
+              updates!
+            </p>
+
+            <button
+              onClick={() => setIsOpen(false)}
+              className="mt-6 px-5 py-2 text-white bg-indigo-500 hover:bg-indigo-600 rounded-full shadow-md transition"
+            >
+              Got it!
+            </button>
+          </motion.div>
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <Footer />

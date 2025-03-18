@@ -238,6 +238,19 @@ const IndividualProviderInquiryForm = () => {
                 isMulti
                 value={selectedCities}
                 onChange={setSelectedCities}
+                styles={{
+                  control: (base, state) => ({
+                    ...base,
+                    backgroundColor: "#f3f4f6",
+                    borderRadius: "0.375rem",
+                    border: state.isFocused ? "2px solid #3b82f6" : "none",
+                    boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    color: "#6b7280",
+                  }),
+                }}
                 required
               />
               {errors.cities && <p className="text-red-500">{errors.cities}</p>}
@@ -260,6 +273,19 @@ const IndividualProviderInquiryForm = () => {
                 isMulti
                 value={selectedServiceCategories}
                 onChange={setSelectedServiceCategories}
+                styles={{
+                  control: (base, state) => ({
+                    ...base,
+                    backgroundColor: "#f3f4f6",
+                    borderRadius: "0.375rem",
+                    border: state.isFocused ? "2px solid #3b82f6" : "none",
+                    boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    color: "#6b7280",
+                  }),
+                }}
                 required
               />
               {errors.categories && (
@@ -274,7 +300,7 @@ const IndividualProviderInquiryForm = () => {
               value={formData.years_experience}
               onChange={handleChange}
               required
-              className="w-full border p-2 mb-4"
+              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             />
             {errors.years_experience && (
               <p className="text-red-500">{errors.years_experience}</p>
@@ -287,7 +313,7 @@ const IndividualProviderInquiryForm = () => {
               value={formData.skills}
               onChange={handleChange}
               required
-              className="w-full border p-2 mb-4"
+              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             />
 
             <button

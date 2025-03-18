@@ -42,8 +42,11 @@ const Footer = () => {
             {
               title: "QProz Jobs",
               items: [
-                { name: "Terms", url: "/terms" },
-                { name: "Privacy", url: "/privacy-policy" },
+                {
+                  name: "Become A Provider",
+                  url: "/registration/provider",
+                },
+                { name: "Book Service", url: "/login/user" },
               ],
             },
             {
@@ -51,7 +54,7 @@ const Footer = () => {
               items: [
                 { name: "Home", url: "/" },
                 { name: "About Us", url: "/about" },
-                { name: "Services", url: "/services" },
+                { name: "Services", url: "#services-section" },
                 { name: "Contact", url: "/contact" },
               ],
             },
@@ -76,11 +79,7 @@ const Footer = () => {
                     key={i}
                     className="hover:text-green-400 transition duration-300 cursor-pointer"
                   >
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={item.url} rel="noopener noreferrer">
                       {item.name}
                     </a>
                   </li>

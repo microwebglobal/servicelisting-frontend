@@ -123,7 +123,7 @@ const SetLocation = ({ location, setLocation }) => {
 
   return (
     <>
-      <div className="flex gap-3 mb-4">
+      <div className="flex gap-3 mb-2">
         <div className="flex-grow">
           <Autocomplete
             onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
@@ -134,7 +134,7 @@ const SetLocation = ({ location, setLocation }) => {
           >
             <input
               type="text"
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
               placeholder="Search for a location"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
@@ -143,7 +143,8 @@ const SetLocation = ({ location, setLocation }) => {
         </div>
 
         <button
-          className=" sm:mt-0 sm:w-auto px-4 py-3 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition"
+          type="button"
+          className="sm:mt-0 sm:w-auto px-4 py-1 h-10 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition flex items-center justify-center"
           onClick={handleCurrentLocation}
         >
           <FaLocationCrosshairs />

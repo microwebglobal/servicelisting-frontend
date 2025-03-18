@@ -27,23 +27,16 @@ const ServiceCard = ({ name, description, icon }) => {
 
         {/* Back Side */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-3xl flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 text-white space-y-3 sm:space-y-4 md:space-y-5 rotate-y-180 backface-hidden shadow-2xl overflow-hidden">
-          {/* Coming Soon Text */}
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl font-semibold text-center truncate">
             Coming <br />
             Soon
           </h3>
 
-          {/* Decorative Icons or Animation */}
           <div className="flex space-x-2">
             <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
             <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-100"></div>
             <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-200"></div>
           </div>
-
-          {/* Optional: Add a subtle description */}
-          <p className="text-sm sm:text-base md:text-lg text-center text-white opacity-80 line-clamp-2">
-            We're working hard to bring this service to you!
-          </p>
         </div>
       </div>
     </div>

@@ -122,6 +122,10 @@ const ProviderDetails = ({
     provider?.ServiceProviderEmployees
   );
 
+  const lat = serviceProvider.primary_location.coordinates[0];
+  const lng = serviceProvider.primary_location.coordinates[1];
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
+
   const handleAddEmployee = () => {
     const newEmployee = {};
     setEmployeeData([...employeeData, newEmployee]);
@@ -508,6 +512,50 @@ const ProviderDetails = ({
                 />
               </div>
             </div>
+            {serviceProvider.business_type === "individual" && (
+              <div className="flex gap-5 justify-between">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Experience Years
+                  </label>
+                  <input
+                    type="number"
+                    value={serviceProvider.years_experience}
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                    onChange={(e) =>
+                      handleChange("years_experience", e.target.value)
+                    }
+                    placeholder="Experience In Years"
+                  />
+                </div>
+                <div className="w-3/4">
+                  <label className="block text-sm font-medium mb-2">
+                    Specializations
+                  </label>
+                  <input
+                    type="text"
+                    value={serviceProvider.specializations}
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                    onChange={(e) =>
+                      handleChange("specializations", e.target.value)
+                    }
+                    placeholder="Specializations"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Qualifications
+              </label>
+              <textarea
+                value={serviceProvider.qualification}
+                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                onChange={(e) => handleChange("qualification", e.target.value)}
+                placeholder="Qualifications"
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium mb-2">
                 Profile Bio
@@ -518,6 +566,41 @@ const ProviderDetails = ({
                 onChange={(e) => handleChange("profile_bio", e.target.value)}
                 placeholder="Profile Bio"
               />
+            </div>
+
+            <div className="flex gap-5 justify-between">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Payment Method
+                </label>
+                <input
+                  type="text"
+                  value={serviceProvider.payment_method}
+                  disabled
+                  className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                  onChange={(e) =>
+                    handleChange("payment_method", e.target.value)
+                  }
+                  placeholder="Payment Method"
+                />
+              </div>
+              {serviceProvider.business_type === "individual" && (
+                <div className="w-3/4">
+                  <label className="block text-sm font-medium mb-2">
+                    Languages Spoken
+                  </label>
+                  <input
+                    type="text"
+                    disabled
+                    value={serviceProvider.languages_spoken}
+                    className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                    onChange={(e) =>
+                      handleChange("languages_spoken", e.target.value)
+                    }
+                    placeholder="Languages Spoken"
+                  />
+                </div>
+              )}
             </div>
             <div>
               <h2 className="text-xl font-bold ">Availability Hours</h2>
@@ -688,6 +771,25 @@ const ProviderDetails = ({
                   placeholder="LinkedIn Link"
                 />
               </div>
+
+              {serviceProvider.primary_location && (
+                <>
+                  <label className="block text-sm font-medium mb-2">
+                    Provider Location
+                  </label>
+                  <div className="bg-gray-50 p-4 rounded-lg shadow-md mt-4 mb-5">
+                    <div className="mt-3 w-full h-52 rounded-lg overflow-hidden shadow-md">
+                      <iframe
+                        className="w-full h-full"
+                        src={`https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${lat},${lng}`}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -866,21 +968,6 @@ const ProviderDetails = ({
                               <option value="Other">Other</option>
                             </select>
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium mb-2">
-                              Birth Date
-                            </label>
-                            <input
-                              type="date"
-                              name="dob"
-                              placeholder="Date of Birth"
-                              value={emp?.User?.dob || ""}
-                              onChange={(e) =>
-                                handleEmployeeChange(e, emp.employee_id)
-                              }
-                              className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                            />
-                          </div>
                         </div>
                       </div>
                     ))}
@@ -893,7 +980,7 @@ const ProviderDetails = ({
               type="submit"
               className="mt-10 w-full py-2 px-4 rounded-m transition-colors disabled:bg-blue-300"
             >
-              Submit
+              Edit
             </Button>
           </form>
         </div>

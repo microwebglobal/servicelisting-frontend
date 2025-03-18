@@ -5,12 +5,14 @@ import Image from "next/image";
 import { FaUsers, FaMoneyBillWave, FaClock } from "react-icons/fa";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
+  const router = useRouter();
   return (
     <>
       <Navbar />
-      <div className="bg-gray-100 text-gray-900 pt-20">
+      <div className="bg-gray-100 text-gray-900 pt-20 overflow-hidden">
         {/* Hero Section */}
         <section
           className="relative w-full min-h-screen flex flex-col justify-center items-center text-center bg-cover bg-center"
@@ -44,10 +46,16 @@ const Page = () => {
               transition={{ duration: 1.2 }}
               className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <button className="bg-indigo-500 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+              <button
+                className="bg-indigo-500 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+                onClick={() => router.push("/services")}
+              >
                 Explore Services
               </button>
-              <button className="bg-white text-indigo-500 hover:text-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+              <button
+                className="bg-white text-indigo-500 hover:text-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+                onClick={() => router.push("/registration/provider")}
+              >
                 Become a Service Partner
               </button>
             </motion.div>
@@ -105,7 +113,6 @@ const Page = () => {
               </p>
             </motion.div>
 
-            {/* Image */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -194,7 +201,7 @@ const Page = () => {
                 style={{
                   backgroundImage: `url(${process.img})`,
                   height: "300px",
-                }} // Adjust height as needed
+                }}
               >
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center px-6">
                   <h4 className="text-xl font-bold text-white">
@@ -209,7 +216,6 @@ const Page = () => {
         {/* Our Story */}
         <section className="py-20 px-6 md:px-16 bg-white">
           <div className="flex flex-col-reverse md:flex-row items-center gap-10">
-            {/* Image */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -225,7 +231,6 @@ const Page = () => {
               />
             </motion.div>
 
-            {/* Text Content */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -277,10 +282,16 @@ const Page = () => {
             transition={{ duration: 1.2 }}
             className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <button className="bg-white text-black hover:text-indigo-500 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+            <button
+              className="bg-white text-black hover:text-indigo-500 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+              onClick={() => router.push("/services")}
+            >
               Explore Services
             </button>
-            <button className="bg-gray-100 text-black hover:text-indigo-500 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+            <button
+              className="bg-gray-100 text-black hover:text-indigo-500 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition-transform transform hover:scale-105"
+              onClick={() => router.push("/registration/provider")}
+            >
               Become a Service Partner
             </button>
           </motion.div>

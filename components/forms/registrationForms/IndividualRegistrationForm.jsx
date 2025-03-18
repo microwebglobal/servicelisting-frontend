@@ -3,6 +3,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import Select from "react-select";
 import { toast } from "@hooks/use-toast";
+import { useRouter } from "next/navigation";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const IndividualRegistrationForm = ({ previousData }) => {
   const [formData, setFormData] = useState({
@@ -90,6 +92,8 @@ const IndividualRegistrationForm = ({ previousData }) => {
     { label: "Hindi", value: "hindi" },
     { label: "Tamil", value: "tamil" },
   ];
+
+  const router = useRouter();
 
   useEffect(() => {
     if (previousData?.enquiry_id) {
@@ -238,7 +242,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
       });
 
       const singleFiles = [
-        { fieldName: "logo", fieldType: "id_proof" }, 
+        { fieldName: "logo", fieldType: "id_proof" },
         { fieldName: "id_proof", fieldType: "id_proof" },
         { fieldName: "aadhar", fieldType: "aadhar" },
         { fieldName: "pan", fieldType: "pan" },
@@ -247,7 +251,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
         { fieldName: "service_certificate", fieldType: "service_certificate" },
         { fieldName: "insurance", fieldType: "insurance" },
         { fieldName: "agreement", fieldType: "agreement" },
-        { fieldName: "terms_acceptance", fieldType: "terms_acceptance" }
+        { fieldName: "terms_acceptance", fieldType: "terms_acceptance" },
       ];
 
       singleFiles.forEach((file) => {
@@ -260,12 +264,16 @@ const IndividualRegistrationForm = ({ previousData }) => {
         });
       }
 
+      console.log(formDataObj);
+
       const response = await providerAPI.registerProvider(formDataObj);
       toast({
         title: "Success!",
         description: "Your registration was submitted successfully.",
         variant: "default",
       });
+
+      router.push("/service-provider/register/sucess");
 
       const providerId = response?.provider_id || response?.data?.provider_id;
 
@@ -292,9 +300,11 @@ const IndividualRegistrationForm = ({ previousData }) => {
     } catch (error) {
       console.error("Registration error:", error);
       const errorMessage =
+        error.response?.data?.details ||
         error.response?.data?.message ||
         error.message ||
         "Registration failed. Please try again.";
+
       toast({
         title: "Error",
         description: errorMessage,
@@ -382,6 +392,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
               languages_spoken: selectedOptions.map((lan) => lan.value),
             }));
           }}
+          placeholder="Languages Spoken"
           required
         />
 
@@ -474,7 +485,18 @@ const IndividualRegistrationForm = ({ previousData }) => {
 
   const renderDocumentUploads = () => (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Document Uploads</h2>
+      <div className="flex flex-col md:flex-row items-center justify-between ">
+        <h2 className="text-3xl font-semibold mb-4 md:mb-0">Documents</h2>
+
+        <a
+          href={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/files/1737979417230-employee_insurance_docs.pdf`}
+          download
+          target="_blank"
+          className="inline-block px-4 py-1 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
+        >
+          Download Agreement
+        </a>
+      </div>
       <div className="grid grid-cols-2 gap-4">
         {renderFileInput("logo", "Profile Picture", true)}
         {renderFileInput("id_proof", "ID Proof", true)}
@@ -640,6 +662,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
         <CardTitle>Service Provider Registration</CardTitle>
       </CardHeader>
       <CardContent>
+        {loading && (
+          <LoadingScreen message={"Registration Application Submitting...."} />
+        )}
         <div className="flex justify-between mb-8">
           {[1, 2, 3, 4].map((i) => (
             <div

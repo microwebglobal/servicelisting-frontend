@@ -132,9 +132,7 @@ const Page = ({ params }) => {
       <div className="mt-12 flex-1 bg-gray-50 py-12">
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
-            {/* Image Section with Blurred Background */}
             <div className="lg:w-1/2 relative">
-              {/* Blurred Background */}
               <div
                 className="absolute inset-0 bg-cover bg-center backdrop-blur-2xl"
                 style={{
