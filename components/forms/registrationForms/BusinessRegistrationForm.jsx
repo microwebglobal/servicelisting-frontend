@@ -39,7 +39,11 @@ const BusinessRegistrationForm = ({ previousData }) => {
       experience_years: 0,
       is_primary: false,
     })),
-    cities: [],
+    cities: (previousData?.Cities || []).map((city) => ({
+      id: city.city_id || "",
+      service_radius: 0,
+      is_primary: false,
+    })),
     employees: Array(previousData?.number_of_employees || 1).fill({
       name: "",
       gender: "",

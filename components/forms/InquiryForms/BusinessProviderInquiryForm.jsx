@@ -22,9 +22,12 @@ const BusinessProviderInquiryForm = () => {
     website: "",
     location: "",
     categories: [],
+    cities: [],
     no_of_employee: "",
   });
 
+  const [citiesOptions, setCitiesOpions] = useState([]);
+  const [selectedCities, setSelectedCities] = useState([]);
   const [serviceCategoriesOptions, setServiceCategoriesOptions] = useState([]);
   const [selectedServiceCategories, setSelectedServiceCategories] = useState(
     []
@@ -44,6 +47,19 @@ const BusinessProviderInquiryForm = () => {
   ];
 
   useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await serviceAPI.getCities();
+        const cityOptions = response.data.map((city) => ({
+          value: city.city_id,
+          label: city.name,
+        }));
+        setCitiesOpions(cityOptions);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+
     const fetchServices = async () => {
       try {
         const response = await serviceAPI.getAllCategories();
@@ -58,6 +74,7 @@ const BusinessProviderInquiryForm = () => {
       }
     };
 
+    fetchCities();
     fetchServices();
   }, []);
 
@@ -98,6 +115,11 @@ const BusinessProviderInquiryForm = () => {
     }
     if (!formData.categories || formData.categories.length === 0) {
       setError("Please select at least one service category");
+      return false;
+    }
+
+    if (!selectedCities.length) {
+      setError("Please select at least one service city");
       return false;
     }
 
@@ -149,6 +171,7 @@ const BusinessProviderInquiryForm = () => {
         coordinates: formData.location.coordinates,
         address: formData.address,
       },
+      cities: selectedCities.map((city) => city.value),
       categories: formData.categories,
       number_of_employees: parseInt(formData.no_of_employee),
       email: formData.email,
@@ -326,6 +349,32 @@ const BusinessProviderInquiryForm = () => {
                 onChange={handleChange}
                 required
                 className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2">Cities/Regions of Service</label>
+              <Select
+                id="cities"
+                options={citiesOptions}
+                isMulti
+                value={selectedCities}
+                onChange={setSelectedCities}
+                className="mb-4"
+                styles={{
+                  control: (base, state) => ({
+                    ...base,
+                    backgroundColor: "#f3f4f6",
+                    borderRadius: "0.375rem",
+                    border: state.isFocused ? "2px solid #3b82f6" : "none",
+                    boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    color: "#6b7280",
+                  }),
+                }}
+                required
               />
             </div>
 
