@@ -32,7 +32,9 @@ export const providerAPI = {
     api.put(`/booking/acceptence/${bookingId}`, data),
   sendBookingStartOtp: (data) => api.post("/booking/send-otp", data),
   bookingStartVerify: (data) => api.post("/booking/verify-otp", data),
-  stopOngoingBooking: (bookingId) => api.get(`/booking/stop/${bookingId}`),
+  stopOngoingBooking: (data) => api.post(`/booking/stop/`, data),
+  stopOngoingBookingVerify: (data) =>
+    api.post("/booking/stop/verify-otp", data),
   sendBookingEditOtp: (data) => api.post("/booking/edit/send-otp", data),
   bookingEditVerify: (data) => api.post("/booking/edit/verify-otp", data),
 
@@ -67,4 +69,11 @@ export const providerAPI = {
   //service provider categories
   updateProviderCategory: (providerId, data) =>
     api.put(`/providers/${providerId}/categories`, data),
+
+  //service provider documents
+  approveProviderDocument: (documentId) =>
+    api.put(`/provider/doc/approve/${documentId}`),
+
+  rejectProviderDocument: (documentId) =>
+    api.put(`/provider/doc/reject/${documentId}`),
 };

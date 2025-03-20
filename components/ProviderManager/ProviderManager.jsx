@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/dialog";
 import ProviderDetails from "@components/ProviderDetails";
 import ProviderDocuments from "./ProviderDocuments";
+import Modal from "react-modal";
+import { toast } from "@hooks/use-toast";
 
 const getDisplayValue = (value, defaultValue = "N/A") => {
   if (Array.isArray(value)) {
@@ -63,9 +65,16 @@ const ProviderManager = () => {
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectingProvider, setRejectingProvider] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [approveProvider, setApproveProvider] = useState({
+    providerId: null,
+    status: null,
+  });
+
   useEffect(() => {
     fetchProviders();
-  }, [isDialogOpen]);
+  }, [isDialogOpen, isDocDialogOpen]);
 
   const handleReject = async () => {
     try {
@@ -80,6 +89,15 @@ const ProviderManager = () => {
     } catch (error) {
       console.error("Error rejecting provider:", error);
     }
+  };
+
+  const openConfirmModal = (providerId, status) => {
+    setApproveProvider({ providerId, status });
+    setConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModalOpen(false);
   };
 
   const fetchProviders = async () => {
@@ -111,6 +129,7 @@ const ProviderManager = () => {
     rejectionReason = null
   ) => {
     try {
+      setIsApproving(true);
       const updateData = {
         status: newStatus,
       };
@@ -146,8 +165,22 @@ const ProviderManager = () => {
         setIsRejectDialogOpen(false);
         setRejectingProvider(null);
       }
+
+      toast({
+        title: "Success!",
+        description: "Service Provider Updated Sucessfully!",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Error updating provider status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update provider status!",
+        variant: "destructive",
+      });
+    } finally {
+      setIsApproving(false);
+      closeConfirmModal();
     }
   };
 
@@ -314,7 +347,7 @@ const ProviderManager = () => {
                           <Button
                             variant="default"
                             onClick={() =>
-                              handleStatusUpdate(provider.provider_id, "active")
+                              openConfirmModal(provider.provider_id, "active")
                             }
                           >
                             Approve
@@ -342,10 +375,10 @@ const ProviderManager = () => {
       </Card>
 
       <Dialog open={isDocDialogOpen} onOpenChange={setDocIsDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-7xl justify-center items-center">
           <DialogHeader>
             <div className="flex gap-10">
-              <DialogTitle className="font-bold text-3xl">
+              <DialogTitle className="font-bold text-center justify-center text-3xl">
                 Provider Documents
               </DialogTitle>
             </div>
@@ -422,14 +455,50 @@ const ProviderManager = () => {
               <Button
                 variant="destructive"
                 onClick={handleReject}
-                disabled={!rejectionReason.trim()}
+                disabled={!rejectionReason.trim() || isApproving}
               >
-                Reject Registration
+                {isApproving ? "Rejecting" : "Reject Registration "}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Modal */}
+      <Modal
+        isOpen={confirmModalOpen}
+        onRequestClose={closeConfirmModal}
+        ariaHideApp={false}
+        className="m-10 bg-white p-8 rounded-lg shadow-xl w-96 max-w-lg"
+        overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
+      >
+        <div className="space-y-4">
+          <p>Are you sure you want to approve this provider?</p>
+          <div className="flex space-x-4">
+            <Button
+              className="flex-1"
+              onClick={() =>
+                handleStatusUpdate(
+                  approveProvider.providerId,
+                  approveProvider.status
+                )
+              }
+              disabled={isApproving}
+            >
+              {isApproving ? "Approving..." : "Confirm"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={closeConfirmModal}
+              disabled={isApproving}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

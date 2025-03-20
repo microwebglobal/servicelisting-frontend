@@ -42,6 +42,7 @@ import moment from "moment";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import ProviderBookingEditModel from "@/components/business-employee/ProviderBookingEditModel";
+import BookingStopModal from "@/components/business-employee/BookingStopModal";
 
 const CountdownTimer = ({ targetDate }) => {
   const [timeLeft, setTimeLeft] = useState({
@@ -364,9 +365,11 @@ const Page = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [latestBooking, setLatestBooking] = useState(null);
   const [isStartModalOpen, setStartModalOpen] = useState(false);
+  const [isStopModalOpen, setStopModalOpen] = useState(false);
   const [selectedBookingForStart, setSelectedBookingForStart] = useState(null);
   const [ongoingBookings, setOngoingBookings] = useState([]);
   const [isBookingEdit, setIsBookingEdit] = useState(false);
+  const [compleatedBookings, setCompleatedBookings] = useState();
 
   const localizer = momentLocalizer(moment);
 
@@ -428,9 +431,14 @@ const Page = () => {
             (booking) => booking.status === "in_progress"
           );
 
+          const compleatedBookings = response.data.filter(
+            (booking) => booking.status === "completed"
+          );
+
           setOngoingBookings(ongingBookings);
           setAcceptedBookings(acceptBookings);
           setBookingRequests(requestBookings);
+          setCompleatedBookings(compleatedBookings);
           setError(null);
         } else {
           setError("Invalid booking data received");
@@ -456,9 +464,9 @@ const Page = () => {
   ]);
 
   useEffect(() => {
-    if (bookings.length > 0) {
+    if (acceptedBookings?.length > 0) {
       const now = new Date();
-      const upcoming = bookings
+      const upcoming = acceptedBookings
         .filter((b) => new Date(`${b.booking_date}T${b.start_time}`) > now)
         .sort(
           (a, b) =>
@@ -470,7 +478,7 @@ const Page = () => {
 
       setLatestBooking(upcoming[0] || null);
     }
-  }, [bookings]);
+  }, [acceptedBookings]);
 
   const filteredBookings = bookings.filter((booking) => {
     const bookingDate = new Date(booking.booking_date);
@@ -562,11 +570,28 @@ const Page = () => {
     }
   };
 
+  const handleStopBooking = async (booking) => {
+    console.log(booking);
+    try {
+      await providerAPI.stopOngoingBooking({
+        bookingId: booking?.booking_id,
+        mobile: booking?.customer?.mobile,
+      });
+      setStopModalOpen(true);
+    } catch (error) {
+      console.error("Error Sending Otp", error);
+    }
+  };
+
   const handleConfirmStart = (booking) => {
     setOngoingBookings((prev) => [
       ...prev,
       { ...booking, startTime: new Date() },
     ]);
+  };
+
+  const handleConfirmStop = () => {
+    setOngoingBookings();
   };
 
   const ConfirmationModal = () => (
@@ -679,7 +704,7 @@ const Page = () => {
           </h2>
           <Card className="p-4">
             <div className="space-y-4">
-              {ongoingBookings.length > 0 ? (
+              {ongoingBookings?.length > 0 ? (
                 ongoingBookings.map((booking) => (
                   <div
                     key={booking.booking_id}
@@ -700,7 +725,12 @@ const Page = () => {
                           <Timer startTime={booking.start_time} />
                         </p>
                       </div>
-                      <Button className="bg-red-500 text-white">Stop</Button>
+                      <Button
+                        className="bg-red-500 text-white"
+                        onClick={() => handleStopBooking(booking)}
+                      >
+                        Stop
+                      </Button>
                       <Button
                         className="bg-red-500 text-white"
                         onClick={() => setIsBookingEdit(true)}
@@ -725,14 +755,15 @@ const Page = () => {
                 <div>
                   <h3 className="font-semibold mb-3">Next Booking</h3>
                   <p>Booking #{latestBooking.booking_id}</p>
-                  {user.role != "business_service_provider" && (
-                    <Button
-                      className="bg-green-300 text-black mt-2"
-                      onClick={() => handleStartBooking(latestBooking)}
-                    >
-                      Start
-                    </Button>
-                  )}
+                  {user.role != "business_service_provider" &&
+                    ongoingBookings?.length === 0 && (
+                      <Button
+                        className="bg-green-300 text-black mt-2"
+                        onClick={() => handleStartBooking(latestBooking)}
+                      >
+                        Start
+                      </Button>
+                    )}
                 </div>
                 <div className="text-center">
                   <CountdownTimer
@@ -804,6 +835,31 @@ const Page = () => {
               ))}
             </div>
           </Card>
+
+          <Card className="p-4">
+            <h3 className="font-semibold mb-3">Compleated Orders</h3>
+            <div>
+              {compleatedBookings.map((booking) => (
+                <div
+                  key={booking.booking_id}
+                  className="p-2 border last:border-b-0"
+                >
+                  <p
+                    onClick={() => {
+                      setSelectedBooking(booking);
+                      setDialogOpen(true);
+                    }}
+                    className="font-medium"
+                  >
+                    Booking #{booking.booking_id}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {booking.customer?.name} - {booking.status}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
 
         <div className="space-y-4">
@@ -832,7 +888,7 @@ const Page = () => {
       </Dialog>
       <Dialog open={isBookingEdit} onOpenChange={setIsBookingEdit}>
         <ProviderBookingEditModel
-          booking={ongoingBookings[0]}
+          booking={ongoingBookings?.[0] || null}
           onClose={() => setIsBookingEdit(false)}
         />
       </Dialog>
@@ -841,6 +897,13 @@ const Page = () => {
           booking={selectedBookingForStart}
           onConfirm={handleConfirmStart}
           onClose={() => setStartModalOpen(false)}
+        />
+      </Dialog>
+      <Dialog open={isStopModalOpen} onOpenChange={setStopModalOpen}>
+        <BookingStopModal
+          booking={ongoingBookings?.[0] || null}
+          onConfirm={handleConfirmStop}
+          onClose={() => setStopModalOpen(false)}
         />
       </Dialog>
     </div>

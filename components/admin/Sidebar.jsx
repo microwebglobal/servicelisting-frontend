@@ -24,7 +24,7 @@ const Sidebar = () => {
     {
       name: "Bookings Management",
       subMenu: [
-        { name: "Pending Bookings", link: "/pending-bookings" },
+        { name: "Bookings", link: "/admin/bookings" },
         { name: "Escalated Bookings", link: "/escalated-bookings" },
         { name: "Cancelled Bookings", link: "/cancelled-bookings" },
       ],

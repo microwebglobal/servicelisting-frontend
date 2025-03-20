@@ -88,7 +88,7 @@ const CustomerLogin = () => {
         </div>
 
         {/* Text Section */}
-        <div className="w-full lg:w-1/2 text-center lg:text-left flex flex-col justify-center">
+        {/* <div className="w-full lg:w-1/2 text-center lg:text-left flex flex-col justify-center">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
             We will be available soon...
           </h2>
@@ -102,9 +102,9 @@ const CustomerLogin = () => {
               support@qproz.com
             </span>
           </p>
-        </div>
+        </div> */}
 
-        {/* <div className="ml-14 w-96">
+        <div className="ml-14 w-96">
           <h2 className="text-3xl font-semibold text-center mb-2">
             Welcome Back!
           </h2>
@@ -170,7 +170,7 @@ const CustomerLogin = () => {
               </button>
             </>
           )}
-        </div> */}
+        </div>
       </div>
     </div>
   );
