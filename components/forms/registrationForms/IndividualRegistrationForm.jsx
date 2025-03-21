@@ -41,16 +41,19 @@ const IndividualRegistrationForm = ({ previousData }) => {
 
     profile_bio: "",
     certificates_awards: "",
-    logo: null,
-    id_proof: null,
-    aadhar: null,
-    pan: null,
-    address_proof: null,
-    qualification_proof: null,
-    service_certificate: null,
-    insurance: null,
-    agreement: null,
-    terms_acceptance: null,
+
+    documents: {
+      logo: null,
+      id_proof: null,
+      aadhar: null,
+      pan: null,
+      address_proof: null,
+      qualification_proof: null,
+      service_certificate: null,
+      insurance: null,
+      agreement: null,
+      terms_acceptance: null,
+    },
 
     social_media_links: {
       facebook: "",
@@ -108,20 +111,18 @@ const IndividualRegistrationForm = ({ previousData }) => {
     const { name, value, type, files } = e.target;
 
     if (type === "file") {
-      if (name === "portfolio_images" || name === "service_certificates") {
-        setFormData((prev) => ({
-          ...prev,
-          [name]: Array.from(files),
-        }));
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          [name]: files[0],
-        }));
-      }
+      // Handle file uploads
+      setFormData((prev) => ({
+        ...prev,
+        documents: {
+          ...prev.documents,
+          [name]: files[0], // Store the first file
+        },
+      }));
       return;
     }
 
+    // Handle nested objects
     if (name.includes(".")) {
       const [parent, child, grandchild] = name.split(".");
       if (grandchild) {
@@ -147,6 +148,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
       return;
     }
 
+    // Handle regular fields
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -168,13 +170,15 @@ const IndividualRegistrationForm = ({ previousData }) => {
         if (!formData.profile_bio) newErrors.profile_bio = "Required";
         break;
       case 3:
-        if (!formData.logo) newErrors.logo = "Required";
-        if (!formData.id_proof) newErrors.id_proof = "Required";
-        if (!formData.aadhar) newErrors.aadhar = "Required";
-        if (!formData.pan) newErrors.pan = "Required";
-        if (!formData.address_proof) newErrors.address_proof = "Required";
-        if (!formData.agreement) newErrors.agreement = "Required";
-        if (!formData.terms_acceptance) newErrors.terms_acceptance = "Required";
+        if (!formData.documents.logo) newErrors.logo = "Required";
+        if (!formData.documents.id_proof) newErrors.id_proof = "Required";
+        if (!formData.documents.aadhar) newErrors.aadhar = "Required";
+        if (!formData.documents.pan) newErrors.pan = "Required";
+        if (!formData.documents.address_proof)
+          newErrors.address_proof = "Required";
+        if (!formData.documents.agreement) newErrors.agreement = "Required";
+        if (!formData.documents.terms_acceptance)
+          newErrors.terms_acceptance = "Required";
         break;
       case 4:
         if (formData.payment_method === "upi") {
@@ -209,28 +213,16 @@ const IndividualRegistrationForm = ({ previousData }) => {
     }
 
     setLoading(true);
-    setFormData((prev) => ({
-      ...prev,
-      languages_spoken: selectedLanguages.map((lan) => lan.value),
-    }));
 
     try {
       const formDataObj = new FormData();
 
+      // Append non-file fields (excluding service_certificate)
       Object.keys(formData).forEach((key) => {
         if (
-          ![
-            "logo",
-            "id_proof",
-            "aadhar",
-            "pan",
-            "address_proof",
-            "qualification_proof",
-            "service_certificate",
-            "insurance",
-            "agreement",
-            "terms_acceptance",
-          ].includes(key)
+          key !== "documents" &&
+          formData[key] !== undefined &&
+          formData[key] !== null
         ) {
           formDataObj.append(
             key,
@@ -241,61 +233,33 @@ const IndividualRegistrationForm = ({ previousData }) => {
         }
       });
 
-      const singleFiles = [
-        { fieldName: "logo", fieldType: "id_proof" },
-        { fieldName: "id_proof", fieldType: "id_proof" },
-        { fieldName: "aadhar", fieldType: "aadhar" },
-        { fieldName: "pan", fieldType: "pan" },
-        { fieldName: "address_proof", fieldType: "address_proof" },
-        { fieldName: "qualification_proof", fieldType: "qualification_proof" },
-        { fieldName: "service_certificate", fieldType: "service_certificate" },
-        { fieldName: "insurance", fieldType: "insurance" },
-        { fieldName: "agreement", fieldType: "agreement" },
-        { fieldName: "terms_acceptance", fieldType: "terms_acceptance" },
-      ];
-
-      singleFiles.forEach((file) => {
-        if (formData[file]) formDataObj.append(file, formData[file]);
+      Object.entries(formData.documents).forEach(([key, file]) => {
+        if (file) {
+          formDataObj.append(key, file);
+        }
       });
 
-      if (formData.service_certificate?.length) {
-        Array.from(formData.service_certificate).forEach((cert) => {
-          formDataObj.append("service_certificate", cert);
-        });
+      // Log FormData for debugging
+      for (let [key, value] of formDataObj.entries()) {
+        console.log(key, value);
       }
 
-      console.log(formDataObj);
-
+      // Send the request
       const response = await providerAPI.registerProvider(formDataObj);
-      toast({
-        title: "Success!",
-        description: "Your registration was submitted successfully.",
-        variant: "default",
-      });
 
-      router.push("/service-provider/register/sucess");
-
-      const providerId = response?.provider_id || response?.data?.provider_id;
-
-      if (providerId) {
+      if (response?.provider_id || response?.data?.provider_id) {
         toast({
           title: "Success!",
           description: "Your registration was submitted successfully.",
           variant: "default",
         });
-      } else if (response?.message === "Provider registered successfully") {
-        toast({
-          title: "Success!",
-          description: "Your registration was submitted successfully.",
-          variant: "default",
-        });
+        router.push("/service-provider/register/sucess");
       } else {
         toast({
           title: "Error",
-          description: response?.message,
+          description: response?.message || "Registration failed.",
           variant: "destructive",
         });
-        throw new Error("Registration failed: Invalid response format");
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -342,12 +306,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
       </label>
       <input
         type="file"
-        name={name}
+        name={name} // Ensure this matches the key in the `documents` object
         onChange={handleChange}
         className={`w-full ${errors[name] ? "border-red-500" : ""}`}
-        multiple={
-          name === "portfolio_images" || name === "service_certificates"
-        }
       />
       {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
     </div>

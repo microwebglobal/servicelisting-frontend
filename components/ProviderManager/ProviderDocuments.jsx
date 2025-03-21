@@ -1,42 +1,131 @@
 "use client";
-import React from "react";
+import { providerAPI } from "@/api/provider";
+import { DockIcon, ImageIcon } from "lucide-react";
+import React, { useState } from "react";
+import {
+  FaFilePdf,
+  FaFileImage,
+  FaDownload,
+  FaCheckCircle,
+  FaClock,
+  FaTimesCircle,
+  FaEye,
+} from "react-icons/fa";
 
-const ProviderDocuments = ({ provider, onCloseDialog }) => {
-  if (
-    !provider ||
-    !provider.ServiceProviderDocuments ||
-    provider.ServiceProviderDocuments.length === 0
-  ) {
-    return <p className="text-gray-500">No documents available.</p>;
+const ProviderDocuments = ({ provider }) => {
+  const [documents, setDocuments] = useState(
+    provider?.ServiceProviderDocuments || []
+  );
+
+  if (!documents.length) {
+    return <p className="text-gray-500 text-center">No documents available.</p>;
   }
 
+  const isImage = (url) => /\.(jpg|jpeg|png)$/i.test(url);
+  const isPDF = (url) => /\.pdf$/i.test(url);
+
+  const getStatusBadge = (status) => {
+    const lowerStatus = status?.toLowerCase();
+    const statuses = {
+      verified: {
+        color: "bg-green-100 text-green-800 border-green-400",
+        icon: <FaCheckCircle className="mr-1 text-green-600" />,
+      },
+      pending: {
+        color: "bg-yellow-100 text-yellow-800 border-yellow-400",
+        icon: <FaClock className="mr-1 text-yellow-600" />,
+      },
+      rejected: {
+        color: "bg-red-100 text-red-800 border-red-400",
+        icon: <FaTimesCircle className="mr-1 text-red-600" />,
+      },
+    };
+
+    return (
+      statuses[lowerStatus] || {
+        color: "bg-gray-100 text-gray-800 border-gray-400",
+        icon: null,
+      }
+    );
+  };
+
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Provider Documents</h2>
-      <ul className="space-y-3">
-        {provider.ServiceProviderDocuments.map((doc) => (
-          <li key={doc.document_id} className="border p-3 rounded-lg shadow-sm">
-            <p className="font-semibold capitalize">
-              {doc.document_type.replace("_", " ")}
-            </p>
-            <p className="text-sm text-gray-600">
-              Status:{" "}
-              <span className="font-medium">{doc.verification_status}</span>
-            </p>
-            <a
-              href={
-                process.env.NEXT_PUBLIC_API_ENDPOINT + "/" + doc.document_url
-              }
-              target="_blank"
-              crossOrigin="anonymous"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline mt-2"
+    <div className=" mx-auto p-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {documents.map((doc) => {
+          const documentUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${doc.document_url}`;
+          const statusBadge = getStatusBadge(doc.verification_status);
+
+          return (
+            <div
+              key={doc.document_id}
+              className="border rounded-lg shadow-md bg-white p-5 transition-transform transform hover:scale-105"
             >
-              View Document
-            </a>
-          </li>
-        ))}
-      </ul>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  {isImage(doc.document_url) && (
+                    <ImageIcon className="w-6 h-6" />
+                  )}
+                  {isPDF(doc.document_url) && (
+                    <DockIcon className="w-6 h-6 text-red-500" />
+                  )}
+                  <p className="font-medium text-gray-900 capitalize">
+                    {doc.document_type.replace("_", " ")}
+                  </p>
+                </div>
+
+                <span
+                  className={`px-3 py-1 text-sm font-medium rounded-full border ${statusBadge.color} flex items-center`}
+                >
+                  {statusBadge.icon}
+                  {doc.verification_status}
+                </span>
+              </div>
+
+              {/* Document Preview */}
+              <div className="mb-4">
+                {isImage(doc.document_url) ? (
+                  <img
+                    src={documentUrl}
+                    crossOrigin="anonymous"
+                    alt={doc.document_type}
+                    className="w-full h-40 object-cover rounded-lg shadow-sm"
+                  />
+                ) : isPDF(doc.document_url) ? (
+                  <iframe
+                    src={documentUrl}
+                    crossOrigin="anonymous"
+                    title={doc.document_type}
+                    className="w-full h-40 rounded-lg shadow-sm"
+                  ></iframe>
+                ) : (
+                  <p className="text-gray-500 text-sm">
+                    Preview not available for this file type.
+                  </p>
+                )}
+              </div>
+              {/* Action Buttons */}
+              <div className="flex gap-3 flex-wrap">
+                <a
+                  href={documentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  <FaEye />
+                </a>
+                <a
+                  href={documentUrl}
+                  download
+                  className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-green-700 transition"
+                >
+                  <FaDownload />
+                </a>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

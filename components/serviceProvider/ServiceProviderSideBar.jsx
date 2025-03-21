@@ -62,7 +62,7 @@ const ServiceProviderSideBar = () => {
       });
 
       // Redirect to login
-      router.push("/login");
+      router.push("/login/service-provider");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -97,6 +97,11 @@ const ServiceProviderSideBar = () => {
       label: "Orders",
       icon: BookCheck,
       path: "/profile/provider/orders",
+    },
+    {
+      label: "Booking Payments",
+      icon: BookCheck,
+      path: "/profile/provider/bookingPayments",
     },
     ...(profileData?.business_type !== "individual"
       ? [
