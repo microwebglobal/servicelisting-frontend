@@ -150,7 +150,7 @@ const Home = () => {
           className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 py-8 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-24 sm:pb-32 md:pb-40"
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6 drop-shadow-lg">
-            Book Trusted Professionals <br /> In Just a Click!
+            Hire verified experts <br /> In just one tap!
           </h1>
           <p className="mb-6 sm:mb-8 md:mb-10 text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
             Discover a world of trusted professionals ready to transform your
