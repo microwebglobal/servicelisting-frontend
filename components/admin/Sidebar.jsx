@@ -32,7 +32,7 @@ const Sidebar = () => {
     {
       name: "Payments Management",
       subMenu: [
-        { name: "Transactions History", link: "/transactions-history" },
+        { name: "Transactions History", link: "/admin/transactions" },
         { name: "Pending Payouts", link: "/pending-payouts" },
       ],
     },
@@ -42,10 +42,7 @@ const Sidebar = () => {
     },
     {
       name: "Services Management",
-      subMenu: [
-        { name: "Services List", link: "/admin/services" },
-        { name: "Add Service", link: "/add-service" },
-      ],
+      subMenu: [{ name: "Services List", link: "/admin/services" }],
     },
     {
       name: "Notifications Management",

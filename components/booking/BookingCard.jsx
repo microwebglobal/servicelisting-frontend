@@ -1,7 +1,9 @@
 import { Card, CardImage } from "@/components/ui/card";
 import { Calendar, Clock, CheckCircle } from "lucide-react";
+import { Button } from "../ui/button";
 
 const BookingCard = ({ booking, onClick }) => {
+  console.log(booking);
   const getImageUrl = (booking) => {
     const baseUrl = process.env.NEXT_PUBLIC_API_ENDPOINT;
     const item = booking?.BookingItems[0];
@@ -66,6 +68,9 @@ const BookingCard = ({ booking, onClick }) => {
             {booking?.BookingPayment?.payment_status}
           </p>
         </div>
+      </div>
+      <div className="mt-5">
+        <Button variant="destructive">Cancel</Button>
       </div>
     </div>
   );

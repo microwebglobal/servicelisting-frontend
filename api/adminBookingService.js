@@ -91,4 +91,15 @@ export const adminBookingService = {
       );
     }
   },
+
+  getBookingTransactions: async () => {
+    try {
+      const response = await api.get("/admin/transactions");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch transactions"
+      );
+    }
+  },
 };

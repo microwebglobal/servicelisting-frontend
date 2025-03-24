@@ -40,6 +40,8 @@ export const providerAPI = {
   getProviderBookingPayments: (id) => api.get(`/booking/${id}/payment`),
   collectBookingPayment: (id, data) =>
     api.put(`/booking/${id}/payment/collect`, data),
+  getProviderBookingPaymentsHistory: (id) =>
+    api.get(`/booking/${id}/payment/history`),
 
   // Service Provider Employee
   getProviderEmployees: (providerId) =>
