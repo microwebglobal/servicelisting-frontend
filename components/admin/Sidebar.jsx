@@ -25,15 +25,18 @@ const Sidebar = () => {
       name: "Bookings Management",
       subMenu: [
         { name: "Bookings", link: "/admin/bookings" },
-        { name: "Escalated Bookings", link: "/escalated-bookings" },
-        { name: "Cancelled Bookings", link: "/cancelled-bookings" },
+
+        {
+          name: "Cancelled Bookings",
+          link: "/admin/bookings/canceled-bokings",
+        },
       ],
     },
     {
       name: "Payments Management",
       subMenu: [
         { name: "Transactions History", link: "/admin/transactions" },
-        { name: "Pending Payouts", link: "/pending-payouts" },
+        { name: "Payouts", link: "/admin/payouts" },
       ],
     },
     {

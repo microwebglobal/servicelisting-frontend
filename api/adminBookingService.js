@@ -102,4 +102,48 @@ export const adminBookingService = {
       );
     }
   },
+
+  getCancelledBookingsByCustomer: async () => {
+    try {
+      const response = await api.get("/admin/bookings/cancel/cus");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch bookings"
+      );
+    }
+  },
+
+  handleCancelledBookingPanalty: async (data) => {
+    try {
+      const response = await api.post("/admin/bookings/cancel/handle", data);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch bookings"
+      );
+    }
+  },
+
+  getDailyPayoutLogs: async (date) => {
+    try {
+      const response = await api.get(`payout/logs/${date}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch payout logs"
+      );
+    }
+  },
+
+  genarateDailyPayoutLogs: async (date) => {
+    try {
+      const response = await api.get(`payout/logs/genarate/${date}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch payout logs"
+      );
+    }
+  },
 };
