@@ -171,6 +171,7 @@ const Navbar = () => {
               <Link
                 href="/registration/provider"
                 className="text-white border-2 border-white px-4 py-1 my-2 rounded-2xl font-semibold"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 Register as Professional
               </Link>
