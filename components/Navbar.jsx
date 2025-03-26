@@ -150,7 +150,7 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-[#5f60b9] text-white absolute top-16 left-0 w-full shadow-lg p-5 flex flex-col gap-4"
+            className="md:hidden bg-[#5f60b9] text-white absolute top-14 left-0 w-full shadow-lg p-5 flex flex-col gap-4"
           >
             {["Home", "About", "Services", "Contact"].map((item, index) => (
               <motion.div
