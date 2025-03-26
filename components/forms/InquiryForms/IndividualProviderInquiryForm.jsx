@@ -72,6 +72,18 @@ const IndividualProviderInquiryForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if (value === "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: `${name} is required`,
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "",
+      }));
+    }
   };
 
   const validateStep1 = () => {
