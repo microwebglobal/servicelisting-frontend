@@ -363,9 +363,15 @@ const IndividualProviderInquiryForm = () => {
                 styles={{
                   control: (base, state) => ({
                     ...base,
-                    backgroundColor: "#f3f4f6",
+                    backgroundColor: errors.cities
+                      ? "rgba(239, 68, 68, 0.05)"
+                      : "#f3f4f6",
                     borderRadius: "0.375rem",
-                    border: state.isFocused ? "2px solid #3b82f6" : "none",
+                    border: state.isFocused
+                      ? "2px solid #3b82f6"
+                      : errors.cities
+                      ? "1px solid #ef4444"
+                      : "none",
                     boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
                   }),
                   placeholder: (base) => ({
@@ -379,6 +385,10 @@ const IndividualProviderInquiryForm = () => {
 
             <label className="block mb-2">Exact Location</label>
             <SetLocation
+              className={cn({
+                "bg-red-500/5 border border-red-500/50 text-red-500":
+                  errors.location,
+              })}
               location={formData.location}
               setLocation={(newLocation) =>
                 setFormData({ ...formData, location: newLocation })
@@ -400,9 +410,15 @@ const IndividualProviderInquiryForm = () => {
                 styles={{
                   control: (base, state) => ({
                     ...base,
-                    backgroundColor: "#f3f4f6",
+                    backgroundColor: errors.cities
+                      ? "rgba(239, 68, 68, 0.05)"
+                      : "#f3f4f6",
                     borderRadius: "0.375rem",
-                    border: state.isFocused ? "2px solid #3b82f6" : "none",
+                    border: state.isFocused
+                      ? "2px solid #3b82f6"
+                      : errors.cities
+                      ? "1px solid #ef4444"
+                      : "none",
                     boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
                   }),
                   placeholder: (base) => ({

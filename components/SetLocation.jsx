@@ -4,6 +4,7 @@ import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { FaLocationCrosshairs } from "react-icons/fa6";
+import { cn } from "@/lib/utils";
 
 const libraries = ["places"];
 const center = {
@@ -11,7 +12,7 @@ const center = {
   lng: 79.8612,
 };
 
-const SetLocation = ({ location, setLocation }) => {
+const SetLocation = ({ location, setLocation, className }) => {
   const router = useRouter();
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY,
@@ -134,7 +135,10 @@ const SetLocation = ({ location, setLocation }) => {
           >
             <input
               type="text"
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className={cn(
+                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                className
+              )}
               placeholder="Search for a location"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
