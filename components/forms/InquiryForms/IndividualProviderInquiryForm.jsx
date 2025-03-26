@@ -11,6 +11,16 @@ import LoadingScreen from "@/components/LoadingScreen";
 const IndividualProviderInquiryForm = () => {
   const [step, setStep] = useState(1);
 
+  // Calculate minimum age
+  const today = new Date();
+  const minAgeDate = new Date(
+    today.getFullYear() - 18,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+
   const [formData, setFormData] = useState({
     type: "individual",
     name: "",
@@ -71,17 +81,43 @@ const IndividualProviderInquiryForm = () => {
   // Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
 
     if (value === "") {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [name]: `${name} is required`,
+        [name]: `${name.split("_").join(" ")} is required`,
       }));
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
         [name]: "",
+      }));
+    }
+
+    // Prevent unusual inputs in years_experience
+    if (name === "years_experience") {
+      const years = parseInt(value);
+      if (years < 0 || years > 80) {
+        return;
+      }
+    }
+
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle Selected Cities Change
+  const handleSelectedCitiesChange = (selectedCities) => {
+    if (Array.isArray(selectedCities) && selectedCities.length > 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        cities: "",
+      }));
+
+      setSelectedCities(selectedCities);
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        cities: "Select at least one city",
       }));
     }
   };
@@ -95,7 +131,13 @@ const IndividualProviderInquiryForm = () => {
     if (!formData.mobile.match(/^\d{10}$/))
       newErrors.mobile = "Phone number must be 10 digits";
     if (!formData.gender) newErrors.gender = "Gender is required";
-    if (!formData.dob) newErrors.dob = "Date of birth is required";
+    if (!formData.dob) {
+      newErrors.dob = "Date of birth is required";
+    } else if (new Date(formData.dob) > today) {
+      newErrors.dob = "Date of birth cannot be in the future";
+    } else if (new Date(formData.dob) > minAgeDate) {
+      newErrors.dob = "You must be at least 18 years old";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -106,13 +148,20 @@ const IndividualProviderInquiryForm = () => {
 
     if (formData.years_experience < 1)
       newErrors.years_experience = "Experience must be at least 1 year";
+    if (formData.years_experience > 80)
+      newErrors.years_experience = "Experience must be less than 80 years";
+
     if (!selectedCities.length) newErrors.cities = "Select at least one city";
     if (!selectedServiceCategories.length)
       newErrors.categories = "Select at least one category";
 
+    if (formData.location === "") newErrors.location = "Location is required";
+    if (formData.skills === "") newErrors.skills = "Skills are required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   // Go to Next Step
   const nextStep = () => {
     if (step === 1 && validateStep1()) {
@@ -126,7 +175,8 @@ const IndividualProviderInquiryForm = () => {
   // Handle Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateStep2) return;
+    if (!validateStep2()) return;
+
     const formDataToSend = {
       ...formData,
       cities: selectedCities.map((city) => city.value),
@@ -200,6 +250,7 @@ const IndividualProviderInquiryForm = () => {
             <input
               type="date"
               name="dob"
+              max={minAgeDate}
               value={formData.dob}
               onChange={handleChange}
               required
@@ -220,7 +271,7 @@ const IndividualProviderInquiryForm = () => {
 
             <label className="block mb-2">Phone</label>
             <input
-              type="text"
+              type="number"
               name="mobile"
               value={formData.mobile}
               onChange={handleChange}
@@ -249,7 +300,7 @@ const IndividualProviderInquiryForm = () => {
                 options={citiesOptions}
                 isMulti
                 value={selectedCities}
-                onChange={setSelectedCities}
+                onChange={handleSelectedCitiesChange}
                 styles={{
                   control: (base, state) => ({
                     ...base,
@@ -263,7 +314,6 @@ const IndividualProviderInquiryForm = () => {
                     color: "#6b7280",
                   }),
                 }}
-                required
               />
               {errors.cities && <p className="text-red-500">{errors.cities}</p>}
             </div>
@@ -276,6 +326,9 @@ const IndividualProviderInquiryForm = () => {
               }
               required
             />
+            {errors.location && (
+              <p className="text-red-500">{errors.location}</p>
+            )}
 
             <label className="block mb-2">Service Categories</label>
             <div className="mb-4">
@@ -298,35 +351,40 @@ const IndividualProviderInquiryForm = () => {
                     color: "#6b7280",
                   }),
                 }}
-                required
               />
               {errors.categories && (
                 <p className="text-red-500">{errors.categories}</p>
               )}
             </div>
 
-            <label className="block mb-2">Years Experiance</label>
-            <input
-              type="number"
-              name="years_experience"
-              value={formData.years_experience}
-              onChange={handleChange}
-              required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
-            {errors.years_experience && (
-              <p className="text-red-500">{errors.years_experience}</p>
-            )}
+            <div className="mb-4">
+              <label className="block mb-2">Years of Experience</label>
+              <input
+                type="number"
+                name="years_experience"
+                min="0"
+                max="80"
+                value={formData.years_experience}
+                onChange={handleChange}
+                required
+                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              />
+              {errors.years_experience && (
+                <p className="text-red-500">{errors.years_experience}</p>
+              )}
+            </div>
 
-            <label className="block mb-2">Skills</label>
-            <input
-              type="text"
-              name="skills"
-              value={formData.skills}
-              onChange={handleChange}
-              required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
+            <div className="mb-4">
+              <label className="block mb-2">Skills</label>
+              <input
+                type="text"
+                name="skills"
+                value={formData.skills}
+                onChange={handleChange}
+                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              />
+              {errors.skills && <p className="text-red-500">{errors.skills}</p>}
+            </div>
 
             <button
               type="button"
