@@ -7,6 +7,7 @@ import SetLocation from "@components/SetLocation";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
+import { cn } from "@/lib/utils";
 
 const IndividualProviderInquiryForm = () => {
   const [step, setStep] = useState(1);
@@ -227,7 +228,13 @@ const IndividualProviderInquiryForm = () => {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className={cn(
+                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                {
+                  "bg-red-500/5 border border-red-500/50 text-red-500":
+                    errors.name,
+                }
+              )}
             />
             {errors.name && <p className="text-red-500">{errors.name}</p>}
 
@@ -237,7 +244,13 @@ const IndividualProviderInquiryForm = () => {
               value={formData.gender}
               onChange={handleChange}
               required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className={cn(
+                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                {
+                  "bg-red-500/5 border border-red-500/50 text-red-500":
+                    errors.gender,
+                }
+              )}
             >
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
@@ -254,7 +267,13 @@ const IndividualProviderInquiryForm = () => {
               value={formData.dob}
               onChange={handleChange}
               required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className={cn(
+                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                {
+                  "bg-red-500/5 border border-red-500/50 text-red-500":
+                    errors.dob,
+                }
+              )}
             />
             {errors.dob && <p className="text-red-500">{errors.dob}</p>}
 
@@ -265,7 +284,13 @@ const IndividualProviderInquiryForm = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className={cn(
+                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                {
+                  "bg-red-500/5 border border-red-500/50 text-red-500":
+                    errors.email,
+                }
+              )}
             />
             {errors.email && <p className="text-red-500">{errors.email}</p>}
 
@@ -276,7 +301,13 @@ const IndividualProviderInquiryForm = () => {
               value={formData.mobile}
               onChange={handleChange}
               required
-              className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className={cn(
+                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                {
+                  "bg-red-500/5 border border-red-500/50 text-red-500":
+                    errors.mobile,
+                }
+              )}
             />
             {errors.mobile && <p className="text-red-500">{errors.mobile}</p>}
 
@@ -367,7 +398,13 @@ const IndividualProviderInquiryForm = () => {
                 value={formData.years_experience}
                 onChange={handleChange}
                 required
-                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                className={cn(
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  {
+                    "bg-red-500/5 border border-red-500/50 text-red-500":
+                      errors.years_experience,
+                  }
+                )}
               />
               {errors.years_experience && (
                 <p className="text-red-500">{errors.years_experience}</p>
@@ -381,7 +418,13 @@ const IndividualProviderInquiryForm = () => {
                 name="skills"
                 value={formData.skills}
                 onChange={handleChange}
-                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                className={cn(
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  {
+                    "bg-red-500/5 border border-red-500/50 text-red-500":
+                      errors.skills,
+                  }
+                )}
               />
               {errors.skills && <p className="text-red-500">{errors.skills}</p>}
             </div>
