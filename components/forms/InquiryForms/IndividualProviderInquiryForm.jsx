@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import { cn } from "@/lib/utils";
 
+const formDataCacheKey = "IndividualProviderInquiryFormData";
+
 const IndividualProviderInquiryForm = () => {
   const [step, setStep] = useState(1);
 
@@ -22,20 +24,31 @@ const IndividualProviderInquiryForm = () => {
     .toISOString()
     .split("T")[0];
 
-  const [formData, setFormData] = useState({
-    type: "individual",
-    name: "",
-    email: "",
-    mobile: "",
-    gender: "",
-    business_type: "individual",
-    dob: "",
-    years_experience: 0,
-    categories: [],
-    cities: [],
-    location: "",
-    skills: "",
-  });
+  // Retrieve form data from session storage
+  const cachedFormData = sessionStorage.getItem(formDataCacheKey);
+  const [formData, setFormData] = useState(
+    cachedFormData
+      ? JSON.parse(cachedFormData)
+      : {
+          type: "individual",
+          name: "",
+          email: "",
+          mobile: "",
+          gender: "",
+          business_type: "individual",
+          dob: "",
+          years_experience: 0,
+          categories: [],
+          cities: [],
+          location: "",
+          skills: "",
+        }
+  );
+
+  // Save form data to session storage
+  useEffect(() => {
+    sessionStorage.setItem(formDataCacheKey, JSON.stringify(formData));
+  }, [formData]);
 
   const [citiesOptions, setCitiesOpions] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
@@ -77,6 +90,9 @@ const IndividualProviderInquiryForm = () => {
 
     fetchCities();
     fetchServices();
+
+    // Clear old form data cache on page load
+    sessionStorage.removeItem(formDataCacheKey);
   }, []);
 
   // Handle Input Change
@@ -204,6 +220,10 @@ const IndividualProviderInquiryForm = () => {
         description: "Your inquiry was submitted successfully.",
         variant: "default",
       });
+
+      // Clear form data cache after successful submission
+      sessionStorage.removeItem(formDataCacheKey);
+
       router.push("/registration/sucess");
     } catch (error) {
       console.error(error);

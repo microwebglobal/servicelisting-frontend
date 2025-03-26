@@ -10,21 +10,34 @@ import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 
+const formDataCacheKey = "BusinessProviderInquiryFormData";
+
 const BusinessProviderInquiryForm = () => {
-  const [formData, setFormData] = useState({
-    type: "business",
-    business_name: "",
-    name: "", // Authorized Person Name
-    mobile: "", // Authorized Person Contact
-    email: "",
-    gender: "", // Authorized Person Gender
-    business_type: "sole_proprietorship",
-    website: "",
-    location: "",
-    categories: [],
-    cities: [],
-    no_of_employee: "",
-  });
+  // Retrieve form data from session storage
+  const cachedFormData = sessionStorage.getItem(formDataCacheKey);
+  const [formData, setFormData] = useState(
+    cachedFormData
+      ? JSON.parse(cachedFormData)
+      : {
+          type: "business",
+          business_name: "",
+          name: "", // Authorized Person Name
+          mobile: "", // Authorized Person Contact
+          email: "",
+          gender: "", // Authorized Person Gender
+          business_type: "sole_proprietorship",
+          website: "",
+          location: "",
+          categories: [],
+          cities: [],
+          no_of_employee: "",
+        }
+  );
+
+  // Save form data to session storage
+  useEffect(() => {
+    sessionStorage.setItem(formDataCacheKey, JSON.stringify(formData));
+  }, [formData]);
 
   const [citiesOptions, setCitiesOpions] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
@@ -76,6 +89,9 @@ const BusinessProviderInquiryForm = () => {
 
     fetchCities();
     fetchServices();
+
+    // Clear form data cache on page load
+    sessionStorage.removeItem(formDataCacheKey);
   }, []);
 
   const handleChange = (e) => {
