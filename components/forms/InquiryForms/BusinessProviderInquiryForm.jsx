@@ -80,6 +80,14 @@ const BusinessProviderInquiryForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Prevent unusual inputs in mobile
+    if (name === "mobile") {
+      if (value.length > 10) {
+        return;
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -347,7 +355,6 @@ const BusinessProviderInquiryForm = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
                 className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
               />
             </div>
@@ -388,6 +395,7 @@ const BusinessProviderInquiryForm = () => {
                 required
               />
             </div>
+
             <div>
               <label className="block mb-2">Number of Employees</label>
               <input

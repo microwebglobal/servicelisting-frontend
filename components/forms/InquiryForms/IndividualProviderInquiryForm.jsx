@@ -83,6 +83,7 @@ const IndividualProviderInquiryForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Show/hide error messages realtime
     if (value === "") {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -99,6 +100,13 @@ const IndividualProviderInquiryForm = () => {
     if (name === "years_experience") {
       const years = parseInt(value);
       if (years < 0 || years > 80) {
+        return;
+      }
+    }
+
+    // Prevent unusual inputs in mobile
+    if (name === "mobile") {
+      if (value.length > 10) {
         return;
       }
     }
