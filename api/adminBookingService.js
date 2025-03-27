@@ -146,4 +146,15 @@ export const adminBookingService = {
       );
     }
   },
+
+  settleDailyPayoutLogs: async (logId, data) => {
+    try {
+      const response = await api.put(`payout/logs/settle/${logId}`, data);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch payout logs"
+      );
+    }
+  },
 };

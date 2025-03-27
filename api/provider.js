@@ -38,10 +38,14 @@ export const providerAPI = {
   sendBookingEditOtp: (data) => api.post("/booking/edit/send-otp", data),
   bookingEditVerify: (data) => api.post("/booking/edit/verify-otp", data),
   getProviderBookingPayments: (id) => api.get(`/booking/${id}/payment`),
+  getProviderEmployeeBookingPayments: (id) =>
+    api.get(`/booking/${id}/payment/employee`),
   collectBookingPayment: (id, data) =>
     api.put(`/booking/${id}/payment/collect`, data),
   getProviderBookingPaymentsHistory: (id) =>
     api.get(`/booking/${id}/payment/history`),
+  getProviderEmployeeBookingPaymentsHistory: (id) =>
+    api.get(`/booking/${id}/payment/history/employee`),
 
   // Service Provider Employee
   getProviderEmployees: (providerId) =>
