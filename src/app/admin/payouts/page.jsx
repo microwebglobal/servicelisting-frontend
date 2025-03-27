@@ -7,7 +7,8 @@ const Page = () => {
   const [payoutLogs, setPayoutLogs] = useState([]);
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
-  ); // Default to today
+  );
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchPayoutLogsByDate(selectedDate);
@@ -26,6 +27,7 @@ const Page = () => {
   const handleGenarateDailyReport = async () => {
     try {
       await adminBookingService.genarateDailyPayoutLogs(selectedDate);
+      fetchPayoutLogsByDate(selectedDate);
     } catch (error) {}
   };
 

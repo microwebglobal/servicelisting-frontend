@@ -67,9 +67,9 @@ const PaymentPage = () => {
       const response = await cartService.proceedPayment(paymentDetails);
       setPaymentResponse(response);
 
-      if (response.success && selectedMethod === "cash") {
-        await cartService.completeCashPayment(bookingData.booking_id);
-      }
+      // if (response.success && selectedMethod === "cash") {
+      //   await cartService.completeCashPayment(bookingData.booking_id);
+      // }
     } catch (error) {
       setError(error.message || "Payment processing failed. Please try again.");
     } finally {
