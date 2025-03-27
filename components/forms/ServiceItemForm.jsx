@@ -22,6 +22,8 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
     description: data?.description || "",
     overview: data?.overview || "",
     base_price: data?.base_price || "",
+    grace_period: data?.grace_period || null,
+    penalty_percentage: data?.penalty_percentage || null,
     duration_hours: data?.duration_hours || "",
     duration_minutes: data?.duration_minutes || "",
     service_id: selectedData?.serviceId || data?.service_id,
@@ -348,6 +350,46 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
             setFormData({
               ...formData,
               advance_percentage: parseFloat(e.target.value),
+            })
+          }
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="base_price">Grace Period Percentage</Label>
+        <Input
+          id="grace_period"
+          type="number"
+          step="0.01"
+          min="0"
+          max="100"
+          placeholder="Advance Percentage"
+          value={formData.grace_period}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              grace_period: parseFloat(e.target.value),
+            })
+          }
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="base_price">Penalty Percentage</Label>
+        <Input
+          id="penalty_percentage"
+          type="number"
+          step="0.01"
+          min="0"
+          max="100"
+          placeholder="Penalty Percentage"
+          value={formData.penalty_percentage}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              penalty_percentage: parseFloat(e.target.value),
             })
           }
           required

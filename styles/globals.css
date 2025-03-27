@@ -13,6 +13,10 @@
   --color-text: #1f2937; /* Dark Gray */
 }
 
+nextjs-portal {
+  display: none;
+}
+
 .dialog-content {
   pointer-events: all !important;
 }
