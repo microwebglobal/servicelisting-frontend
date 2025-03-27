@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import Select from "react-select";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
+import { cn } from "@/lib/utils";
 
 const IndividualRegistrationForm = ({ previousData }) => {
   const [formData, setFormData] = useState({
@@ -110,13 +111,12 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
-    if (type === "file") {
-      // Handle file uploads
+    if (type === "file" && files[0]) {
       setFormData((prev) => ({
         ...prev,
         documents: {
           ...prev.documents,
-          [name]: files[0], // Store the first file
+          [name]: files[0], // Store the first selected file
         },
       }));
       return;
@@ -298,21 +298,70 @@ const IndividualRegistrationForm = ({ previousData }) => {
     />
   );
 
-  const renderFileInput = (name, label, required = false) => (
-    <div className="space-y-2">
-      <label className="block">
-        {label}
-        {required && "*"}
-      </label>
-      <input
-        type="file"
-        name={name} // Ensure this matches the key in the `documents` object
-        onChange={handleChange}
-        className={`w-full ${errors[name] ? "border-red-500" : ""}`}
-      />
-      {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
-    </div>
-  );
+  // Function to remove a selected file
+  const handleRemoveFile = (name) => {
+    setFormData((prev) => ({
+      ...prev,
+      documents: {
+        ...prev.documents,
+        [name]: null, // Set the selected file to null to remove it
+      },
+    }));
+  };
+
+  const renderFileInput = (name, label, required = false) => {
+    const isFileSelected = formData.documents[name] !== null;
+
+    return (
+      <div className="space-y-2 w-full">
+        <label className="block">
+          {label}
+          {required && "*"}
+        </label>
+
+        <div className="flex items-center gap-2">
+          {isFileSelected && (
+            <img
+              src={URL.createObjectURL(formData.documents[name])}
+              alt={name}
+              className="w-28 h-28 object-cover rounded-md"
+            />
+          )}
+
+          <div className={cn(!isFileSelected && "flex gap-1 items-center")}>
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png,.pdf" // Accespt PDF and image files only
+              name={name} // Ensure this matches the key in the `documents` object
+              onChange={handleChange}
+              className={`text-transparent w-28 ${
+                errors[name] ? "border-red-500" : ""
+              }`}
+            />
+
+            {isFileSelected ? (
+              <p>
+                <span className="block">
+                  Selected File: {formData.documents[name].name}
+                </span>
+
+                <button
+                  onClick={() => handleRemoveFile(name)}
+                  className="text-sm text-red-500 font-medium"
+                >
+                  Remove
+                </button>
+              </p>
+            ) : (
+              <p>No file selected</p>
+            )}
+          </div>
+        </div>
+
+        {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
+      </div>
+    );
+  };
 
   const renderPersonalDetails = () => (
     <div className="space-y-4">
@@ -458,7 +507,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           Download Agreement
         </a>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-5">
         {renderFileInput("logo", "Profile Picture", true)}
         {renderFileInput("id_proof", "ID Proof", true)}
         {renderFileInput("aadhar", "Aadhar Card", true)}
@@ -467,9 +516,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
         {renderFileInput("qualification_proof", "Qualification Proof")}
         {renderFileInput("service_certificate", "Service Certificates")}
         {renderFileInput("insurance", "Insurance Documents")}
+        {renderFileInput("agreement", "Signed Agreement", true)}
+        {renderFileInput("terms_acceptance", "Signed Terms & Conditions", true)}
       </div>
-      {renderFileInput("agreement", "Signed Agreement", true)}
-      {renderFileInput("terms_acceptance", "Signed Terms & Conditions", true)}
     </div>
   );
 
