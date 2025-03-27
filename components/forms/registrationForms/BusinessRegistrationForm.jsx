@@ -4,6 +4,7 @@ import { providerAPI } from "@/api/provider";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
+import { cn } from "@/lib/utils";
 
 const BusinessRegistrationForm = ({ previousData }) => {
   const [formData, setFormData] = useState({
@@ -79,6 +80,33 @@ const BusinessRegistrationForm = ({ previousData }) => {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
+    // Show/hide error messages realtime
+    if (value === "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: `${name.split("_").join(" ")} is required`,
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "",
+      }));
+    }
+
+    // Prevent unusual inputs in mobile
+    if (name === "whatsapp_number") {
+      if (value.length > 10) {
+        return;
+      }
+    }
+
+    // Prevent unusual inputs in TIN
+    if (name === "tax_id") {
+      if (value.length > 11) {
+        return;
+      }
+    }
+
     if (type === "file") {
       setFormData((prev) => ({
         ...prev,
@@ -123,10 +151,18 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
   const handleEmployeeChange = (index, field, value) => {
     const updatedEmployees = [...formData.employees];
+
+    if (field === "phone" || field === "whatsapp_number") {
+      if (value.length > 10) {
+        return;
+      }
+    }
+
     updatedEmployees[index] = {
       ...updatedEmployees[index],
       [field]: value,
     };
+
     setFormData((prev) => ({
       ...prev,
       employees: updatedEmployees,
@@ -143,6 +179,8 @@ const BusinessRegistrationForm = ({ previousData }) => {
         if (!formData.tax_id?.trim()) newErrors.tax_id = "Required";
         if (!formData.whatsapp_number?.match(/^\d{10}$/))
           newErrors.whatsapp_number = "Required";
+        if (!formData.business_start_date)
+          newErrors.business_start_date = "Required";
         break;
       case 2:
         if (!formData.service_radius?.trim())
@@ -314,7 +352,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Tax Identification Number*"
             className={`p-2 border rounded w-full ${
-              errors.tax_id ? "border-red-500" : ""
+              errors.tax_id ? "border-red-500 bg-red-500/5 text-red-500" : ""
             }`}
           />
           {errors.tax_id && (
@@ -329,7 +367,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Business Registration Number*"
             className={`p-2 border rounded w-full ${
-              errors.business_registration_number ? "border-red-500" : ""
+              errors.business_registration_number
+                ? "border-red-500 bg-red-500/5 text-red-500"
+                : ""
             }`}
           />
           {errors.business_registration_number && (
@@ -340,13 +380,15 @@ const BusinessRegistrationForm = ({ previousData }) => {
         </div>
         <div>
           <input
-            type="tel"
+            type="number"
             name="whatsapp_number"
             value={formData.whatsapp_number}
             onChange={handleChange}
             placeholder="WhatsApp Number*"
             className={`p-2 border rounded w-full ${
-              errors.whatsapp_number ? "border-red-500" : ""
+              errors.whatsapp_number
+                ? "border-red-500 bg-red-500/5 text-red-500"
+                : ""
             }`}
           />
           {errors.whatsapp_number && (
@@ -355,16 +397,30 @@ const BusinessRegistrationForm = ({ previousData }) => {
             </p>
           )}
         </div>
-        <div>
-          <input
-            type="date"
-            name="business_start_date"
-            value={formData.business_start_date}
-            onChange={handleChange}
-            className="p-2 border rounded w-full"
-            placeholder="Business Start Date"
-          />
-        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Business Start Date
+        </label>
+
+        <input
+          type="date"
+          name="business_start_date"
+          value={formData.business_start_date}
+          onChange={handleChange}
+          className={cn("p-2 border rounded w-full", {
+            "border-red-500 bg-red-500/5 text-red-500":
+              errors.business_start_date,
+          })}
+          placeholder="Business Start Date"
+        />
+
+        {errors.business_start_date && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.business_start_date}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -381,7 +437,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Service Radius (km)*"
             className={`p-2 border rounded w-full ${
-              errors.service_radius ? "border-red-500" : ""
+              errors.service_radius
+                ? "border-red-500 bg-red-500/5 text-red-500"
+                : ""
             }`}
           />
           {errors.service_radius && (
@@ -396,7 +454,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
           onChange={handleChange}
           placeholder="Business Address*"
           className={`w-full p-2 border rounded ${
-            errors.address ? "border-red-500" : ""
+            errors.address ? "border-red-500 bg-red-500/5 text-red-500" : ""
           }`}
           rows="3"
         />
@@ -406,6 +464,25 @@ const BusinessRegistrationForm = ({ previousData }) => {
       </div>
     </div>
   );
+
+  // // Remove employee
+  // const handleRemoveEmployee = (index) => {
+  //   const updatedEmployees = formData.employees.filter(
+  //     (_, empIndex) => empIndex !== index
+  //   );
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     employees: updatedEmployees,
+  //   }));
+  // };
+
+  // // Add employee
+  // const handleAddEmployee = () => {
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     employees: [...prevData.employees, {}], // Add an empty employee object
+  //   }));
+  // };
 
   const renderEmployeeDetails = () => (
     <div className="space-y-4">
@@ -417,13 +494,14 @@ const BusinessRegistrationForm = ({ previousData }) => {
             {/* {index > 0 && (
               <button
                 type="button"
-                onClick={() => removeEmployee(index)}
+                onClick={() => handleRemoveEmployee(index)}
                 className="text-red-500"
               >
                 Remove
               </button>
             )} */}
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <input
@@ -434,7 +512,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
                 }
                 placeholder="Employee Name*"
                 className={`p-2 border rounded w-full ${
-                  errors[`employees.${index}.name`] ? "border-red-500" : ""
+                  errors[`employees.${index}.name`]
+                    ? "border-red-500 bg-red-500/5 text-red-500"
+                    : ""
                 }`}
               />
               {errors[`employees.${index}.name`] && (
@@ -443,18 +523,23 @@ const BusinessRegistrationForm = ({ previousData }) => {
                 </p>
               )}
             </div>
+
             <select
               value={employee.gender}
               onChange={(e) =>
                 handleEmployeeChange(index, "gender", e.target.value)
               }
-              className="p-2 border rounded w-full"
+              className={cn("p-2 border rounded w-full", {
+                "border-red-500 bg-red-500/5 text-red-500":
+                  errors[`employees.${index}.gender`],
+              })}
             >
               <option value="">Select Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
             </select>
+
             <input
               type="text"
               value={employee.qualification}
@@ -464,6 +549,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               placeholder="Qualification"
               className="p-2 border rounded w-full"
             />
+
             <input
               type="text"
               value={employee.designation}
@@ -473,16 +559,19 @@ const BusinessRegistrationForm = ({ previousData }) => {
               placeholder="Designation"
               className="p-2 border rounded w-full"
             />
+
             <div>
               <input
-                type="tel"
+                type="number"
                 value={employee.phone}
                 onChange={(e) =>
                   handleEmployeeChange(index, "phone", e.target.value)
                 }
                 placeholder="Phone Number*"
                 className={`p-2 border rounded w-full ${
-                  errors[`employees.${index}.phone`] ? "border-red-500" : ""
+                  errors[`employees.${index}.phone`]
+                    ? "border-red-500 bg-red-500/5 text-red-500"
+                    : ""
                 }`}
               />
               {errors[`employees.${index}.phone`] && (
@@ -491,6 +580,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
                 </p>
               )}
             </div>
+
             <input
               type="email"
               value={employee.email}
@@ -501,8 +591,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
               placeholder="Email"
               className="p-2 border rounded w-full"
             />
+
             <input
-              type="tel"
+              type="number"
               value={employee.whatsapp_number}
               onChange={(e) =>
                 handleEmployeeChange(index, "whatsapp_number", e.target.value)
@@ -513,9 +604,10 @@ const BusinessRegistrationForm = ({ previousData }) => {
           </div>
         </div>
       ))}
+
       {/* <button
         type="button"
-        onClick={addEmployee}
+        onClick={handleAddEmployee}
         className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         Add Employee

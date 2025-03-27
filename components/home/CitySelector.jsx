@@ -6,9 +6,10 @@ import { serviceAPI } from "../../api/services";
 import { motion, AnimatePresence } from "framer-motion";
 
 const placeholderTexts = [
-  "Search for a location...",
-  "Find nearby services...",
-  "Enter your city name...",
+  "What service do you need today?",
+  "Book a service instantly-Search here!",
+  "Search for expert help in your area!",
+  "Type a service or location to get started!",
 ];
 
 const CitySelector = () => {
@@ -90,7 +91,7 @@ const CitySelector = () => {
       <div className="flex items-center">
         <input
           type="text"
-          className="p-3 h-1/2 w-full border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition-all duration-300"
+          className="p-3 h-1/2 w-full border placeholder:text-black placeholder:font-medium border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition-all duration-300"
           placeholder={placeholder}
           value={searchTerm}
           onChange={handleSearch}

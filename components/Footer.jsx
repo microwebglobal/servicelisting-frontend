@@ -4,8 +4,8 @@ import { FaFacebook, FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="text-white py-20 px-6 bg-[#5f60b9]">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-20 items-start">
+    <footer className="text-white py-10 lg:py-20 px-6 bg-[#5f60b9]">
+      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-14 lg:gap-20 items-start">
         {/* Left Section */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}

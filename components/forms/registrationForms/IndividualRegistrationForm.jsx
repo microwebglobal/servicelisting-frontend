@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import Select from "react-select";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
+import { cn } from "@/lib/utils";
 
 const IndividualRegistrationForm = ({ previousData }) => {
   const [formData, setFormData] = useState({
@@ -110,13 +111,48 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
-    if (type === "file") {
-      // Handle file uploads
+    // Show/hide error messages realtime
+    if (value === "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: `${name.split("_").join(" ")} is required`,
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "",
+      }));
+    }
+
+    if (
+      name === "phone" ||
+      name === "whatsapp_number" ||
+      name === "alternate_number" ||
+      name === "emergency_contact_number"
+    ) {
+      if (value.length > 10) {
+        return;
+      }
+    }
+
+    if (name === "pan_number") {
+      if (value.length > 10) {
+        return;
+      }
+    }
+
+    if (name === "aadhar_number") {
+      if (value.length > 12) {
+        return;
+      }
+    }
+
+    if (type === "file" && files[0]) {
       setFormData((prev) => ({
         ...prev,
         documents: {
           ...prev.documents,
-          [name]: files[0], // Store the first file
+          [name]: files[0], // Store the first selected file
         },
       }));
       return;
@@ -292,32 +328,87 @@ const IndividualRegistrationForm = ({ previousData }) => {
       onChange={handleChange}
       placeholder={placeholder}
       className={`p-2 border rounded w-full ${
-        errors[name] ? "border-red-500" : ""
+        errors[name] ? "border-red-500 bg-red-500/5" : ""
       }`}
       disabled={disabled}
     />
   );
 
-  const renderFileInput = (name, label, required = false) => (
-    <div className="space-y-2">
-      <label className="block">
-        {label}
-        {required && "*"}
-      </label>
-      <input
-        type="file"
-        name={name} // Ensure this matches the key in the `documents` object
-        onChange={handleChange}
-        className={`w-full ${errors[name] ? "border-red-500" : ""}`}
-      />
-      {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
-    </div>
-  );
+  // Function to remove a selected file
+  const handleRemoveFile = (name) => {
+    setFormData((prev) => ({
+      ...prev,
+      documents: {
+        ...prev.documents,
+        [name]: null, // Set the selected file to null to remove it
+      },
+    }));
+  };
+
+  const renderFileInput = (name, label, required = false) => {
+    const isFileSelected = formData.documents[name] !== null;
+
+    return (
+      <div className="space-y-2 w-full">
+        <label className="block">
+          {label}
+          {required && "*"}
+        </label>
+
+        <div className="flex items-center gap-2">
+          {isFileSelected && (
+            <a
+              target="_blank"
+              className="w-28 h-28 aspect-square"
+              href={URL.createObjectURL(formData.documents[name])}
+            >
+              <img
+                src={URL.createObjectURL(formData.documents[name])}
+                alt={name}
+                className="w-full h-full object-cover rounded-md"
+              />
+            </a>
+          )}
+
+          <div className={cn(!isFileSelected && "flex gap-1 items-center")}>
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png,.pdf" // Accespt PDF and image files only
+              name={name} // Ensure this matches the key in the `documents` object
+              onChange={handleChange}
+              className={`text-transparent w-28 ${
+                errors[name] ? "border-red-500 bg-red-500/5" : ""
+              }`}
+            />
+
+            {isFileSelected ? (
+              <p>
+                <span className="block">
+                  Selected File: {formData.documents[name].name}
+                </span>
+
+                <button
+                  onClick={() => handleRemoveFile(name)}
+                  className="text-sm text-red-500 font-medium"
+                >
+                  Remove
+                </button>
+              </p>
+            ) : (
+              <p>No file selected</p>
+            )}
+          </div>
+        </div>
+
+        {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
+      </div>
+    );
+  };
 
   const renderPersonalDetails = () => (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Personal Information</h2>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {renderInputField("name", "Full Name", "text", true)}
         <input
           type="date"
@@ -346,7 +437,28 @@ const IndividualRegistrationForm = ({ previousData }) => {
           options={spokenLanguages}
           isMulti
           value={selectedLanguages}
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderColor: errors.languages_spoken ? "red" : "",
+              backgroundColor: errors.languages_spoken
+                ? "rgba(239, 68, 68, 0.05)"
+                : "",
+            }),
+          }}
           onChange={(selectedOptions) => {
+            if (!selectedOptions.length) {
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                languages_spoken: "Select at least one language",
+              }));
+            } else {
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                languages_spoken: "",
+              }));
+            }
+
             setSelectedLanguages(selectedOptions);
             setFormData((prev) => ({
               ...prev,
@@ -360,9 +472,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
         {renderInputField("aadhar_number", "Aadhar Number")}
         {renderInputField("pan_number", "PAN Number")}
         {renderInputField("email", "Email", "email", true)}
-        {renderInputField("phone", "Phone Number", "tel", true)}
-        {renderInputField("whatsapp_number", "WhatsApp Number", "tel")}
-        {renderInputField("alternate_number", "Alternate Number", "tel")}
+        {renderInputField("phone", "Phone Number", "number", true)}
+        {renderInputField("whatsapp_number", "WhatsApp Number", "number")}
+        {renderInputField("alternate_number", "Alternate Number", "number")}
       </div>
       <textarea
         name="address"
@@ -370,11 +482,11 @@ const IndividualRegistrationForm = ({ previousData }) => {
         onChange={handleChange}
         placeholder="Address"
         className={`w-full p-2 border rounded ${
-          errors.address ? "border-red-500" : ""
+          errors.address ? "border-red-500 bg-red-500/5" : ""
         }`}
         rows="3"
       />
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {renderInputField("emergency_contact_name", "Emergency Contact Name")}
         {renderInputField("reference_name", "Reference Name")}
         {renderInputField("reference_number", "Reference Number")}
@@ -385,7 +497,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const renderServiceDetails = () => (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Service Details</h2>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {renderInputField("service_radius", "Service Radius (km)", "number")}
         <select
           name="availability_type"
@@ -458,7 +570,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           Download Agreement
         </a>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {renderFileInput("logo", "Profile Picture", true)}
         {renderFileInput("id_proof", "ID Proof", true)}
         {renderFileInput("aadhar", "Aadhar Card", true)}
@@ -467,9 +579,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
         {renderFileInput("qualification_proof", "Qualification Proof")}
         {renderFileInput("service_certificate", "Service Certificates")}
         {renderFileInput("insurance", "Insurance Documents")}
+        {renderFileInput("agreement", "Signed Agreement", true)}
+        {renderFileInput("terms_acceptance", "Signed Terms & Conditions", true)}
       </div>
-      {renderFileInput("agreement", "Signed Agreement", true)}
-      {renderFileInput("terms_acceptance", "Signed Terms & Conditions", true)}
     </div>
   );
 
@@ -494,7 +606,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="UPI ID"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.upi.id"] ? "border-red-500" : ""
+              errors["payment_details.upi.id"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.upi.id"] && (
@@ -509,7 +623,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Display Name"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.upi.display_name"] ? "border-red-500" : ""
+              errors["payment_details.upi.display_name"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.upi.display_name"] && (
@@ -524,7 +640,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="UPI Phone Number"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.upi.phone"] ? "border-red-500" : ""
+              errors["payment_details.upi.phone"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.upi.phone"] && (
@@ -542,7 +660,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Bank Name"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.bank.name"] ? "border-red-500" : ""
+              errors["payment_details.bank.name"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.bank.name"] && (
@@ -557,7 +677,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Branch"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.bank.branch"] ? "border-red-500" : ""
+              errors["payment_details.bank.branch"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.bank.branch"] && (
@@ -572,7 +694,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="IFSC Code"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.bank.ifsc"] ? "border-red-500" : ""
+              errors["payment_details.bank.ifsc"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.bank.ifsc"] && (
@@ -588,7 +712,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             placeholder="Account Number"
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.account_number"]
-                ? "border-red-500"
+                ? "border-red-500 bg-red-500/5"
                 : ""
             }`}
           />

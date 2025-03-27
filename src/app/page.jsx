@@ -233,15 +233,15 @@ const Home = () => {
 
         {/* Right Side - Steps */}
         <motion.div
-          initial={{ opacity: 0, x: 30 }}
+          initial={{ opacity: 0, x: 30, transform: "none" }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="w-full lg:w-1/2 lg:mr-20"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-16 text-gray-900 p-3">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-center lg:text-left font-bold mb-16 text-gray-900 p-3">
             How does <span className="text-indigo-600">QProz</span> work?
           </h2>
-          <ul className="list-decimal pl-8 marker:text-indigo-600 marker:font-bold marker:text-3xl lg:marker:text-4xl marker:relative marker:top-2">
+          <ul className="lg:pl-8">
             {steps.map((step, index) => (
               <li key={index} className="mb-10 list-item">
                 <motion.div
@@ -249,7 +249,7 @@ const Home = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0, x: 0 }}
                   transition={{ duration: 0.8, delay: index * 0.3 }}
-                  className="flex flex-col lg:flex-row gap-4 lg:gap-10 items-start"
+                  className="flex flex-col lg:flex-row gap-4 lg:gap-8 items-center text-center lg:text-left"
                 >
                   {/* Icon */}
                   <div className="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
@@ -308,21 +308,21 @@ const Home = () => {
       </section>
 
       {/* Professionals Section */}
-      <section className="py-16 items-center justify-center bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA] px-4">
+      <section className="py-16 bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA] px-4">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col lg:flex-row gap-10 lg:gap-20 max-w-6xl mx-auto"
+          className="flex flex-col items-center lg:flex-row gap-10 lg:gap-20 max-w-6xl mx-auto"
         >
-          <div className="w-full lg:w-1/2">
+          <div className="w-full lg:w-1/2 text-center lg:text-left">
             <motion.h2
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-center text-3xl md:text-4xl lg:text-5xl font-bold mb-10"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-10"
             >
-              Trusted Professionals for <br /> Your Home Services
+              Trusted Professionals for Your Home Services
             </motion.h2>
             <p className="text-gray-600 mb-8 text-lg">
               Finding reliable professionals for your home services has never
@@ -331,7 +331,7 @@ const Home = () => {
               you require repairs, installations, or maintenance, we ensure a
               seamless and stress-free experience.
             </p>
-            <div className="flex flex-col lg:flex-row gap-12">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 items-center -ml-8 lg:items-start">
               <div>
                 <ul className="list-inside pl-5 text-gray-600 space-y-4">
                   <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
@@ -360,6 +360,7 @@ const Home = () => {
               </div>
             </div>
           </div>
+
           <div className="w-full lg:w-1/2">
             <Image
               src="/assets/images/roof_work.jpg"
@@ -414,7 +415,7 @@ const Home = () => {
       </motion.section>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-md text-center bg-white/90 backdrop-blur-md shadow-lg rounded-2xl p-6">
+        <DialogContent className="min-w-[300px] max-w-md text-center bg-white/90 backdrop-blur-md shadow-lg rounded-2xl p-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}

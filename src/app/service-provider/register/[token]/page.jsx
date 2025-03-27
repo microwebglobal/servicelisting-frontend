@@ -129,7 +129,7 @@ const Page = ({ params }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <div className="mt-12 flex-1 bg-gray-50 py-12">
+      <div className="mt-12 flex-1 bg-gray-50 py-8 lg:py-12">
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
             <div className="lg:w-1/2 relative">
@@ -141,7 +141,7 @@ const Page = ({ params }) => {
               ></div>
             </div>
             {/* Form Section */}
-            <div className="lg:w-1/2 p-8 flex flex-col justify-center">
+            <div className="lg:w-1/2 p-3 lg:p-8 flex flex-col justify-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-6">
                 Complete Your Registration
               </h1>
