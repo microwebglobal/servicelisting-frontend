@@ -25,7 +25,11 @@ const IndividualProviderInquiryForm = () => {
     .split("T")[0];
 
   // Retrieve form data from session storage
-  const cachedFormData = sessionStorage.getItem(formDataCacheKey);
+  let cachedFormData = null;
+  if (typeof window !== "undefined") {
+    cachedFormData = sessionStorage.getItem(formDataCacheKey);
+  }
+
   const [formData, setFormData] = useState(
     cachedFormData
       ? JSON.parse(cachedFormData)
