@@ -111,6 +111,19 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
+    // Show/hide error messages realtime
+    if (value === "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: `${name.split("_").join(" ")} is required`,
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "",
+      }));
+    }
+
     if (
       name === "phone" ||
       name === "whatsapp_number" ||
@@ -344,11 +357,17 @@ const IndividualRegistrationForm = ({ previousData }) => {
 
         <div className="flex items-center gap-2">
           {isFileSelected && (
-            <img
-              src={URL.createObjectURL(formData.documents[name])}
-              alt={name}
-              className="w-28 h-28 object-cover rounded-md"
-            />
+            <a
+              target="_blank"
+              className="w-28 h-28 aspect-square"
+              href={URL.createObjectURL(formData.documents[name])}
+            >
+              <img
+                src={URL.createObjectURL(formData.documents[name])}
+                alt={name}
+                className="w-full h-full object-cover rounded-md"
+              />
+            </a>
           )}
 
           <div className={cn(!isFileSelected && "flex gap-1 items-center")}>
