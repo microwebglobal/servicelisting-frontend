@@ -366,7 +366,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const renderPersonalDetails = () => (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Personal Information</h2>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {renderInputField("name", "Full Name", "text", true)}
         <input
           type="date"
@@ -423,7 +423,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
         }`}
         rows="3"
       />
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {renderInputField("emergency_contact_name", "Emergency Contact Name")}
         {renderInputField("reference_name", "Reference Name")}
         {renderInputField("reference_number", "Reference Number")}
@@ -434,7 +434,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const renderServiceDetails = () => (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Service Details</h2>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {renderInputField("service_radius", "Service Radius (km)", "number")}
         <select
           name="availability_type"
@@ -507,7 +507,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           Download Agreement
         </a>
       </div>
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {renderFileInput("logo", "Profile Picture", true)}
         {renderFileInput("id_proof", "ID Proof", true)}
         {renderFileInput("aadhar", "Aadhar Card", true)}
