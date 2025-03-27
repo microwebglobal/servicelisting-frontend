@@ -111,6 +111,29 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
+    if (
+      name === "phone" ||
+      name === "whatsapp_number" ||
+      name === "alternate_number" ||
+      name === "emergency_contact_number"
+    ) {
+      if (value.length > 10) {
+        return;
+      }
+    }
+
+    if (name === "pan_number") {
+      if (value.length > 10) {
+        return;
+      }
+    }
+
+    if (name === "aadhar_number") {
+      if (value.length > 12) {
+        return;
+      }
+    }
+
     if (type === "file" && files[0]) {
       setFormData((prev) => ({
         ...prev,
@@ -292,7 +315,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
       onChange={handleChange}
       placeholder={placeholder}
       className={`p-2 border rounded w-full ${
-        errors[name] ? "border-red-500" : ""
+        errors[name] ? "border-red-500 bg-red-500/5" : ""
       }`}
       disabled={disabled}
     />
@@ -335,7 +358,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
               name={name} // Ensure this matches the key in the `documents` object
               onChange={handleChange}
               className={`text-transparent w-28 ${
-                errors[name] ? "border-red-500" : ""
+                errors[name] ? "border-red-500 bg-red-500/5" : ""
               }`}
             />
 
@@ -395,7 +418,28 @@ const IndividualRegistrationForm = ({ previousData }) => {
           options={spokenLanguages}
           isMulti
           value={selectedLanguages}
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderColor: errors.languages_spoken ? "red" : "",
+              backgroundColor: errors.languages_spoken
+                ? "rgba(239, 68, 68, 0.05)"
+                : "",
+            }),
+          }}
           onChange={(selectedOptions) => {
+            if (!selectedOptions.length) {
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                languages_spoken: "Select at least one language",
+              }));
+            } else {
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                languages_spoken: "",
+              }));
+            }
+
             setSelectedLanguages(selectedOptions);
             setFormData((prev) => ({
               ...prev,
@@ -409,9 +453,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
         {renderInputField("aadhar_number", "Aadhar Number")}
         {renderInputField("pan_number", "PAN Number")}
         {renderInputField("email", "Email", "email", true)}
-        {renderInputField("phone", "Phone Number", "tel", true)}
-        {renderInputField("whatsapp_number", "WhatsApp Number", "tel")}
-        {renderInputField("alternate_number", "Alternate Number", "tel")}
+        {renderInputField("phone", "Phone Number", "number", true)}
+        {renderInputField("whatsapp_number", "WhatsApp Number", "number")}
+        {renderInputField("alternate_number", "Alternate Number", "number")}
       </div>
       <textarea
         name="address"
@@ -419,7 +463,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
         onChange={handleChange}
         placeholder="Address"
         className={`w-full p-2 border rounded ${
-          errors.address ? "border-red-500" : ""
+          errors.address ? "border-red-500 bg-red-500/5" : ""
         }`}
         rows="3"
       />
@@ -543,7 +587,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="UPI ID"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.upi.id"] ? "border-red-500" : ""
+              errors["payment_details.upi.id"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.upi.id"] && (
@@ -558,7 +604,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Display Name"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.upi.display_name"] ? "border-red-500" : ""
+              errors["payment_details.upi.display_name"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.upi.display_name"] && (
@@ -573,7 +621,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="UPI Phone Number"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.upi.phone"] ? "border-red-500" : ""
+              errors["payment_details.upi.phone"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.upi.phone"] && (
@@ -591,7 +641,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Bank Name"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.bank.name"] ? "border-red-500" : ""
+              errors["payment_details.bank.name"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.bank.name"] && (
@@ -606,7 +658,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="Branch"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.bank.branch"] ? "border-red-500" : ""
+              errors["payment_details.bank.branch"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.bank.branch"] && (
@@ -621,7 +675,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             onChange={handleChange}
             placeholder="IFSC Code"
             className={`w-full p-2 border rounded ${
-              errors["payment_details.bank.ifsc"] ? "border-red-500" : ""
+              errors["payment_details.bank.ifsc"]
+                ? "border-red-500 bg-red-500/5"
+                : ""
             }`}
           />
           {errors["payment_details.bank.ifsc"] && (
@@ -637,7 +693,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             placeholder="Account Number"
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.account_number"]
-                ? "border-red-500"
+                ? "border-red-500 bg-red-500/5"
                 : ""
             }`}
           />
