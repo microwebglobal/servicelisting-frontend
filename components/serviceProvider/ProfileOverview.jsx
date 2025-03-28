@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -23,18 +24,22 @@ import {
 } from "@/components/ui/tooltip";
 import { AccountBalance } from "@mui/icons-material";
 import { formatCurrency } from "@/utils/bookingUtils";
+import { profileAPI } from "@/api/profile";
+import { toast } from "@hooks/use-toast";
 
-const ProfileContent = ({ userData }) => {
+const ProfileOverview = ({ userData, onSettle }) => {
   console.log(userData);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // Calculate profile completion percentage
   const getProfileCompletion = () => {
     const requiredFields = ["email", "gender", "dob", "mobile", "photo"];
     const optionalFields = ["email_verified", "mobile_verified"];
 
     const requiredScore =
-      requiredFields.filter((field) => userData[field]).length * 15;
+      requiredFields.filter((field) => userData.User[field]).length * 15;
     const optionalScore =
-      optionalFields.filter((field) => userData[field]).length * 10;
+      optionalFields.filter((field) => userData.User[field]).length * 10;
 
     return Math.min(requiredScore + optionalScore, 100);
   };
@@ -51,13 +56,13 @@ const ProfileContent = ({ userData }) => {
 
   const getMissingFields = () => {
     const missing = [];
-    if (!userData.email) missing.push("Email Address");
-    if (!userData.email_verified) missing.push("Email Verification");
-    if (!userData.gender) missing.push("Gender");
-    if (!userData.dob) missing.push("Date of Birth");
-    if (!userData.mobile) missing.push("Mobile Number");
-    if (!userData.mobile_verified) missing.push("Mobile Verification");
-    if (!userData.photo) missing.push("Profile Photo");
+    if (!userData.User.email) missing.push("Email Address");
+    if (!userData.User.email_verified) missing.push("Email Verification");
+    if (!userData.User.gender) missing.push("Gender");
+    if (!userData.User.dob) missing.push("Date of Birth");
+    if (!userData.User.mobile) missing.push("Mobile Number");
+    if (!userData.User.mobile_verified) missing.push("Mobile Verification");
+    if (!userData.User.photo) missing.push("Profile Photo");
     return missing;
   };
 
@@ -71,6 +76,25 @@ const ProfileContent = ({ userData }) => {
     upcomingBookings: 2,
   };
 
+  const handleSettleProviderAccBalance = async () => {
+    try {
+      await profileAPI.settleProviderAccBalance();
+      setIsModalOpen(false);
+      onSettle();
+      toast({
+        title: "Success!",
+        description: "Payment Settled Sucessfully",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed To Settle Payment",
+        variant: "destructive",
+      });
+      console.error(error);
+    }
+  };
   return (
     <main className="flex-1 p-6 bg-gray-50">
       <div className="max-w-5xl mx-auto space-y-6">
@@ -147,18 +171,21 @@ const ProfileContent = ({ userData }) => {
                   <div className="flex items-center gap-2">
                     <AccountBalance className="h-10 w-10 text-blue-500" />
                     <p className="text-xl font-bold">
-                      {formatCurrency(userData?.acc_balance ?? 0)}
+                      {formatCurrency(userData?.User?.acc_balance ?? 0)}
                     </p>
                   </div>
                 </div>
-                {userData?.acc_balance > 0 ? (
+                <p>
+                  Last Updated at: <span>{userData?.User?.acc_balance}</span>
+                </p>
+                {userData?.User?.acc_balance > 0 ? (
                   <p className="text-sm text-gray-600">
-                    This amount will be reduced for the next booking.
+                    This amount will be credit for the your bank.
                   </p>
                 ) : (
-                  <p className="text-sm text-gray-600">
-                    You will be charged for the next booking.
-                  </p>
+                  <Button onClick={() => setIsModalOpen(true)}>
+                    Settle Balance
+                  </Button>
                 )}
               </div>
             </Card>
@@ -292,8 +319,36 @@ const ProfileContent = ({ userData }) => {
           </Button>
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-semibold mb-4">Confirm Settlement</h2>
+            <p className="text-gray-700">
+              Are you sure you want to settle this payout of{" "}
+              <span className="font-bold text-green-600">
+                {formatCurrency(userData?.User?.acc_balance)}
+              </span>{" "}
+            </p>
+            <div className="flex justify-end mt-4">
+              <Button
+                className="bg-gray-500 text-white px-4 py-2 mr-2"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 text-white px-4 py-2"
+                onClick={handleSettleProviderAccBalance}
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
 
-export default ProfileContent;
+export default ProfileOverview;

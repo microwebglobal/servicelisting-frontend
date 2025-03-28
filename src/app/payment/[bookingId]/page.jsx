@@ -33,6 +33,7 @@ const PaymentPage = () => {
         if (response.status !== "payment_pending") {
           throw new Error("This payment has already been completed.");
         }
+        console.log(response);
         setBookingData(response);
       } catch (error) {
         setError(error.message);
@@ -121,6 +122,14 @@ const PaymentPage = () => {
                   ₹{formatCurrency(bookingData.BookingPayment.tax_amount)}
                 </span>
               </div>
+              {bookingData.customer.acc_balance && (
+                <div className="flex justify-between">
+                  <span>Previous Balance</span>
+                  <span>
+                    ₹{formatCurrency(bookingData.customer.acc_balance)}
+                  </span>
+                </div>
+              )}
               {bookingData.BookingPayment.tip_amount > 0 && (
                 <div className="flex justify-between">
                   <span>Tip</span>
@@ -132,7 +141,11 @@ const PaymentPage = () => {
               <div className="flex justify-between font-bold text-lg pt-2">
                 <span>Total</span>
                 <span>
-                  ₹{formatCurrency(bookingData.BookingPayment.total_amount)}
+                  ₹
+                  {formatCurrency(
+                    parseFloat(bookingData.BookingPayment.total_amount) +
+                      parseFloat(bookingData.customer.acc_balance)
+                  )}
                 </span>
               </div>
               {bookingData.BookingPayment.advance_payment > 0 && (
@@ -166,11 +179,14 @@ const PaymentPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <Button
                 variant={paymentType === "advance" ? "default" : "outline"}
-                className="h-16 text-lg"
+                className="h-16 text-lg whitespace-normal p-2"
                 onClick={() => setPaymentType("advance")}
               >
-                Pay Advance Only
+                Pay Advance
+                {bookingData.customer.acc_balance > 0 &&
+                  " + Previous Balance"}{" "}
               </Button>
+
               <Button
                 variant={paymentType === "full" ? "default" : "outline"}
                 className="h-16 text-lg"

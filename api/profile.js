@@ -30,4 +30,6 @@ export const profileAPI = {
   changePassword: (data) => api.put("/users/password", data),
   deactivateAccount: () => api.put("/users/deactivate"),
   deleteAccount: () => api.delete("/users/account"),
+  getAccBalance: () => api.get("/payout/acc-balance"),
+  settleProviderAccBalance: () => api.put("/payout/acc-balance/settle"),
 };

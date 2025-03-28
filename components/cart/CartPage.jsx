@@ -26,6 +26,7 @@ export default function Cart() {
   const fetchCart = async () => {
     try {
       const cartData = await cartService.getCart();
+      console.log(cartData);
       setCart(cartData);
     } catch (error) {
       toast({
@@ -160,6 +161,11 @@ export default function Cart() {
                 <span>Tax (18%)</span>
                 <span>₹{formatCurrency(payment.tax_amount)}</span>
               </div>
+
+              <div className="flex justify-between">
+                <span>Previous Amount</span>
+                <span>₹{formatCurrency(cart?.customer?.acc_balance)}</span>
+              </div>
               {payment.tip_amount > 0 && (
                 <div className="flex justify-between">
                   <span>Tip</span>
@@ -168,7 +174,13 @@ export default function Cart() {
               )}
               <div className="flex justify-between font-bold text-lg pt-2">
                 <span>Total</span>
-                <span>₹{formatCurrency(payment.total_amount)}</span>
+                <span>
+                  ₹
+                  {formatCurrency(
+                    parseFloat(payment.total_amount) +
+                      parseFloat(cart?.customer?.acc_balance)
+                  )}
+                </span>
               </div>
               <div className="flex justify-between font-bold text-lg pt-2">
                 <span>Advance Amount</span>
