@@ -13,6 +13,22 @@ const InquiryPopup = ({ inquiry }) => {
   const lng = inquiry.primary_location.coordinates[1];
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
 
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    // Adjust age if birthday hasn't occurred yet
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    return age;
+  };
+
   return (
     <div className="w-full max-w-2xl p-2 ">
       {/* Header */}
@@ -61,6 +77,16 @@ const InquiryPopup = ({ inquiry }) => {
           </p>
           {inquiry.business_type === "individual" && (
             <>
+              <p>
+                <span className="font-semibold">Date of Birth:</span>{" "}
+                {inquiry.User?.dob}
+              </p>
+
+              <p>
+                <span className="font-semibold">Age:</span>{" "}
+                {calculateAge(inquiry.User?.dob)}
+              </p>
+
               <p>
                 <span className="font-semibold">Experience:</span>{" "}
                 {inquiry.years_experience}
