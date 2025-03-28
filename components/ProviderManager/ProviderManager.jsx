@@ -23,6 +23,26 @@ import ProviderDetails from "@components/ProviderDetails";
 import ProviderDocuments from "./ProviderDocuments";
 import Modal from "react-modal";
 import { toast } from "@hooks/use-toast";
+import Select from "react-select";
+
+// Rejectable fields
+const rejectedFieldOptions = [
+  { value: "aadhar_number", label: "Aadhar Number" },
+  { value: "aadhar", label: "Aadhar Card" },
+  { value: "email", label: "Email" },
+  { value: "mobile", label: "Mobile" },
+  { value: "pan_number", label: "PAN Number" },
+  { value: "pan", label: "PAN Card" },
+  { value: "id_proof", label: "ID Proof" },
+  { value: "address_proof", label: "Address Proof" },
+  { value: "qualification_proof", label: "Qualification Proof" },
+  { value: "service_certificate", label: "Service Certificates" },
+  { value: "insurance", label: "Insurance Documents" },
+  { value: "agreement", label: "Signed Agreement" },
+  { value: "terms_acceptance", label: "Signed Terms & Conditions" },
+  { value: "logo", label: "Business Logo" },
+  { value: "business_registration", label: "Business Registration Document" },
+];
 
 const getDisplayValue = (value, defaultValue = "N/A") => {
   if (Array.isArray(value)) {
@@ -71,6 +91,8 @@ const ProviderManager = () => {
     providerId: null,
     status: null,
   });
+  // Rejected fields
+  const [rejectedFields, setRejectedFields] = useState([]);
 
   useEffect(() => {
     fetchProviders();
@@ -81,11 +103,11 @@ const ProviderManager = () => {
       await handleStatusUpdate(
         rejectingProvider.provider_id,
         "rejected",
-        rejectionReason
+        rejectionReason,
+        rejectedFields
       );
-      setIsRejectDialogOpen(false);
-      setRejectionReason("");
-      setRejectingProvider(null);
+
+      closeRejectModal();
     } catch (error) {
       console.error("Error rejecting provider:", error);
     }
@@ -98,6 +120,13 @@ const ProviderManager = () => {
 
   const closeConfirmModal = () => {
     setConfirmModalOpen(false);
+  };
+
+  const closeRejectModal = () => {
+    setIsRejectDialogOpen(false);
+    setRejectionReason("");
+    setRejectingProvider(null);
+    setRejectedFields([]);
   };
 
   const fetchProviders = async () => {
@@ -126,7 +155,8 @@ const ProviderManager = () => {
   const handleStatusUpdate = async (
     providerId,
     newStatus,
-    rejectionReason = null
+    rejectionReason = null,
+    rejectedFields = []
   ) => {
     try {
       setIsApproving(true);
@@ -141,6 +171,11 @@ const ProviderManager = () => {
           return;
         }
         updateData.rejection_reason = rejectionReason;
+
+        // Add rejected fields
+        if (rejectedFields.length > 0) {
+          updateData.rejected_fields = rejectedFields;
+        }
       }
 
       await providerAPI.updateProvider(providerId, updateData);
@@ -427,42 +462,53 @@ const ProviderManager = () => {
           )}
         </DialogContent>
       </Dialog>
-      <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reject Provider Registration</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 p-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Rejection Reason
-              </label>
-              <textarea
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                rows={4}
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                placeholder="Please provide a reason for rejection..."
-              />
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsRejectDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleReject}
-                disabled={!rejectionReason.trim() || isApproving}
-              >
-                {isApproving ? "Rejecting" : "Reject Registration "}
-              </Button>
-            </div>
+
+      {/* Reject Modal */}
+      <Modal
+        isOpen={isRejectDialogOpen}
+        onRequestClose={closeRejectModal}
+        ariaHideApp={false}
+        className="m-10 bg-white p-8 rounded-lg shadow-xl w-96 max-w-lg"
+        overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
+      >
+        <div className="space-y-4 z-50">
+          <p className="text-lg font-semibold">Reject Provider Registration</p>
+
+          <Select
+            isMulti
+            placeholder="Select rejected fields"
+            value={rejectedFields}
+            onChange={setRejectedFields}
+            options={rejectedFieldOptions}
+          />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Rejection Reason
+            </label>
+            <textarea
+              className="mt-1 block w-full rounded-md border p-2 shadow-sm"
+              rows={4}
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Please provide a reason for rejection..."
+            />
           </div>
-        </DialogContent>
-      </Dialog>
+
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={closeRejectModal}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleReject}
+              disabled={!rejectionReason.trim() || isApproving}
+            >
+              {isApproving ? "Rejecting..." : "Reject Registration "}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Confirm Modal */}
       <Modal
