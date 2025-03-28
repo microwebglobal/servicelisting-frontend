@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -30,6 +30,43 @@ const SetLocation = ({ location, setLocation, className }) => {
     country: "",
     postalCode: "",
   });
+
+  // Function to fetch address by location
+  const getAddressByLocation = async () => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coordinates[0]},${location.coordinates[1]}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}`
+      );
+      const place = response.data.results[0];
+      setSearchInput(place.formatted_address || "");
+
+      // Extract address components
+      const addressComponents = place.address_components || [];
+      const getAddressComponent = (type) => {
+        const component = addressComponents.find((comp) =>
+          comp.types.includes(type)
+        );
+        return component ? component.long_name : "";
+      };
+
+      setAddressDetails({
+        street: getAddressComponent("route"),
+        city: getAddressComponent("locality"),
+        state: getAddressComponent("administrative_area_level_1"),
+        country: getAddressComponent("country"),
+        postalCode: getAddressComponent("postal_code"),
+      });
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    }
+  };
+
+  // useEffect to fetch address when location prop changes
+  useEffect(() => {
+    if (location) {
+      getAddressByLocation();
+    }
+  }, [location]);
 
   const handlePlaceChanged = () => {
     const place = autocompleteRef.current.getPlace();

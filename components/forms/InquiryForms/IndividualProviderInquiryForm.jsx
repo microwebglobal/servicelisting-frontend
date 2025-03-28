@@ -74,6 +74,15 @@ const IndividualProviderInquiryForm = () => {
           label: city.name,
         }));
         setCitiesOpions(cityOptions);
+
+        // Restore selected cities
+        const selectedCityIds = formData.cities;
+        if (selectedCityIds.length > 0) {
+          const selectedCities = cityOptions.filter((city) =>
+            selectedCityIds.includes(city.value)
+          );
+          setSelectedCities(selectedCities);
+        }
       } catch (error) {
         console.error("Error fetching cities:", error);
       }
@@ -87,6 +96,15 @@ const IndividualProviderInquiryForm = () => {
           label: cat.name,
         }));
         setServiceCategoriesOptions(categoryOptions);
+
+        // Restore selected categories
+        const selectedCategoryIds = formData.categories;
+        if (selectedCategoryIds.length > 0) {
+          const selectedCategories = categoryOptions.filter((cat) =>
+            selectedCategoryIds.includes(cat.value)
+          );
+          setSelectedServiceCategories(selectedCategories);
+        }
       } catch (error) {
         console.error("Error fetching services:", error);
       }
@@ -134,6 +152,28 @@ const IndividualProviderInquiryForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  //Handle Seelecte categories change
+  const handleSelectedCategoriesChange = (selectedCategories) => {
+    if (Array.isArray(selectedCategories) && selectedCategories.length > 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        categories: "",
+      }));
+
+      setFormData({
+        ...formData,
+        categories: selectedCategories.map((category) => category.value),
+      });
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        categories: "Select at least one category",
+      }));
+    }
+
+    setSelectedServiceCategories(selectedCategories);
+  };
+
   // Handle Selected Cities Change
   const handleSelectedCitiesChange = (selectedCities) => {
     if (Array.isArray(selectedCities) && selectedCities.length > 0) {
@@ -142,13 +182,18 @@ const IndividualProviderInquiryForm = () => {
         cities: "",
       }));
 
-      setSelectedCities(selectedCities);
+      setFormData({
+        ...formData,
+        cities: selectedCities.map((city) => city.value),
+      });
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
         cities: "Select at least one city",
       }));
     }
+
+    setSelectedCities(selectedCities);
   };
 
   const validateStep1 = () => {
@@ -410,7 +455,7 @@ const IndividualProviderInquiryForm = () => {
                 options={serviceCategoriesOptions}
                 isMulti
                 value={selectedServiceCategories}
-                onChange={setSelectedServiceCategories}
+                onChange={handleSelectedCategoriesChange}
                 styles={{
                   control: (base, state) => ({
                     ...base,

@@ -93,8 +93,16 @@ const BusinessRegistrationForm = ({ previousData }) => {
       }));
     }
 
+    // Prevent unusual inputs in service_radius
+    if (name === "service_radius") {
+      const radius = parseInt(value);
+      if (radius < 0 || radius > 1000) {
+        return;
+      }
+    }
+
     // Prevent unusual inputs in mobile
-    if (name === "whatsapp_number") {
+    if (name === "whatsapp_number" || name === "payment_details.upi.phone") {
       if (value.length > 10) {
         return;
       }
@@ -152,6 +160,22 @@ const BusinessRegistrationForm = ({ previousData }) => {
   const handleEmployeeChange = (index, field, value) => {
     const updatedEmployees = [...formData.employees];
 
+    // Show/hide error messages realtime
+    if (value === "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [`employees.${index}.${field}`]: `${field
+          .split("_")
+          .join(" ")} is required`,
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [`employees.${index}.${field}`]: "",
+      }));
+    }
+
+    // Prevent unusual inputs in mobile
     if (field === "phone" || field === "whatsapp_number") {
       if (value.length > 10) {
         return;
@@ -169,8 +193,42 @@ const BusinessRegistrationForm = ({ previousData }) => {
     }));
   };
 
+  // Validate employees
+  const validateEmployees = (errors) => {
+    formData.employees.forEach((employee, index) => {
+      if (!employee.name?.trim())
+        errors[`employees.${index}.name`] = "Required";
+      if (!employee.phone?.match(/^\d{10}$/))
+        errors[`employees.${index}.phone`] = "Required";
+      if (!employee.email?.match(/^\S+@\S+\.\S+$/))
+        errors[`employees.${index}.email`] = "Required";
+    });
+
+    if (Object.keys(errors).length === 0) {
+      const emails = new Set();
+      formData.employees.forEach((employee, index) => {
+        if (emails.has(employee.email)) {
+          errors[`employees.${index}.email`] = "Email already used";
+        } else {
+          emails.add(employee.email);
+        }
+      });
+
+      const phones = new Set();
+      formData.employees.forEach((employee, index) => {
+        if (phones.has(employee.phone)) {
+          errors[`employees.${index}.phone`] = "Phone number already used";
+        } else {
+          phones.add(employee.phone);
+        }
+      });
+    }
+
+    return errors;
+  };
+
   const validateStep = (stepNumber) => {
-    const newErrors = {};
+    let newErrors = {};
 
     switch (stepNumber) {
       case 1:
@@ -188,22 +246,16 @@ const BusinessRegistrationForm = ({ previousData }) => {
         if (!formData.address?.trim()) newErrors.address = "Required";
         break;
       case 3:
-        formData.employees.forEach((employee, index) => {
-          if (!employee.name?.trim())
-            newErrors[`employees.${index}.name`] = "Required";
-          if (!employee.phone?.match(/^\d{10}$/))
-            newErrors[`employees.${index}.phone`] = "Required";
-        });
+        newErrors = validateEmployees(newErrors);
         break;
       case 4:
         if (!formData.documents.business_registration)
-          newErrors.business_registration_doc = "Required";
+          newErrors.business_registration = "Required";
         if (!formData.documents.address_proof)
           newErrors.address_proof = "Required";
         if (!formData.documents.terms_acceptance)
-          newErrors.signed_terms = "Required";
-        if (!formData.documents.agreement)
-          newErrors.signed_agreement = "Required";
+          newErrors.terms_acceptance = "Required";
+        if (!formData.documents.agreement) newErrors.agreement = "Required";
         break;
       case 5:
         if (formData.payment_method === "upi") {
@@ -314,6 +366,77 @@ const BusinessRegistrationForm = ({ previousData }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Function to remove a selected file
+  const handleRemoveFile = (name) => {
+    setFormData((prev) => ({
+      ...prev,
+      documents: {
+        ...prev.documents,
+        [name]: null, // Set the selected file to null to remove it
+      },
+    }));
+  };
+
+  const renderFileInput = (name, label, required = false) => {
+    const isFileSelected = formData.documents[name] !== null;
+
+    return (
+      <div className="space-y-2 w-full">
+        <label className="block">
+          {label}
+          {required && "*"}
+        </label>
+
+        <div className="flex items-center gap-2">
+          {isFileSelected && (
+            <a
+              target="_blank"
+              className="w-28 h-28 aspect-square"
+              href={URL.createObjectURL(formData.documents[name])}
+            >
+              <img
+                src={URL.createObjectURL(formData.documents[name])}
+                alt={name}
+                className="w-full h-full object-cover rounded-md"
+              />
+            </a>
+          )}
+
+          <div className={cn(!isFileSelected && "flex gap-1 items-center")}>
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png,.pdf" // Accespt PDF and image files only
+              name={name} // Ensure this matches the key in the `documents` object
+              onChange={handleChange}
+              className={`text-transparent w-28 ${
+                errors[name] ? "border-red-500 bg-red-500/5" : ""
+              }`}
+            />
+
+            {isFileSelected ? (
+              <p>
+                <span className="block">
+                  Selected File: {formData.documents[name].name}
+                </span>
+
+                <button
+                  onClick={() => handleRemoveFile(name)}
+                  className="text-sm text-red-500 font-medium"
+                >
+                  Remove
+                </button>
+              </p>
+            ) : (
+              <p>No file selected</p>
+            )}
+          </div>
+        </div>
+
+        {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
+      </div>
+    );
   };
 
   const renderReadOnlyField = (label, value) => (
@@ -487,10 +610,14 @@ const BusinessRegistrationForm = ({ previousData }) => {
   const renderEmployeeDetails = () => (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Employee Details</h2>
+
       {formData.employees.map((employee, index) => (
         <div key={index} className="p-4 border rounded space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">Employee {index + 1}</h3>
+            <p>
+              {index + 1} of {formData.employees.length}
+            </p>
             {/* {index > 0 && (
               <button
                 type="button"
@@ -529,7 +656,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               onChange={(e) =>
                 handleEmployeeChange(index, "gender", e.target.value)
               }
-              className={cn("p-2 border rounded w-full", {
+              className={cn("p-2 border rounded w-full h-11", {
                 "border-red-500 bg-red-500/5 text-red-500":
                   errors[`employees.${index}.gender`],
               })}
@@ -581,16 +708,27 @@ const BusinessRegistrationForm = ({ previousData }) => {
               )}
             </div>
 
-            <input
-              type="email"
-              value={employee.email}
-              required
-              onChange={(e) =>
-                handleEmployeeChange(index, "email", e.target.value)
-              }
-              placeholder="Email"
-              className="p-2 border rounded w-full"
-            />
+            <div>
+              <input
+                type="email"
+                value={employee.email}
+                required
+                onChange={(e) =>
+                  handleEmployeeChange(index, "email", e.target.value)
+                }
+                placeholder="Email"
+                className={`p-2 border rounded w-full h-11 ${
+                  errors[`employees.${index}.email`]
+                    ? "border-red-500 bg-red-500/5 text-red-500"
+                    : ""
+                }`}
+              />
+              {errors[`employees.${index}.email`] && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors[`employees.${index}.email`]}
+                </p>
+              )}
+            </div>
 
             <input
               type="number"
@@ -630,82 +768,17 @@ const BusinessRegistrationForm = ({ previousData }) => {
         </a>
       </div>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block mb-2">Business Registration Document*</label>
-          <input
-            type="file"
-            name="business_registration"
-            onChange={handleChange}
-            className={`w-full ${
-              errors.business_registration_doc ? "border-red-500" : ""
-            }`}
-          />
-          {errors.business_registration_doc && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.business_registration_doc}
-            </p>
-          )}
-        </div>
-        <div>
-          <label className="block mb-2">Address Proof*</label>
-          <input
-            type="file"
-            name="address_proof"
-            onChange={handleChange}
-            className={`w-full ${errors.address_proof ? "border-red-500" : ""}`}
-          />
-          {errors.address_proof && (
-            <p className="text-red-500 text-sm mt-1">{errors.address_proof}</p>
-          )}
-        </div>
-        <div>
-          <label className="block mb-2">Employee Insurance Documents</label>
-          <input
-            type="file"
-            name="insurance"
-            onChange={handleChange}
-            className="w-full"
-          />
-        </div>
-        <div>
-          <label className="block mb-2">Signed Terms & Conditions*</label>
-          <input
-            type="file"
-            name="terms_acceptance"
-            onChange={handleChange}
-            className={`w-full ${errors.signed_terms ? "border-red-500" : ""}`}
-          />
-          {errors.signed_terms && (
-            <p className="text-red-500 text-sm mt-1">{errors.signed_terms}</p>
-          )}
-        </div>
-        <div>
-          <label className="block mb-2">Signed Service Agreement*</label>
-          <input
-            type="file"
-            name="agreement"
-            onChange={handleChange}
-            className={`w-full ${
-              errors.signed_agreement ? "border-red-500" : ""
-            }`}
-          />
-          {errors.signed_agreement && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.signed_agreement}
-            </p>
-          )}
-        </div>
-        <div>
-          <label className="block mb-2">Business Logo</label>
-          <input
-            type="file"
-            name="logo"
-            onChange={handleChange}
-            className="w-full"
-            accept="image/*"
-          />
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {renderFileInput(
+          "business_registration",
+          "Business Registration Document",
+          true
+        )}
+        {renderFileInput("address_proof", "Address Proof", true)}
+        {renderFileInput("insurance", "Employee Insurance Documents")}
+        {renderFileInput("terms_acceptance", "Signed Terms & Conditions", true)}
+        {renderFileInput("agreement", "Signed Service Agreement", true)}
+        {renderFileInput("logo", "Business Logo")}
       </div>
     </div>
   );
@@ -733,7 +806,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
               onChange={handleChange}
               placeholder="UPI ID*"
               className={`w-full p-2 border rounded ${
-                errors["payment_details.upi.id"] ? "border-red-500" : ""
+                errors["payment_details.upi.id"]
+                  ? "border-red-500 bg-red-500/5 text-red-500"
+                  : ""
               }`}
             />
             {errors["payment_details.upi.id"] && (
@@ -751,7 +826,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               placeholder="Display Name*"
               className={`w-full p-2 border rounded ${
                 errors["payment_details.upi.display_name"]
-                  ? "border-red-500"
+                  ? "border-red-500 bg-red-500/5 text-red-500"
                   : ""
               }`}
             />
@@ -763,13 +838,15 @@ const BusinessRegistrationForm = ({ previousData }) => {
           </div>
           <div>
             <input
-              type="tel"
+              type="number"
               name="payment_details.upi.phone"
               value={formData.payment_details.upi.phone}
               onChange={handleChange}
               placeholder="UPI Phone Number*"
               className={`w-full p-2 border rounded ${
-                errors["payment_details.upi.phone"] ? "border-red-500" : ""
+                errors["payment_details.upi.phone"]
+                  ? "border-red-500 bg-red-500/5 text-red-500"
+                  : ""
               }`}
             />
             {errors["payment_details.upi.phone"] && (
@@ -789,7 +866,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
               onChange={handleChange}
               placeholder="Bank Name*"
               className={`w-full p-2 border rounded ${
-                errors["payment_details.bank.name"] ? "border-red-500" : ""
+                errors["payment_details.bank.name"]
+                  ? "border-red-500 bg-red-500/5 text-red-500"
+                  : ""
               }`}
             />
             {errors["payment_details.bank.name"] && (
@@ -806,7 +885,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
               onChange={handleChange}
               placeholder="Branch*"
               className={`w-full p-2 border rounded ${
-                errors["payment_details.bank.branch"] ? "border-red-500" : ""
+                errors["payment_details.bank.branch"]
+                  ? "border-red-500 bg-red-500/5 text-red-500"
+                  : ""
               }`}
             />
             {errors["payment_details.bank.branch"] && (
@@ -823,7 +904,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
               onChange={handleChange}
               placeholder="IFSC Code*"
               className={`w-full p-2 border rounded ${
-                errors["payment_details.bank.ifsc"] ? "border-red-500" : ""
+                errors["payment_details.bank.ifsc"]
+                  ? "border-red-500 bg-red-500/5 text-red-500"
+                  : ""
               }`}
             />
             {errors["payment_details.bank.ifsc"] && (
@@ -841,7 +924,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               placeholder="Account Number*"
               className={`w-full p-2 border rounded ${
                 errors["payment_details.bank.account_number"]
-                  ? "border-red-500"
+                  ? "border-red-500 text-red-500 bg-red-500/5"
                   : ""
               }`}
             />
@@ -905,7 +988,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
                 Previous
               </button>
             )}
-            {step < 5 ? (
+            {step < 5 && (
               <button
                 type="button"
                 onClick={handleNextStep}
@@ -913,7 +996,9 @@ const BusinessRegistrationForm = ({ previousData }) => {
               >
                 Next
               </button>
-            ) : (
+            )}
+
+            {step === 5 && (
               <button
                 type="submit"
                 disabled={loading}

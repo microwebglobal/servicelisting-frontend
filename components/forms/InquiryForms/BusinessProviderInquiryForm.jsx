@@ -71,6 +71,15 @@ const BusinessProviderInquiryForm = () => {
           label: city.name,
         }));
         setCitiesOpions(cityOptions);
+
+        // Restore selected cities
+        const selectedCityIds = formData.cities;
+        if (selectedCityIds.length > 0) {
+          const selectedCities = cityOptions.filter((city) =>
+            selectedCityIds.includes(city.value)
+          );
+          setSelectedCities(selectedCities);
+        }
       } catch (error) {
         console.error("Error fetching cities:", error);
       }
@@ -84,6 +93,15 @@ const BusinessProviderInquiryForm = () => {
           label: cat.name,
         }));
         setServiceCategoriesOptions(categoryOptions);
+
+        // Restore selected categories
+        const selectedCategoryIds = formData.categories;
+        if (selectedCategoryIds.length > 0) {
+          const selectedCategories = categoryOptions.filter((cat) =>
+            selectedCategoryIds.includes(cat.value)
+          );
+          setSelectedServiceCategories(selectedCategories);
+        }
       } catch (error) {
         console.error("Error fetching services:", error);
         toast({
@@ -127,14 +145,64 @@ const BusinessProviderInquiryForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle category change
   const handleCategoryChange = (selectedOptions) => {
+    if (selectedOptions && selectedOptions.length > 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        categories: "",
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        categories: selectedOptions.map((option) => option.value),
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        categories: "Select at least one category",
+      }));
+    }
+
     setSelectedServiceCategories(selectedOptions);
-    setFormData((prev) => ({
-      ...prev,
-      categories: selectedOptions
-        ? selectedOptions.map((option) => option.value)
-        : [],
-    }));
+  };
+
+  // Hnadle city change
+  const handleCitiesChange = (selectedOptions) => {
+    if (selectedOptions && selectedOptions.length > 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        cities: "",
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        cities: selectedOptions.map((option) => option.value),
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        cities: "Select at least one city",
+      }));
+    }
+
+    setSelectedCities(selectedOptions);
+  };
+
+  // Handle location change
+  const handleLocationChange = (location) => {
+    if (!location) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        location: "Location is required",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        location: "",
+      }));
+      setFormData((prev) => ({ ...prev, location: location }));
+    }
   };
 
   const validateStep1 = () => {
@@ -184,7 +252,7 @@ const BusinessProviderInquiryForm = () => {
       newErrors.no_of_employee = "Number of employees is required";
     }
 
-    if (!formData.email) {
+    if (!formData.email || formData.email === "") {
       newErrors.email = "Email is required";
     }
 
@@ -232,8 +300,8 @@ const BusinessProviderInquiryForm = () => {
         coordinates: formData.location.coordinates,
         address: formData.address,
       },
-      cities: selectedCities.map((city) => city.value),
       categories: formData.categories,
+      cities: selectedCities.map((city) => city.value),
       number_of_employees: parseInt(formData.no_of_employee),
       email: formData.email,
       gender: formData.gender,
@@ -437,8 +505,15 @@ const BusinessProviderInquiryForm = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                className={cn(
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  {
+                    "border border-red-500 bg-red-500/5 text-red-500":
+                      errors.email,
+                  }
+                )}
               />
+              {errors.email && <p className="text-red-500">{errors.email}</p>}
             </div>
 
             <div>
@@ -448,7 +523,7 @@ const BusinessProviderInquiryForm = () => {
                 options={citiesOptions}
                 isMulti
                 value={selectedCities}
-                onChange={setSelectedCities}
+                onChange={handleCitiesChange}
                 className="mb-4"
                 styles={{
                   control: (base, state) => ({
@@ -481,9 +556,7 @@ const BusinessProviderInquiryForm = () => {
                     errors.location,
                 })}
                 location={formData.location}
-                setLocation={(newLocation) =>
-                  setFormData({ ...formData, location: newLocation })
-                }
+                setLocation={handleLocationChange}
               />
               {errors.location && (
                 <p className="text-red-500">{errors.location}</p>
