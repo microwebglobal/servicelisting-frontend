@@ -124,11 +124,19 @@ const IndividualRegistrationForm = ({ previousData }) => {
       }));
     }
 
+    if (name === "service_radius") {
+      const radius = parseInt(value);
+      if (radius < 0 || radius > 1000) {
+        return;
+      }
+    }
+
     if (
       name === "phone" ||
       name === "whatsapp_number" ||
       name === "alternate_number" ||
-      name === "emergency_contact_number"
+      name === "emergency_contact_number" ||
+      name === "payment_details.upi.phone"
     ) {
       if (value.length > 10) {
         return;
@@ -191,6 +199,28 @@ const IndividualRegistrationForm = ({ previousData }) => {
     }));
   };
 
+  // handle language change
+  const handleLanguageChange = (selectedOptions) => {
+    if (selectedOptions && selectedOptions.length > 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        languages_spoken: "",
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        languages_spoken: selectedOptions.map((option) => option.value),
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        languages_spoken: "Select at least one language",
+      }));
+    }
+
+    setSelectedLanguages(selectedOptions);
+  };
+
   const validateStep = (stepNumber) => {
     const newErrors = {};
 
@@ -200,6 +230,11 @@ const IndividualRegistrationForm = ({ previousData }) => {
         if (!formData.aadhar_number) newErrors.aadhar_number = "Required";
         if (!formData.pan_number) newErrors.pan_number = "Required";
         if (!formData.address) newErrors.address = "Required";
+        if (
+          !formData.languages_spoken ||
+          formData.languages_spoken.length === 0
+        )
+          newErrors.languages_spoken = "Required";
         break;
       case 2:
         if (!formData.service_radius) newErrors.service_radius = "Required";
@@ -321,17 +356,21 @@ const IndividualRegistrationForm = ({ previousData }) => {
     type = "text",
     disabled = false
   ) => (
-    <input
-      type={type}
-      name={name}
-      value={formData[name]}
-      onChange={handleChange}
-      placeholder={placeholder}
-      className={`p-2 border rounded w-full ${
-        errors[name] ? "border-red-500 bg-red-500/5" : ""
-      }`}
-      disabled={disabled}
-    />
+    <div className="space-y-2">
+      <input
+        type={type}
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className={`p-2 border rounded w-full ${
+          errors[name] ? "border-red-500 bg-red-500/5" : ""
+        }`}
+        disabled={disabled}
+      />
+
+      {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
+    </div>
   );
 
   // Function to remove a selected file
@@ -423,7 +462,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           name="gender"
           value={formData.gender}
           onChange={handleChange}
-          className="p-2 border rounded w-full"
+          className="p-2 border rounded w-full h-11"
           disabled
         >
           <option value="">{formData.gender}</option>
@@ -432,42 +471,31 @@ const IndividualRegistrationForm = ({ previousData }) => {
           <option value="other">Other</option>
         </select>
 
-        <Select
-          id="categories"
-          options={spokenLanguages}
-          isMulti
-          value={selectedLanguages}
-          styles={{
-            control: (base) => ({
-              ...base,
-              borderColor: errors.languages_spoken ? "red" : "",
-              backgroundColor: errors.languages_spoken
-                ? "rgba(239, 68, 68, 0.05)"
-                : "",
-            }),
-          }}
-          onChange={(selectedOptions) => {
-            if (!selectedOptions.length) {
-              setErrors((prevErrors) => ({
-                ...prevErrors,
-                languages_spoken: "Select at least one language",
-              }));
-            } else {
-              setErrors((prevErrors) => ({
-                ...prevErrors,
-                languages_spoken: "",
-              }));
-            }
-
-            setSelectedLanguages(selectedOptions);
-            setFormData((prev) => ({
-              ...prev,
-              languages_spoken: selectedOptions.map((lan) => lan.value),
-            }));
-          }}
-          placeholder="Languages Spoken"
-          required
-        />
+        <div className="space-y-2">
+          <Select
+            id="languages_spoken"
+            isMulti
+            options={spokenLanguages}
+            value={selectedLanguages}
+            styles={{
+              control: (base) => ({
+                ...base,
+                borderColor: errors.languages_spoken ? "red" : "",
+                backgroundColor: errors.languages_spoken
+                  ? "rgba(239, 68, 68, 0.05)"
+                  : "",
+              }),
+            }}
+            onChange={handleLanguageChange}
+            placeholder="Languages Spoken"
+            required
+          />
+          {errors.languages_spoken && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.languages_spoken}
+            </p>
+          )}
+        </div>
 
         {renderInputField("aadhar_number", "Aadhar Number")}
         {renderInputField("pan_number", "PAN Number")}
@@ -476,16 +504,24 @@ const IndividualRegistrationForm = ({ previousData }) => {
         {renderInputField("whatsapp_number", "WhatsApp Number", "number")}
         {renderInputField("alternate_number", "Alternate Number", "number")}
       </div>
-      <textarea
-        name="address"
-        value={formData.address}
-        onChange={handleChange}
-        placeholder="Address"
-        className={`w-full p-2 border rounded ${
-          errors.address ? "border-red-500 bg-red-500/5" : ""
-        }`}
-        rows="3"
-      />
+
+      <div className="space-y-2">
+        <textarea
+          name="address"
+          value={formData.address}
+          onChange={handleChange}
+          placeholder="Address"
+          className={`w-full p-2 border rounded ${
+            errors.address ? "border-red-500 bg-red-500/5" : ""
+          }`}
+          rows="3"
+        />
+
+        {errors.address && (
+          <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {renderInputField("emergency_contact_name", "Emergency Contact Name")}
         {renderInputField("reference_name", "Reference Name")}
@@ -503,7 +539,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           name="availability_type"
           value={formData.availability_type}
           onChange={handleChange}
-          className="p-2 border rounded w-full"
+          className="p-2 border rounded w-full h-11"
         >
           <option value="full_time">Full Time</option>
           <option value="part_time">Part Time</option>
@@ -634,7 +670,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             </p>
           )}
           <input
-            type="tel"
+            type="number"
             name="payment_details.upi.phone"
             value={formData.payment_details.upi.phone}
             onChange={handleChange}
@@ -772,7 +808,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
                 Previous
               </button>
             )}
-            {step < 4 ? (
+            {step < 4 && (
               <button
                 type="button"
                 onClick={() =>
@@ -782,7 +818,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
               >
                 Next
               </button>
-            ) : (
+            )}
+
+            {step === 4 && (
               <button
                 type="submit"
                 disabled={loading}

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@components/ui/tabs";
 import {
   Table,
@@ -357,12 +357,14 @@ const InquiryManager = () => {
         >
           <div className="space-y-4">
             <p>Enter a reason for rejecting this inquiry:</p>
+
             <textarea
               className="w-full p-2 border border-gray-300 rounded"
               rows="3"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
             />
+
             <div className="flex space-x-4">
               <Button
                 className="flex-1"
