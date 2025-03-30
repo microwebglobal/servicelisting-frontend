@@ -4,6 +4,7 @@ import { FaLocationCrosshairs } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { serviceAPI } from "../../api/services";
 import { motion, AnimatePresence } from "framer-motion";
+import { Search } from "@mui/icons-material";
 
 const placeholderTexts = [
   "What service do you need today?",
@@ -87,19 +88,24 @@ const CitySelector = () => {
   };
 
   return (
-    <div className="relative w-full max-w-lg">
+    <div className="relative w-full">
       <div className="flex items-center">
-        <input
-          type="text"
-          className="p-3 h-1/2 w-full border placeholder:text-black placeholder:font-medium border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition-all duration-300"
-          placeholder={placeholder}
-          value={searchTerm}
-          onChange={handleSearch}
-          onFocus={() => setShowDropdown(true)}
-          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-        />
-        <button className="px-4 py-4 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition ml-4 shadow-md hover:shadow-lg">
-          <FaLocationCrosshairs />
+        <div className="relative w-full">
+          <Search className="absolute left-4 top-[1.8rem] lg:top-[2.05rem] transform -translate-y-1/2 text-black size-6 lg:size-8" />
+
+          <input
+            type="text"
+            className="p-3 pl-12 lg:pl-[3.7rem] w-full h-14 lg:h-16 border placeholder:text-black placeholder:text-base lg:placeholder:text-xl text-xl text-black focus:placeholder:text-transparent placeholder:font-medium border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition-all duration-300"
+            placeholder={placeholder}
+            value={searchTerm}
+            onChange={handleSearch}
+            onFocus={() => setShowDropdown(true)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+          />
+        </div>
+
+        <button className="flex items-center justify-center size-14 aspect-square lg:size-16 bg-indigo-500 text-white rounded-xl hover:bg-blue-600 transition ml-4 shadow-md hover:shadow-lg">
+          <FaLocationCrosshairs size={20} />
         </button>
       </div>
 

@@ -12,7 +12,7 @@ const Page = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-gray-100 text-gray-900 pt-20 overflow-hidden">
+      <div className="bg-gray-100 text-gray-900 overflow-hidden">
         {/* Hero Section */}
         <section
           className="relative w-full min-h-screen flex flex-col justify-center items-center text-center bg-cover bg-center"
@@ -84,32 +84,28 @@ const Page = () => {
             >
               <h2 className="text-5xl font-bold">Our Mission & Vision</h2>
               <p className="mt-10 text-lg text-gray-700">
-                Our mission is to <strong>revolutionize home services</strong>{" "}
-                by seamlessly connecting skilled professionals with customers in
-                need of reliable, high-quality assistance. We strive to{" "}
-                <strong>eliminate the hassle</strong> of finding trustworthy
-                service providers by offering a{" "}
-                <strong>transparent, efficient, and technology-driven</strong>{" "}
-                platform.
+                Our mission is to revolutionize home services by seamlessly
+                connecting skilled professionals with customers in need of
+                reliable, high-quality assistance. We strive to eliminate the
+                hassle of finding trustworthy service providers by offering a{" "}
+                transparent, efficient, and technology-driven platform.
                 <br />
                 <br />
                 Whether it's home maintenance, beauty services, appliance
                 repairs, or deep cleaning, we ensure that every service is
-                delivered with{" "}
-                <strong>expertise, punctuality, and professionalism</strong>. By
+                delivered with expertise, punctuality, and professionalism. By
                 partnering with highly trained and verified professionals, we{" "}
-                <strong>empower both service providers and homeowners</strong>,
-                creating opportunities for skilled workers while enhancing
-                customer convenience.
+                empower both service providers and homeowners, creating
+                opportunities for skilled workers while enhancing customer
+                convenience.
                 <br />
                 <br />
-                Our vision is to{" "}
-                <strong>bridge the service accessibility gap</strong> across
+                Our vision is to bridge the service accessibility gap across
                 major cities and rural areas, making top-tier home services
-                available to everyone. Through our commitment to{" "}
-                <strong>affordability, trust, and ease of booking</strong>, we
-                aim to redefine how people experience home services—making it
-                smoother, safer, and more reliable than ever before.
+                available to everyone. Through our commitment to affordability,
+                trust, and ease of booking, we aim to redefine how people
+                experience home services—making it smoother, safer, and more
+                reliable than ever before.
               </p>
             </motion.div>
 
@@ -240,17 +236,15 @@ const Page = () => {
               <h2 className="text-5xl font-bold">Our Story</h2>
               <p className="mt-6 text-lg text-gray-700">
                 What started as a small initiative to connect skilled workers
-                with customers has grown into India’s leading{" "}
-                <strong>home service marketplace</strong>. We noticed the gap
-                between professionals looking for work and homeowners struggling
-                to find reliable services.
+                with customers has grown into India’s leading home service
+                marketplace. We noticed the gap between professionals looking
+                for work and homeowners struggling to find reliable services.
                 <br />
                 <br />
                 With **passion and innovation**, we built a seamless, trusted,
                 and technology-driven platform that empowers both service
-                providers and customers alike. Every day, we bring{" "}
-                <strong>convenience, affordability, and expertise</strong> to
-                thousands of homes.
+                providers and customers alike. Every day, we bring convenience,
+                affordability, and expertise to thousands of homes.
               </p>
             </motion.div>
           </div>

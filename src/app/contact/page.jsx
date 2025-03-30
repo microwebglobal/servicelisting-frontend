@@ -9,7 +9,7 @@ const ContactPage = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-gray-50 text-gray-900 pt-20">
+      <div className="bg-gray-50 text-gray-900">
         {/* Hero Section with Background Image */}
         <section
           className="relative bg-cover bg-center text-white text-center py-28 px-6"

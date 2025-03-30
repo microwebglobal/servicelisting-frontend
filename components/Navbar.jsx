@@ -67,7 +67,7 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className="bg-primary py-4 px-6 md:px-10 fixed w-full z-20 flex justify-between items-center"
+        className="bg-primary py-4 px-6 md:px-10 fixed w-full z-20 flex items-center justify-between"
         style={{ backgroundColor: "#5f60b9" }}
       >
         {/* Logo (Left Side) */}
@@ -76,7 +76,7 @@ const Navbar = () => {
         </div>
 
         {/* Navigation Links (Centered) */}
-        <div className="hidden md:flex items-center gap-6 flex-grow justify-center">
+        <div className="hidden md:flex items-center gap-6 flex-grow justify-center absolute w-full -ml-16">
           {["Home", "About", "Services", "Contact"].map((item, index) => (
             <motion.div
               key={index}
@@ -98,7 +98,7 @@ const Navbar = () => {
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/registration/provider"
-              className="text-white border-2 border-white px-4 py-1 rounded-2xl font-semibold"
+              className="text-white border-2 border-white px-4 py-1 rounded-lg font-semibold"
             >
               Register as Professional
             </Link>
@@ -170,8 +170,8 @@ const Navbar = () => {
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/registration/provider"
-                className="text-white border-2 border-white px-4 py-1 my-2 rounded-2xl font-semibold"
                 onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white border-2 border-white px-4 py-1 my-2 rounded-lg font-semibold"
               >
                 Register as Professional
               </Link>
@@ -215,7 +215,7 @@ const Navbar = () => {
         onRequestClose={() => setConfirmLogout(false)}
         ariaHideApp={false}
         className="m-10 bg-white p-6 rounded-lg shadow-xl w-96 max-w-lg"
-        overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-sm"
+        overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-sm z-50"
       >
         <div className="space-y-4">
           <p className="text-lg font-semibold">
