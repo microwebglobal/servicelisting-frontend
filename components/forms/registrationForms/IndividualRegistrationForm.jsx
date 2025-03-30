@@ -109,18 +109,26 @@ const IndividualRegistrationForm = ({ previousData }) => {
   }, [previousData]);
 
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
+    const { name, value, type, files, required } = e.target;
+
+    // Custom error keys for part-time availability hours
+    const erroKey =
+      name === "availability_hours.start"
+        ? "start_time"
+        : name === "availability_hours.end"
+        ? "end_time"
+        : name;
 
     // Show/hide error messages realtime
-    if (value === "") {
+    if (value === "" && required) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [name]: `${name.split("_").join(" ")} is required`,
+        [erroKey]: `${name.split("_").join(" ")} is required`,
       }));
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [name]: "",
+        [erroKey]: "",
       }));
     }
 
@@ -221,8 +229,13 @@ const IndividualRegistrationForm = ({ previousData }) => {
     setSelectedLanguages(selectedOptions);
   };
 
+  const isValidTimeSlot = (availability_hours) => {
+    const { start, end } = availability_hours;
+    if (start > end) return "Start time cannot be after end time";
+  };
+
   const validateStep = (stepNumber) => {
-    const newErrors = {};
+    let newErrors = {};
 
     switch (stepNumber) {
       case 1:
@@ -239,6 +252,14 @@ const IndividualRegistrationForm = ({ previousData }) => {
       case 2:
         if (!formData.service_radius) newErrors.service_radius = "Required";
         if (!formData.profile_bio) newErrors.profile_bio = "Required";
+        if (formData.availability_type === "part_time") {
+          if (!formData.availability_hours.start)
+            newErrors.start_time = "Required";
+          if (!formData.availability_hours.end) newErrors.end_time = "Required";
+
+          const error = isValidTimeSlot(formData.availability_hours);
+          if (error) newErrors.availability_hours = error;
+        }
         break;
       case 3:
         if (!formData.documents.logo) newErrors.logo = "Required";
@@ -354,7 +375,8 @@ const IndividualRegistrationForm = ({ previousData }) => {
     name,
     placeholder,
     type = "text",
-    disabled = false
+    disabled = false,
+    required = false
   ) => (
     <div className="space-y-2">
       <input
@@ -367,6 +389,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           errors[name] ? "border-red-500 bg-red-500/5" : ""
         }`}
         disabled={disabled}
+        required={required}
       />
 
       {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
@@ -457,7 +480,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           className="p-2 border rounded w-full"
           disabled
         />
-        {renderInputField("nationality", "Nationality")}
+        {renderInputField("nationality", "Nationality*", "text", false, true)}
         <select
           name="gender"
           value={formData.gender}
@@ -487,7 +510,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
               }),
             }}
             onChange={handleLanguageChange}
-            placeholder="Languages Spoken"
+            placeholder="Languages Spoken*"
             required
           />
           {errors.languages_spoken && (
@@ -497,8 +520,14 @@ const IndividualRegistrationForm = ({ previousData }) => {
           )}
         </div>
 
-        {renderInputField("aadhar_number", "Aadhar Number")}
-        {renderInputField("pan_number", "PAN Number")}
+        {renderInputField(
+          "aadhar_number",
+          "Aadhar Number*",
+          "number",
+          false,
+          true
+        )}
+        {renderInputField("pan_number", "PAN Number*", "text", false, true)}
         {renderInputField("email", "Email", "email", true)}
         {renderInputField("phone", "Phone Number", "number", true)}
         {renderInputField("whatsapp_number", "WhatsApp Number", "number")}
@@ -510,7 +539,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           name="address"
           value={formData.address}
           onChange={handleChange}
-          placeholder="Address"
+          placeholder="Address*"
           className={`w-full p-2 border rounded ${
             errors.address ? "border-red-500 bg-red-500/5" : ""
           }`}
@@ -534,7 +563,13 @@ const IndividualRegistrationForm = ({ previousData }) => {
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Service Details</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {renderInputField("service_radius", "Service Radius (km)", "number")}
+        {renderInputField(
+          "service_radius",
+          "Service Radius (km)*",
+          "number",
+          false,
+          true
+        )}
         <select
           name="availability_type"
           value={formData.availability_type}
@@ -546,21 +581,44 @@ const IndividualRegistrationForm = ({ previousData }) => {
         </select>
       </div>
       {formData.availability_type === "part_time" && (
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="time"
-            name="availability_hours.start"
-            value={formData.availability_hours.start}
-            onChange={handleChange}
-            className="p-2 border rounded w-full"
-          />
-          <input
-            type="time"
-            name="availability_hours.end"
-            value={formData.availability_hours.end}
-            onChange={handleChange}
-            className="p-2 border rounded w-full"
-          />
+        <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <input
+                type="time"
+                name="availability_hours.start"
+                value={formData.availability_hours.start || ""}
+                onChange={handleChange}
+                className={cn("p-2 border rounded w-full", {
+                  "border-red-500 bg-red-500/5 text-red-500": errors.start_time,
+                })}
+              />
+              {errors.start_time && (
+                <p className="text-red-500 text-sm mt-1">{errors.start_time}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <input
+                type="time"
+                name="availability_hours.end"
+                value={formData.availability_hours.end || ""}
+                onChange={handleChange}
+                className={cn("p-2 border rounded w-full", {
+                  "border-red-500 bg-red-500/5 text-red-500": errors.end_time,
+                })}
+              />
+              {errors.end_time && (
+                <p className="text-red-500 text-sm mt-1">{errors.end_time}</p>
+              )}
+            </div>
+          </div>
+
+          {errors.availability_hours && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.availability_hours}
+            </p>
+          )}
         </div>
       )}
       <textarea
@@ -570,17 +628,25 @@ const IndividualRegistrationForm = ({ previousData }) => {
         placeholder="Specializations/Skills"
         className="w-full p-2 border rounded"
         rows="3"
+        required
       />
-      <textarea
-        name="profile_bio"
-        value={formData.profile_bio}
-        onChange={handleChange}
-        placeholder="Profile Bio"
-        className={`w-full p-2 border rounded ${
-          errors.profile_bio ? "border-red-500" : ""
-        }`}
-        rows="3"
-      />
+      <div className="space-y-2">
+        <textarea
+          name="profile_bio"
+          value={formData.profile_bio}
+          onChange={handleChange}
+          placeholder="Profile Bio"
+          className={`w-full p-2 border rounded ${
+            errors.profile_bio ? "border-red-500 bg-red-500/5" : ""
+          }`}
+          rows="3"
+          required
+        />
+
+        {errors.profile_bio && (
+          <p className="text-red-500 text-sm mt-1">{errors.profile_bio}</p>
+        )}
+      </div>
       <textarea
         name="certificates_awards"
         value={formData.certificates_awards}
