@@ -3,8 +3,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import Select from "react-select";
 import { toast } from "@hooks/use-toast";
-import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const IndividualRegistrationForm = ({ previousData }) => {
@@ -241,7 +241,11 @@ const IndividualRegistrationForm = ({ previousData }) => {
       case 1:
         if (!formData.nationality) newErrors.nationality = "Required";
         if (!formData.aadhar_number) newErrors.aadhar_number = "Required";
+        if (!formData.aadhar_number.match(/^\d{12}$/))
+          newErrors.aadhar_number = "Invalid Aadhar Number";
         if (!formData.pan_number) newErrors.pan_number = "Required";
+        if (!formData.pan_number.match(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/))
+          newErrors.pan_number = "Invalid PAN Number";
         if (!formData.address) newErrors.address = "Required";
         if (
           !formData.languages_spoken ||
