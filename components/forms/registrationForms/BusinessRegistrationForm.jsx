@@ -7,6 +7,19 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { cn } from "@/lib/utils";
 
 const BusinessRegistrationForm = ({ previousData }) => {
+  // Calculate minimum start
+  const today = new Date();
+  const minStartDate = today.toISOString().split("T")[0];
+
+  // Calculate maximum start
+  const maxStartDate = new Date(
+    today.getFullYear() - 200,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+
   const [formData, setFormData] = useState({
     // Pre-filled data from enquiry (non-editable)
     enquiry_id: previousData?.enquiry_id || "",
@@ -91,6 +104,22 @@ const BusinessRegistrationForm = ({ previousData }) => {
         ...prevErrors,
         [name]: "",
       }));
+    }
+
+    // Prevent unusual inputs in start date
+    if (name === "business_start_date") {
+      const error = isValidStartDate(value);
+      if (error) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          business_start_date: error,
+        }));
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          business_start_date: "",
+        }));
+      }
     }
 
     // Prevent unusual inputs in service_radius
@@ -227,6 +256,15 @@ const BusinessRegistrationForm = ({ previousData }) => {
     return errors;
   };
 
+  const isValidStartDate = (startDate) => {
+    const today = new Date();
+    const start = new Date(startDate);
+
+    if (start > today) return "Start date cannot be in the future";
+    if (start.getFullYear() < today.getFullYear() - 200)
+      return "Invalid start date";
+  };
+
   const validateStep = (stepNumber) => {
     let newErrors = {};
 
@@ -239,6 +277,10 @@ const BusinessRegistrationForm = ({ previousData }) => {
           newErrors.whatsapp_number = "Required";
         if (!formData.business_start_date)
           newErrors.business_start_date = "Required";
+        else {
+          const error = isValidStartDate(formData.business_start_date);
+          if (error) newErrors.business_start_date = error;
+        }
         break;
       case 2:
         if (!formData.service_radius?.trim())
@@ -529,6 +571,8 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
         <input
           type="date"
+          min={maxStartDate}
+          max={minStartDate}
           name="business_start_date"
           value={formData.business_start_date}
           onChange={handleChange}

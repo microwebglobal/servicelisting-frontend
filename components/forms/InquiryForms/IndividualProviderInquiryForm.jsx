@@ -24,6 +24,15 @@ const IndividualProviderInquiryForm = () => {
     .toISOString()
     .split("T")[0];
 
+  // Calculate maximum age
+  const maxAgeDate = new Date(
+    today.getFullYear() - 80,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+
   // Retrieve form data from session storage
   let cachedFormData = null;
   if (typeof window !== "undefined") {
@@ -134,6 +143,22 @@ const IndividualProviderInquiryForm = () => {
       }));
     }
 
+    // Prevent unusual inputs in dob
+    if (name === "dob") {
+      const error = isValidDOB(value);
+      if (error) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          dob: error,
+        }));
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          dob: "",
+        }));
+      }
+    }
+
     // Prevent unusual inputs in years_experience
     if (name === "years_experience") {
       const years = parseInt(value);
@@ -196,6 +221,24 @@ const IndividualProviderInquiryForm = () => {
     setSelectedCities(selectedCities);
   };
 
+  // Validate date of birth
+  const isValidDOB = (dob) => {
+    const dobDate = new Date(dob);
+    if (dobDate > today) return "Birthdate cannot be in the future";
+
+    // Calculate age
+    const age = today.getFullYear() - dobDate.getFullYear();
+    const monthDiff = today.getMonth() - dobDate.getMonth();
+    const dayDiff = today.getDate() - dobDate.getDate();
+
+    // Check if birthday occured this year
+    const adjustedAge =
+      monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0) ? age : age - 1;
+
+    if (adjustedAge < 18 || adjustedAge > 80)
+      return "Age must be between 18 and 80";
+  };
+
   const validateStep1 = () => {
     let newErrors = {};
 
@@ -205,12 +248,12 @@ const IndividualProviderInquiryForm = () => {
     if (!formData.mobile.match(/^\d{10}$/))
       newErrors.mobile = "Phone number must be 10 digits";
     if (!formData.gender) newErrors.gender = "Gender is required";
+
     if (!formData.dob) {
       newErrors.dob = "Date of birth is required";
-    } else if (new Date(formData.dob) > today) {
-      newErrors.dob = "Date of birth cannot be in the future";
-    } else if (new Date(formData.dob) > minAgeDate) {
-      newErrors.dob = "You must be at least 18 years old";
+    } else {
+      const error = isValidDOB(formData.dob);
+      if (error) newErrors.dob = error;
     }
 
     setErrors(newErrors);
@@ -340,6 +383,7 @@ const IndividualProviderInquiryForm = () => {
             <input
               type="date"
               name="dob"
+              min={maxAgeDate}
               max={minAgeDate}
               value={formData.dob}
               onChange={handleChange}
