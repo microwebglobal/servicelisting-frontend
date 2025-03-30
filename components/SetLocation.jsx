@@ -161,7 +161,7 @@ const SetLocation = ({ location, setLocation, className }) => {
 
   return (
     <>
-      <div className="flex gap-3 mb-2">
+      <div className="flex gap-3">
         <div className="flex-grow">
           <Autocomplete
             onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
@@ -173,7 +173,7 @@ const SetLocation = ({ location, setLocation, className }) => {
             <input
               type="text"
               className={cn(
-                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                 className
               )}
               placeholder="Search for a location"
