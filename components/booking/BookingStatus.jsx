@@ -2,7 +2,7 @@
 import { ArrowForwardIosSharp } from "@mui/icons-material";
 
 const statuses = [
-  { name: "Pending", value: "payment_pending" },
+  { name: "Accepted", value: "accepted" },
   { name: "Confirmed", value: "confirmed" },
   { name: "Assigned", value: "assigned" },
   { name: "In Progress", value: "in_progress" },

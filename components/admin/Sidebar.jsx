@@ -25,15 +25,18 @@ const Sidebar = () => {
       name: "Bookings Management",
       subMenu: [
         { name: "Bookings", link: "/admin/bookings" },
-        { name: "Escalated Bookings", link: "/escalated-bookings" },
-        { name: "Cancelled Bookings", link: "/cancelled-bookings" },
+
+        {
+          name: "Cancelled Bookings",
+          link: "/admin/bookings/canceled-bokings",
+        },
       ],
     },
     {
       name: "Payments Management",
       subMenu: [
-        { name: "Transactions History", link: "/transactions-history" },
-        { name: "Pending Payouts", link: "/pending-payouts" },
+        { name: "Transactions History", link: "/admin/transactions" },
+        { name: "Payouts", link: "/admin/payouts" },
       ],
     },
     {
@@ -42,10 +45,7 @@ const Sidebar = () => {
     },
     {
       name: "Services Management",
-      subMenu: [
-        { name: "Services List", link: "/admin/services" },
-        { name: "Add Service", link: "/add-service" },
-      ],
+      subMenu: [{ name: "Services List", link: "/admin/services" }],
     },
     {
       name: "Notifications Management",

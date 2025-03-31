@@ -152,6 +152,7 @@ const Home = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
             Find Trusted Professionals <br className="hidden sm:block" /> In
             Just a Click!
+
           </h1>
 
           <p className="mb-6 sm:mb-8 md:mb-10 text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">

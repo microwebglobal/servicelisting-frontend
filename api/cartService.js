@@ -135,4 +135,29 @@ export const cartService = {
       );
     }
   },
+
+  cancellBookingByCustomer: async (bookingId) => {
+    try {
+      const response = await api.get(`/booking/cancel/${bookingId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch booking"
+      );
+    }
+  },
+
+  confirmCancellBookingByCustomer: async (bookingId, data) => {
+    try {
+      const response = await api.put(
+        `/booking/cancel/confirm/${bookingId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch booking"
+      );
+    }
+  },
 };

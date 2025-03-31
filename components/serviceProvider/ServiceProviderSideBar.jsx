@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import Rating from "@mui/material/Rating";
 import { providerAPI } from "@api/provider";
 import { Button } from "@/components/ui/button";
-import { LogOut, Calendar, BookCheck, Settings, Loader2 } from "lucide-react";
+import {
+  LogOut,
+  Calendar,
+  BookCheck,
+  Settings,
+  Loader2,
+  DollarSignIcon,
+} from "lucide-react";
 import { PeopleAltSharp } from "@mui/icons-material";
 import { format } from "date-fns";
 import {
@@ -100,8 +107,8 @@ const ServiceProviderSideBar = () => {
     },
     {
       label: "Booking Payments",
-      icon: BookCheck,
-      path: "/profile/provider/bookingPayments",
+      icon: DollarSignIcon,
+      path: "/profile/provider/payments",
     },
     ...(profileData?.business_type !== "individual"
       ? [

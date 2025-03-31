@@ -57,17 +57,13 @@ const EmployeeSidebar = ({ profileData }) => {
     {
       label: "Orders",
       icon: BookCheck,
-      path: "/",
+      path: "/profile/business-employee",
     },
-    {
-      label: "Service Management",
-      icon: Calendar,
-      path: "##",
-    },
+
     {
       label: "Payments",
       icon: Settings,
-      path: " ###",
+      path: "/profile/business-employee/payments",
     },
   ];
 
