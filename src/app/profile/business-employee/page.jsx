@@ -40,6 +40,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Button } from "@/components/ui/button";
 import BookingStartModal from "@/components/business-employee/BookingStartModal";
 import { LoginAPI } from "@/api/login";
+import BookingStopModal from "@/components/business-employee/BookingStopModal";
 
 const BookingDetailsModal = ({ booking }) => {
   if (!booking) return null;
@@ -295,6 +296,7 @@ const BusinessEmployeeProfile = () => {
   const [isStartModalOpen, setStartModalOpen] = useState(false);
   const [selectedBookingForStart, setSelectedBookingForStart] = useState(null);
   const [ongoingBookings, setOngoingBookings] = useState([]);
+  const [isStopModalOpen, setStopModalOpen] = useState(false);
 
   const localizer = momentLocalizer(moment);
 
@@ -326,12 +328,19 @@ const BusinessEmployeeProfile = () => {
       const response = await providerAPI.getEmployeeBookings(employeeId);
       const formattedBookings = response.data.map((booking) => ({
         id: booking.booking_id,
+        status: booking.status,
         title: booking.booking_id,
         start: new Date(`${booking.booking_date}T${booking.start_time}`),
         end: new Date(`${booking.booking_date}T${booking.end_time}`),
         details: booking,
       }));
       setBookings(formattedBookings);
+
+      const ongingBookings = formattedBookings.filter(
+        (booking) => booking.status === "in_progress"
+      );
+
+      setOngoingBookings(ongingBookings);
 
       console.log("Formatted Bookings Data:", formattedBookings);
     } catch (error) {
@@ -380,18 +389,15 @@ const BusinessEmployeeProfile = () => {
   };
 
   const handleStopBooking = async (booking) => {
+    console.log(booking);
     try {
-      await providerAPI.updateBookingStatus({
-        bookingId: booking.id,
-        status: "completed",
+      await providerAPI.stopOngoingBooking({
+        bookingId: booking?.details?.booking_id,
+        mobile: booking?.customer?.mobile,
       });
-
-      const updatedOngoingBookings = ongoingBookings.filter(
-        (b) => b.id !== booking.id
-      );
-      setOngoingBookings(updatedOngoingBookings);
+      setStopModalOpen(true);
     } catch (error) {
-      console.error("Error stopping booking:", error);
+      console.error("Error Sending Otp", error);
     }
   };
 
@@ -430,13 +436,16 @@ const BusinessEmployeeProfile = () => {
     }
   }, [bookings]);
 
+  const handleConfirmStop = () => {
+    setOngoingBookings();
+  };
+
   const formatBookingTime = (date) => {
     return format(date, "MMM dd, yyyy - hh:mm a");
   };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-      <EmployeeSidebar profileData={profileData} />
       <div className="flex p-6 gap-10">
         <div className="w-1/2">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -547,6 +556,13 @@ const BusinessEmployeeProfile = () => {
           booking={selectedBookingForStart}
           onConfirm={handleConfirmStart}
           onClose={() => setStartModalOpen(false)}
+        />
+      </Dialog>
+      <Dialog open={isStopModalOpen} onOpenChange={setStopModalOpen}>
+        <BookingStopModal
+          booking={ongoingBookings?.[0] || null}
+          onConfirm={handleConfirmStop}
+          onClose={() => setStopModalOpen(false)}
         />
       </Dialog>
     </div>
