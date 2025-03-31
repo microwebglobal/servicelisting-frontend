@@ -9,7 +9,7 @@ const Sidebar = () => {
     },
     {
       name: "Customer Management",
-      subMenu: [{ name: "Customers", link: "/admin/customer_management" }],
+      subMenu: [{ name: "Customers", link: "/admin/customers" }],
     },
     {
       name: "Service Provider Management",

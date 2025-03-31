@@ -117,6 +117,7 @@ export default function Cart() {
                 </div>
                 <div className="flex items-center gap-4">
                   <Button
+                    key={item.item_id}
                     variant="outline"
                     size="sm"
                     onClick={() =>
@@ -131,6 +132,7 @@ export default function Cart() {
                   </Button>
                   <span>{item.quantity}</span>
                   <Button
+                    key={item.item_id}
                     variant="outline"
                     size="sm"
                     onClick={() =>
