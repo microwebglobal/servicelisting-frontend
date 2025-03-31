@@ -88,7 +88,7 @@ const Home = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative mt-10 h-screen flex flex-col justify-center items-center text-white overflow-hidden">
+      <section className="relative mt-10 h-[calc(100vh-40px)] flex flex-col justify-center items-center text-white overflow-hidden">
         {/* Background Image Slider */}
         <div className="absolute inset-0 -z-10 w-full h-full">
           <Swiper
@@ -147,11 +147,14 @@ const Home = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 py-8 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-24 sm:pb-32 md:pb-40"
+          className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 py-8 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-24 sm:pb-32 md:pb-40 space-y-8 sm:space-y-10"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6 drop-shadow-lg">
-            Hire verified experts <br /> In just one tap!
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
+            Find Trusted Professionals <br className="hidden sm:block" /> In
+            Just a Click!
+
           </h1>
+
           <p className="mb-6 sm:mb-8 md:mb-10 text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
             Discover a world of trusted professionals ready to transform your
             home with top-notch services tailored to your needs. Simply search
@@ -160,7 +163,7 @@ const Home = () => {
           </p>
 
           {/* Search Bar */}
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-3xl">
             <CitySelector />
           </div>
 
@@ -173,7 +176,7 @@ const Home = () => {
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-6 sm:mt-8 px-6 sm:px-8 py-3 sm:py-4 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
+            className="px-6 sm:px-8 py-3 sm:py-4 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
           >
             View all services
           </motion.button>
@@ -184,7 +187,7 @@ const Home = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white bg-opacity-90 rounded-t-3xl shadow-md"
+          className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white bg-opacity-90 shadow-md"
         >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-black text-sm sm:text-base md:text-lg px-4 sm:px-8">
             <div className="flex flex-col items-center">
@@ -241,7 +244,8 @@ const Home = () => {
           <h2 className="text-3xl md:text-4xl lg:text-5xl text-center lg:text-left font-bold mb-16 text-gray-900 p-3">
             How does <span className="text-indigo-600">QProz</span> work?
           </h2>
-          <ul className="lg:pl-8">
+
+          <ul className="lg:pl-8 text-lg">
             {steps.map((step, index) => (
               <li key={index} className="mb-10 list-item">
                 <motion.div
@@ -289,12 +293,13 @@ const Home = () => {
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="grid grid-cols-3 md:grid-cols-5  gap-6"
+            className="grid grid-cols-1 md:max-w-xl mx-auto md:grid-cols-2 lg:grid-cols-4 lg:max-w-7xl gap-6"
           >
             {categories.slice(0, 10).map((serv, index) => (
               <ServiceCard key={index} name={serv.name} icon={serv.icon_url} />
             ))}
           </motion.div>
+
           <motion.button
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -331,7 +336,7 @@ const Home = () => {
               you require repairs, installations, or maintenance, we ensure a
               seamless and stress-free experience.
             </p>
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 items-center -ml-8 lg:items-start">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 items-center -ml-8 lg:items-start textl-lg">
               <div>
                 <ul className="list-inside pl-5 text-gray-600 space-y-4">
                   <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
@@ -395,19 +400,19 @@ const Home = () => {
             Download the <br />
             mobile app today!
           </h2>
-          <p className="text-lg text-left pr-10 md:text-xl text-gray-600 mb-6 leading-relaxed">
+          <p className="text-lg text-left pr-10 md:text-xl tracking-tight text-gray-600 mb-6 leading-relaxed">
             Experience seamless services at your fingertips. Get instant access,
             connect with top professionals, and manage everything
             effortlessly—all in one place.
           </p>
 
           <div className="flex mt-10 gap-4 justify-center lg:justify-start">
-            <button className="bg-black text-white px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
-              <FaGooglePlay />
+            <button className="bg-black text-white h-14 px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
+              <FaGooglePlay size={24} />
               Google Play
             </button>
-            <button className="bg-black text-white px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
-              <FaAppStore />
+            <button className="bg-black text-white h-14 px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
+              <FaAppStore size={24} />
               App Store
             </button>
           </div>

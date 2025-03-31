@@ -2,7 +2,7 @@ import React from "react";
 
 const ServiceCard = ({ name, description, icon }) => {
   return (
-    <div className="w-full sm:w-48 md:w-32 lg:w-48 min-h-48 sm:min-h-56 md:min-h-60 lg:min-h-64 bg-transparent cursor-pointer group rounded-3xl perspective-1000 p-1">
+    <div className="h-64 w-full mx-auto max-w-64 bg-transparent cursor-pointer group rounded-3xl perspective-1000 p-1">
       {/* Card Container */}
       <div className="relative w-full h-full transform-style-preserve-3d transition-transform duration-700 group-hover:rotate-y-180">
         {/* Front Side */}

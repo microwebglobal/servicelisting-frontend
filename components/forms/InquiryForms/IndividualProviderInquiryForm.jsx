@@ -24,6 +24,15 @@ const IndividualProviderInquiryForm = () => {
     .toISOString()
     .split("T")[0];
 
+  // Calculate maximum age
+  const maxAgeDate = new Date(
+    today.getFullYear() - 80,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+
   // Retrieve form data from session storage
   let cachedFormData = null;
   if (typeof window !== "undefined") {
@@ -134,6 +143,22 @@ const IndividualProviderInquiryForm = () => {
       }));
     }
 
+    // Prevent unusual inputs in dob
+    if (name === "dob") {
+      const error = isValidDOB(value);
+      if (error) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          dob: error,
+        }));
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          dob: "",
+        }));
+      }
+    }
+
     // Prevent unusual inputs in years_experience
     if (name === "years_experience") {
       const years = parseInt(value);
@@ -196,6 +221,24 @@ const IndividualProviderInquiryForm = () => {
     setSelectedCities(selectedCities);
   };
 
+  // Validate date of birth
+  const isValidDOB = (dob) => {
+    const dobDate = new Date(dob);
+    if (dobDate > today) return "Birthdate cannot be in the future";
+
+    // Calculate age
+    const age = today.getFullYear() - dobDate.getFullYear();
+    const monthDiff = today.getMonth() - dobDate.getMonth();
+    const dayDiff = today.getDate() - dobDate.getDate();
+
+    // Check if birthday occured this year
+    const adjustedAge =
+      monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0) ? age : age - 1;
+
+    if (adjustedAge < 18 || adjustedAge > 80)
+      return "Age must be between 18 and 80";
+  };
+
   const validateStep1 = () => {
     let newErrors = {};
 
@@ -205,12 +248,12 @@ const IndividualProviderInquiryForm = () => {
     if (!formData.mobile.match(/^\d{10}$/))
       newErrors.mobile = "Phone number must be 10 digits";
     if (!formData.gender) newErrors.gender = "Gender is required";
+
     if (!formData.dob) {
       newErrors.dob = "Date of birth is required";
-    } else if (new Date(formData.dob) > today) {
-      newErrors.dob = "Date of birth cannot be in the future";
-    } else if (new Date(formData.dob) > minAgeDate) {
-      newErrors.dob = "You must be at least 18 years old";
+    } else {
+      const error = isValidDOB(formData.dob);
+      if (error) newErrors.dob = error;
     }
 
     setErrors(newErrors);
@@ -297,96 +340,107 @@ const IndividualProviderInquiryForm = () => {
       <form onSubmit={handleSubmit}>
         {/* Step 1: General Information */}
         {step === 1 && (
-          <div>
-            <label className="block mb-2">Full Name</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className={cn(
-                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
-                {
-                  "bg-red-500/5 border border-red-500/50 text-red-500":
-                    errors.name,
-                }
-              )}
-            />
-            {errors.name && <p className="text-red-500">{errors.name}</p>}
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <label className="block">Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className={cn(
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  {
+                    "bg-red-500/5 border border-red-500/50 text-red-500":
+                      errors.name,
+                  }
+                )}
+              />
+              {errors.name && <p className="text-red-500">{errors.name}</p>}
+            </div>
 
-            <label className="block mb-2">Gender</label>
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              required
-              className={cn(
-                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
-                {
-                  "bg-red-500/5 border border-red-500/50 text-red-500":
-                    errors.gender,
-                }
-              )}
-            >
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.gender && <p className="text-red-500">{errors.gender}</p>}
+            <div className="space-y-2">
+              <label className="block">Gender</label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                required
+                className={cn(
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  {
+                    "bg-red-500/5 border border-red-500/50 text-red-500":
+                      errors.gender,
+                  }
+                )}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              {errors.gender && <p className="text-red-500">{errors.gender}</p>}
+            </div>
 
-            <label className="block mb-2">Date Of Birth</label>
-            <input
-              type="date"
-              name="dob"
-              max={minAgeDate}
-              value={formData.dob}
-              onChange={handleChange}
-              required
-              className={cn(
-                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
-                {
-                  "bg-red-500/5 border border-red-500/50 text-red-500":
-                    errors.dob,
-                }
-              )}
-            />
-            {errors.dob && <p className="text-red-500">{errors.dob}</p>}
+            <div className="space-y-2">
+              <label className="block">Date Of Birth</label>
+              <input
+                type="date"
+                name="dob"
+                min={maxAgeDate}
+                max={minAgeDate}
+                value={formData.dob}
+                onChange={handleChange}
+                required
+                className={cn(
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  {
+                    "bg-red-500/5 border border-red-500/50 text-red-500":
+                      errors.dob,
+                  }
+                )}
+              />
+              {errors.dob && <p className="text-red-500">{errors.dob}</p>}
+            </div>
 
-            <label className="block mb-2">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className={cn(
-                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
-                {
-                  "bg-red-500/5 border border-red-500/50 text-red-500":
-                    errors.email,
-                }
-              )}
-            />
-            {errors.email && <p className="text-red-500">{errors.email}</p>}
+            <div className="space-y-2">
+              <label className="block">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className={cn(
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  {
+                    "bg-red-500/5 border border-red-500/50 text-red-500":
+                      errors.email,
+                  }
+                )}
+              />
+              {errors.email && <p className="text-red-500">{errors.email}</p>}
+            </div>
 
-            <label className="block mb-2">Phone</label>
-            <input
-              type="number"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              required
-              className={cn(
-                "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
-                {
-                  "bg-red-500/5 border border-red-500/50 text-red-500":
-                    errors.mobile,
-                }
-              )}
-            />
-            {errors.mobile && <p className="text-red-500">{errors.mobile}</p>}
+            <div className="space-y-2">
+              <label className="block">Phone</label>
+              <input
+                type="number"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+                required
+                className={cn(
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  {
+                    "bg-red-500/5 border border-red-500/50 text-red-500":
+                      errors.mobile,
+                  }
+                )}
+              />
+              {errors.mobile && <p className="text-red-500">{errors.mobile}</p>}
+            </div>
 
             <button
               type="button"
@@ -400,9 +454,10 @@ const IndividualProviderInquiryForm = () => {
 
         {/* Step 2: Service Details */}
         {step === 2 && (
-          <div>
-            <label className="block mb-2">Cities/Regions of Service</label>
-            <div className="mb-4">
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <label className="block">Cities/Regions of Service</label>
+
               <Select
                 id="cities"
                 options={citiesOptions}
@@ -432,24 +487,27 @@ const IndividualProviderInquiryForm = () => {
               {errors.cities && <p className="text-red-500">{errors.cities}</p>}
             </div>
 
-            <label className="block mb-2">Exact Location</label>
-            <SetLocation
-              className={cn({
-                "bg-red-500/5 border border-red-500/50 text-red-500":
-                  errors.location,
-              })}
-              location={formData.location}
-              setLocation={(newLocation) =>
-                setFormData({ ...formData, location: newLocation })
-              }
-              required
-            />
-            {errors.location && (
-              <p className="text-red-500">{errors.location}</p>
-            )}
+            <div className="space-y-2">
+              <label className="block">Exact Location</label>
+              <SetLocation
+                className={cn({
+                  "bg-red-500/5 border border-red-500/50 text-red-500":
+                    errors.location,
+                })}
+                location={formData.location}
+                setLocation={(newLocation) =>
+                  setFormData({ ...formData, location: newLocation })
+                }
+                required
+              />
+              {errors.location && (
+                <p className="text-red-500">{errors.location}</p>
+              )}
+            </div>
 
-            <label className="block mb-2">Service Categories</label>
-            <div className="mb-4">
+            <div className="space-y-2">
+              <label className="block">Service Categories</label>
+
               <Select
                 id="categories"
                 options={serviceCategoriesOptions}
@@ -481,8 +539,8 @@ const IndividualProviderInquiryForm = () => {
               )}
             </div>
 
-            <div className="mb-4">
-              <label className="block mb-2">Years of Experience</label>
+            <div className="space-y-2">
+              <label className="block">Years of Experience</label>
               <input
                 type="number"
                 name="years_experience"
@@ -492,7 +550,7 @@ const IndividualProviderInquiryForm = () => {
                 onChange={handleChange}
                 required
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "bg-red-500/5 border border-red-500/50 text-red-500":
                       errors.years_experience,
@@ -504,15 +562,15 @@ const IndividualProviderInquiryForm = () => {
               )}
             </div>
 
-            <div className="mb-4">
-              <label className="block mb-2">Skills</label>
+            <div className="space-y-2">
+              <label className="block">Skills</label>
               <input
                 type="text"
                 name="skills"
                 value={formData.skills}
                 onChange={handleChange}
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "bg-red-500/5 border border-red-500/50 text-red-500":
                       errors.skills,

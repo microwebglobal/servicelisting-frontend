@@ -4,7 +4,7 @@ import { FaFacebook, FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="text-white py-10 lg:py-20 px-6 bg-[#5f60b9]">
+    <footer className="text-white py-10 lg:py-16 px-6 bg-[#5f60b9]">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-14 lg:gap-20 items-start">
         {/* Left Section */}
         <motion.div
@@ -37,7 +37,7 @@ const Footer = () => {
         </motion.div>
 
         {/* Center & Right Sections */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 md:col-span-2">
+        <div className="grid grid-cols-3 gap-8 md:col-span-2">
           {[
             {
               title: "QProz Jobs",

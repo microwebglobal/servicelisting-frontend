@@ -366,9 +366,9 @@ const BusinessProviderInquiryForm = () => {
       )}
       <form onSubmit={handleSubmit}>
         {step === 1 && (
-          <>
-            <div>
-              <label className="block mb-2">Business Name</label>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <label className="block">Business Name</label>
               <input
                 type="text"
                 name="business_name"
@@ -376,7 +376,7 @@ const BusinessProviderInquiryForm = () => {
                 onChange={handleChange}
                 required
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "border border-red-500 bg-red-500/5 text-red-500":
                       errors.business_name,
@@ -388,15 +388,15 @@ const BusinessProviderInquiryForm = () => {
               )}
             </div>
 
-            <div>
-              <label className="block mb-2">Business Type</label>
+            <div className="space-y-2">
+              <label className="block">Business Type</label>
               <select
                 name="business_type"
                 value={formData.business_type}
                 onChange={handleChange}
                 required
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "border border-red-500 bg-red-500/5 text-red-500":
                       errors.business_type,
@@ -414,8 +414,8 @@ const BusinessProviderInquiryForm = () => {
               )}
             </div>
 
-            <div>
-              <label className="block mb-2">Authorized Person Name</label>
+            <div className="space-y-2">
+              <label className="block">Authorized Person Name</label>
               <input
                 type="text"
                 name="name"
@@ -423,7 +423,7 @@ const BusinessProviderInquiryForm = () => {
                 onChange={handleChange}
                 required
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "border border-red-500 bg-red-500/5 text-red-500":
                       errors.name,
@@ -433,15 +433,15 @@ const BusinessProviderInquiryForm = () => {
               {errors.name && <p className="text-red-500">{errors.name}</p>}
             </div>
 
-            <div>
-              <label className="block mb-2">Authorized Person Gender</label>
+            <div className="space-y-2">
+              <label className="block">Authorized Person Gender</label>
               <select
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
                 required
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "border border-red-500 bg-red-500/5 text-red-500":
                       errors.gender,
@@ -456,8 +456,8 @@ const BusinessProviderInquiryForm = () => {
               {errors.gender && <p className="text-red-500">{errors.gender}</p>}
             </div>
 
-            <div>
-              <label className="block mb-2">Authorized Person Contact</label>
+            <div className="space-y-2">
+              <label className="block">Authorized Person Contact</label>
               <input
                 type="tel"
                 name="mobile"
@@ -465,7 +465,7 @@ const BusinessProviderInquiryForm = () => {
                 onChange={handleChange}
                 required
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "border border-red-500 bg-red-500/5 text-red-500":
                       errors.mobile,
@@ -482,31 +482,31 @@ const BusinessProviderInquiryForm = () => {
             >
               Next
             </button>
-          </>
+          </div>
         )}
 
         {step === 2 && (
-          <>
-            <div>
-              <label className="block mb-2">Business Website</label>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <label className="block">Business Website</label>
               <input
                 type="url"
                 name="website"
                 value={formData.website}
                 onChange={handleChange}
-                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                className="w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
-            <div>
-              <label className="block mb-2">Business Email</label>
+            <div className="space-y-2">
+              <label className="block">Business Email</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "border border-red-500 bg-red-500/5 text-red-500":
                       errors.email,
@@ -516,15 +516,14 @@ const BusinessProviderInquiryForm = () => {
               {errors.email && <p className="text-red-500">{errors.email}</p>}
             </div>
 
-            <div>
-              <label className="block mb-2">Cities/Regions of Service</label>
+            <div className="space-y-2">
+              <label className="block">Cities/Regions of Service</label>
               <Select
                 id="cities"
                 options={citiesOptions}
                 isMulti
                 value={selectedCities}
                 onChange={handleCitiesChange}
-                className="mb-4"
                 styles={{
                   control: (base, state) => ({
                     ...base,
@@ -548,8 +547,8 @@ const BusinessProviderInquiryForm = () => {
               {errors.cities && <p className="text-red-500">{errors.cities}</p>}
             </div>
 
-            <div>
-              <label className="block mb-2">Business Location</label>
+            <div className="space-y-2">
+              <label className="block">Business Location</label>
               <SetLocation
                 className={cn({
                   "border border-red-500 bg-red-500/5 text-red-500":
@@ -563,8 +562,8 @@ const BusinessProviderInquiryForm = () => {
               )}
             </div>
 
-            <div>
-              <label className="block mb-2">Number of Employees</label>
+            <div className="space-y-2">
+              <label className="block">Number of Employees</label>
               <input
                 type="number"
                 name="no_of_employee"
@@ -572,7 +571,7 @@ const BusinessProviderInquiryForm = () => {
                 onChange={handleChange}
                 min="1"
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4",
+                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                   {
                     "border border-red-500 bg-red-500/5 text-red-500":
                       errors.no_of_employee,
@@ -584,8 +583,8 @@ const BusinessProviderInquiryForm = () => {
               )}
             </div>
 
-            <div>
-              <label className="block mb-2">Service Categories</label>
+            <div className="space-y-2">
+              <label className="block">Service Categories</label>
               <Select
                 isMulti
                 options={serviceCategoriesOptions}
@@ -634,7 +633,7 @@ const BusinessProviderInquiryForm = () => {
                 {isSubmitting ? "Submitting..." : "Submit Registration"}
               </button>
             </div>
-          </>
+          </div>
         )}
       </form>
     </div>
