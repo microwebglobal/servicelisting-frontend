@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import { cn } from "@/lib/utils";
 
-const BusinessRegistrationForm = ({ previousData }) => {
+const BusinessRegistrationForm = ({ enquiryData, previousRegData }) => {
   // Calculate minimum start
   const today = new Date();
   const minStartDate = today.toISOString().split("T")[0];
@@ -22,14 +22,14 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
   const [formData, setFormData] = useState({
     // Pre-filled data from enquiry (non-editable)
-    enquiry_id: previousData?.enquiry_id || "",
-    business_name: previousData?.business_name || "",
-    business_type: previousData?.business_type || "",
-    authorized_person_name: previousData?.authorized_person_name || "",
-    authorized_person_contact: previousData?.authorized_person_contact || "",
-    email: previousData?.User?.email || "",
-    primary_location: previousData?.primary_location || "",
-    number_of_employees: previousData?.number_of_employees || "",
+    enquiry_id: enquiryData?.enquiry_id || "",
+    business_name: enquiryData?.business_name || "",
+    business_type: enquiryData?.business_type || "",
+    authorized_person_name: enquiryData?.authorized_person_name || "",
+    authorized_person_contact: enquiryData?.authorized_person_contact || "",
+    email: enquiryData?.User?.email || "",
+    primary_location: enquiryData?.primary_location || "",
+    number_of_employees: enquiryData?.number_of_employees || "",
 
     // New registration fields
     business_registration_number: "",
@@ -48,17 +48,17 @@ const BusinessRegistrationForm = ({ previousData }) => {
       saturday: { start: "09:00", end: "18:00", isOpen: true },
       sunday: { start: "09:00", end: "18:00", isOpen: false },
     },
-    categories: (previousData?.ServiceCategories || []).map((cat) => ({
+    categories: (enquiryData?.ServiceCategories || []).map((cat) => ({
       id: cat.category_id,
       experience_years: 0,
       is_primary: false,
     })),
-    cities: (previousData?.Cities || []).map((city) => ({
+    cities: (enquiryData?.Cities || []).map((city) => ({
       id: city.city_id || "",
       service_radius: 0,
       is_primary: false,
     })),
-    employees: Array(previousData?.number_of_employees || 1).fill({
+    employees: Array(enquiryData?.number_of_employees || 1).fill({
       name: "",
       gender: "",
       qualification: "",
@@ -83,6 +83,16 @@ const BusinessRegistrationForm = ({ previousData }) => {
       bank: { name: "", branch: "", ifsc: "", account_number: "" },
     },
   });
+
+  // Update form data with previous registration data
+  useEffect(() => {
+    if (previousRegData) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        ...previousRegData,
+      }));
+    }
+  }, [previousRegData]);
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -515,6 +525,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
             name="tax_id"
             value={formData.tax_id}
             onChange={handleChange}
+            disabled={previousRegData.tax_id}
             placeholder="Tax Identification Number*"
             className={`p-2 border rounded w-full ${
               errors.tax_id ? "border-red-500 bg-red-500/5 text-red-500" : ""
@@ -528,6 +539,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
           <input
             type="text"
             name="business_registration_number"
+            disabled={previousRegData.business_registration_number}
             value={formData.business_registration_number}
             onChange={handleChange}
             placeholder="Business Registration Number*"
@@ -548,6 +560,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
             type="number"
             name="whatsapp_number"
             value={formData.whatsapp_number}
+            disabled={previousRegData.whatsapp_number}
             onChange={handleChange}
             placeholder="WhatsApp Number*"
             className={`p-2 border rounded w-full ${
@@ -575,6 +588,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
           max={minStartDate}
           name="business_start_date"
           value={formData.business_start_date}
+          disabled={previousRegData.business_start_date}
           onChange={handleChange}
           className={cn("p-2 border rounded w-full", {
             "border-red-500 bg-red-500/5 text-red-500":
@@ -601,6 +615,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
             type="number"
             name="service_radius"
             value={formData.service_radius}
+            disabled={previousRegData.service_radius}
             onChange={handleChange}
             placeholder="Service Radius (km)*"
             className={`p-2 border rounded w-full ${
@@ -618,6 +633,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
         <textarea
           name="address"
           value={formData.address}
+          disabled={previousRegData.address}
           onChange={handleChange}
           placeholder="Business Address*"
           className={`w-full p-2 border rounded ${
@@ -678,6 +694,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               <input
                 type="text"
                 value={employee.name}
+                // disabled={previousRegData?.employees[index]?.name}
                 onChange={(e) =>
                   handleEmployeeChange(index, "name", e.target.value)
                 }
@@ -697,6 +714,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
             <select
               value={employee.gender}
+              // disabled={previousRegData?.employees[index]?.gender}
               onChange={(e) =>
                 handleEmployeeChange(index, "gender", e.target.value)
               }
@@ -713,6 +731,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
             <input
               type="text"
+              // disabled={previousRegData?.employees[index]?.qualification}
               value={employee.qualification}
               onChange={(e) =>
                 handleEmployeeChange(index, "qualification", e.target.value)
@@ -724,6 +743,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
             <input
               type="text"
               value={employee.designation}
+              // disabled={previousRegData?.employees[index]?.designation}
               onChange={(e) =>
                 handleEmployeeChange(index, "designation", e.target.value)
               }
@@ -734,6 +754,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
             <div>
               <input
                 type="number"
+                // disabled={previousRegData?.employees[index]?.phone}
                 value={employee.phone}
                 onChange={(e) =>
                   handleEmployeeChange(index, "phone", e.target.value)
@@ -755,6 +776,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
             <div>
               <input
                 type="email"
+                // disabled={previousRegData?.employees[index]?.email}
                 value={employee.email}
                 required
                 onChange={(e) =>
@@ -776,6 +798,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
 
             <input
               type="number"
+              // disabled={previousRegData?.employees[index]?.whatsapp_number}
               value={employee.whatsapp_number}
               onChange={(e) =>
                 handleEmployeeChange(index, "whatsapp_number", e.target.value)
@@ -835,6 +858,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
         value={formData.payment_method}
         onChange={handleChange}
         className="w-full p-2 border rounded"
+        disabled={previousRegData.payment_method}
       >
         <option value="upi">UPI</option>
         <option value="bank">Bank Transfer</option>
@@ -847,6 +871,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               type="text"
               name="payment_details.upi.id"
               value={formData.payment_details.upi.id}
+              disabled={previousRegData.payment_details.upi.id}
               onChange={handleChange}
               placeholder="UPI ID*"
               className={`w-full p-2 border rounded ${
@@ -866,6 +891,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               type="text"
               name="payment_details.upi.display_name"
               value={formData.payment_details.upi.display_name}
+              disabled={previousRegData.payment_details.upi.display_name}
               onChange={handleChange}
               placeholder="Display Name*"
               className={`w-full p-2 border rounded ${
@@ -885,6 +911,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               type="number"
               name="payment_details.upi.phone"
               value={formData.payment_details.upi.phone}
+              disabled={previousRegData.payment_details.upi.phone}
               onChange={handleChange}
               placeholder="UPI Phone Number*"
               className={`w-full p-2 border rounded ${
@@ -907,6 +934,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               type="text"
               name="payment_details.bank.name"
               value={formData.payment_details.bank.name}
+              disabled={previousRegData.payment_details.bank.name}
               onChange={handleChange}
               placeholder="Bank Name*"
               className={`w-full p-2 border rounded ${
@@ -926,6 +954,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               type="text"
               name="payment_details.bank.branch"
               value={formData.payment_details.bank.branch}
+              disabled={previousRegData.payment_details.bank.branch}
               onChange={handleChange}
               placeholder="Branch*"
               className={`w-full p-2 border rounded ${
@@ -945,6 +974,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               type="text"
               name="payment_details.bank.ifsc"
               value={formData.payment_details.bank.ifsc}
+              disabled={previousRegData.payment_details.bank.ifsc}
               onChange={handleChange}
               placeholder="IFSC Code*"
               className={`w-full p-2 border rounded ${
@@ -964,6 +994,7 @@ const BusinessRegistrationForm = ({ previousData }) => {
               type="text"
               name="payment_details.bank.account_number"
               value={formData.payment_details.bank.account_number}
+              disabled={previousRegData.payment_details.bank.account_number}
               onChange={handleChange}
               placeholder="Account Number*"
               className={`w-full p-2 border rounded ${

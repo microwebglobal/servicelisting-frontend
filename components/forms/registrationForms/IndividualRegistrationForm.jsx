@@ -7,18 +7,18 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const IndividualRegistrationForm = ({ previousData }) => {
+const IndividualRegistrationForm = ({ enquiryData, previousRegData }) => {
   const [formData, setFormData] = useState({
-    enquiry_id: previousData?.enquiry_id || "",
-    name: previousData?.User?.name || "",
-    dob: previousData?.User?.dob || "",
+    enquiry_id: enquiryData?.enquiry_id || "",
+    name: enquiryData?.User?.name || "",
+    dob: enquiryData?.User?.dob || "",
     nationality: "",
-    gender: previousData?.User?.gender || "",
+    gender: enquiryData?.User?.gender || "",
     qualification: "",
-    email: previousData?.User?.email || "",
-    phone: previousData?.User?.mobile || "",
+    email: enquiryData?.User?.email || "",
+    phone: enquiryData?.User?.mobile || "",
     whatsapp_number: "",
-    alternate_number: previousData?.alternate_number || "",
+    alternate_number: enquiryData?.alternate_number || "",
     address: "",
     emergency_contact_name: "",
     reference_number: "",
@@ -37,8 +37,8 @@ const IndividualRegistrationForm = ({ previousData }) => {
       saturday: { start: "09:00", end: "18:00", isOpen: true },
       sunday: { start: "09:00", end: "18:00", isOpen: false },
     },
-    years_experience: previousData?.years_experience || "",
-    specializations: previousData?.skills || [],
+    years_experience: enquiryData?.years_experience || "",
+    specializations: enquiryData?.skills || [],
 
     profile_bio: "",
     certificates_awards: "",
@@ -75,17 +75,17 @@ const IndividualRegistrationForm = ({ previousData }) => {
         account_number: "",
       },
     },
-    categories: (previousData?.ServiceCategories || []).map((cat) => ({
+    categories: (enquiryData?.ServiceCategories || []).map((cat) => ({
       id: cat.category_id || "",
       experience_years: 0,
       is_primary: false,
     })),
-    cities: (previousData?.Cities || []).map((city) => ({
+    cities: (enquiryData?.Cities || []).map((city) => ({
       id: city.city_id || "",
       service_radius: 0,
       is_primary: false,
     })),
-    primary_location: previousData?.primary_location || "",
+    primary_location: enquiryData?.primary_location || "",
   });
 
   const [step, setStep] = useState(1);
@@ -100,13 +100,20 @@ const IndividualRegistrationForm = ({ previousData }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (previousData?.enquiry_id) {
+    if (enquiryData?.enquiry_id) {
       setFormData((prev) => ({
         ...prev,
-        enquiry_id: previousData.enquiry_id,
+        enquiry_id: enquiryData.enquiry_id,
       }));
     }
-  }, [previousData]);
+
+    if (previousRegData) {
+      setFormData((prev) => ({
+        ...prev,
+        ...previousRegData,
+      }));
+    }
+  }, [enquiryData, previousRegData]);
 
   const handleChange = (e) => {
     const { name, value, type, files, required } = e.target;
@@ -484,7 +491,13 @@ const IndividualRegistrationForm = ({ previousData }) => {
           className="p-2 border rounded w-full"
           disabled
         />
-        {renderInputField("nationality", "Nationality*", "text", false, true)}
+        {renderInputField(
+          "nationality",
+          "Nationality*",
+          "text",
+          previousRegData.nationality,
+          true
+        )}
         <select
           name="gender"
           value={formData.gender}
@@ -504,6 +517,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             isMulti
             options={spokenLanguages}
             value={selectedLanguages}
+            isDisabled={previousRegData.languages_spoken}
             styles={{
               control: (base) => ({
                 ...base,
@@ -528,14 +542,30 @@ const IndividualRegistrationForm = ({ previousData }) => {
           "aadhar_number",
           "Aadhar Number*",
           "number",
-          false,
+          previousRegData.aadhar_number,
           true
         )}
-        {renderInputField("pan_number", "PAN Number*", "text", false, true)}
+        {renderInputField(
+          "pan_number",
+          "PAN Number*",
+          "text",
+          previousRegData.pan_number,
+          true
+        )}
         {renderInputField("email", "Email", "email", true)}
         {renderInputField("phone", "Phone Number", "number", true)}
-        {renderInputField("whatsapp_number", "WhatsApp Number", "number")}
-        {renderInputField("alternate_number", "Alternate Number", "number")}
+        {renderInputField(
+          "whatsapp_number",
+          "WhatsApp Number",
+          "number",
+          previousRegData.whatsapp_number
+        )}
+        {renderInputField(
+          "alternate_number",
+          "Alternate Number",
+          "number",
+          previousRegData.alternate_number
+        )}
       </div>
 
       <div className="space-y-2">
@@ -544,6 +574,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           value={formData.address}
           onChange={handleChange}
           placeholder="Address*"
+          disabled={previousRegData.address}
           className={`w-full p-2 border rounded ${
             errors.address ? "border-red-500 bg-red-500/5" : ""
           }`}
@@ -556,9 +587,24 @@ const IndividualRegistrationForm = ({ previousData }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {renderInputField("emergency_contact_name", "Emergency Contact Name")}
-        {renderInputField("reference_name", "Reference Name")}
-        {renderInputField("reference_number", "Reference Number")}
+        {renderInputField(
+          "emergency_contact_name",
+          "Emergency Contact Name",
+          "text",
+          previousRegData.emergency_contact_name
+        )}
+        {renderInputField(
+          "reference_name",
+          "Reference Name",
+          "text",
+          previousRegData.reference_name
+        )}
+        {renderInputField(
+          "reference_number",
+          "Reference Number",
+          "number",
+          previousRegData.reference_number
+        )}
       </div>
     </div>
   );
@@ -571,7 +617,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           "service_radius",
           "Service Radius (km)*",
           "number",
-          false,
+          previousRegData.service_radius,
           true
         )}
         <select
@@ -579,6 +625,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
           value={formData.availability_type}
           onChange={handleChange}
           className="p-2 border rounded w-full h-11"
+          disabled={previousRegData.availability_type}
         >
           <option value="full_time">Full Time</option>
           <option value="part_time">Part Time</option>
@@ -593,6 +640,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
                 name="availability_hours.start"
                 value={formData.availability_hours.start || ""}
                 onChange={handleChange}
+                disabled={previousRegData.availability_hours.start}
                 className={cn("p-2 border rounded w-full", {
                   "border-red-500 bg-red-500/5 text-red-500": errors.start_time,
                 })}
@@ -607,6 +655,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
                 type="time"
                 name="availability_hours.end"
                 value={formData.availability_hours.end || ""}
+                disabled={previousRegData.availability_hours.end}
                 onChange={handleChange}
                 className={cn("p-2 border rounded w-full", {
                   "border-red-500 bg-red-500/5 text-red-500": errors.end_time,
@@ -629,17 +678,20 @@ const IndividualRegistrationForm = ({ previousData }) => {
         name="specializations"
         value={formData.specializations}
         onChange={handleChange}
+        disabled={previousRegData.specializations}
         placeholder="Specializations/Skills"
         className="w-full p-2 border rounded"
         rows="3"
         required
       />
+
       <div className="space-y-2">
         <textarea
           name="profile_bio"
           value={formData.profile_bio}
           onChange={handleChange}
           placeholder="Profile Bio"
+          disabled={previousRegData.profile_bio}
           className={`w-full p-2 border rounded ${
             errors.profile_bio ? "border-red-500 bg-red-500/5" : ""
           }`}
@@ -651,12 +703,14 @@ const IndividualRegistrationForm = ({ previousData }) => {
           <p className="text-red-500 text-sm mt-1">{errors.profile_bio}</p>
         )}
       </div>
+
       <textarea
         name="certificates_awards"
         value={formData.certificates_awards}
         onChange={handleChange}
         placeholder="Certificates/Awards"
         className="w-full p-2 border rounded"
+        disabled={previousRegData.certificates_awards}
         rows="3"
       />
     </div>
@@ -699,6 +753,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
         value={formData.payment_method}
         onChange={handleChange}
         className="w-full p-2 border rounded"
+        disabled={previousRegData.payment_method}
       >
         <option value="upi">UPI</option>
         <option value="bank">Bank Transfer</option>
@@ -709,6 +764,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             type="text"
             name="payment_details.upi.id"
             value={formData.payment_details.upi.id}
+            disabled={previousRegData.payment_details.upi.id}
             onChange={handleChange}
             placeholder="UPI ID"
             className={`w-full p-2 border rounded ${
@@ -726,6 +782,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             type="text"
             name="payment_details.upi.display_name"
             value={formData.payment_details.upi.display_name}
+            disabled={previousRegData.payment_details.upi.display_name}
             onChange={handleChange}
             placeholder="Display Name"
             className={`w-full p-2 border rounded ${
@@ -743,6 +800,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             type="number"
             name="payment_details.upi.phone"
             value={formData.payment_details.upi.phone}
+            disabled={previousRegData.payment_details.upi.phone}
             onChange={handleChange}
             placeholder="UPI Phone Number"
             className={`w-full p-2 border rounded ${
@@ -763,6 +821,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             type="text"
             name="payment_details.bank.name"
             value={formData.payment_details.bank.name}
+            disabled={previousRegData.payment_details.bank.name}
             onChange={handleChange}
             placeholder="Bank Name"
             className={`w-full p-2 border rounded ${
@@ -780,6 +839,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             type="text"
             name="payment_details.bank.branch"
             value={formData.payment_details.bank.branch}
+            disabled={previousRegData.payment_details.bank.branch}
             onChange={handleChange}
             placeholder="Branch"
             className={`w-full p-2 border rounded ${
@@ -797,6 +857,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             type="text"
             name="payment_details.bank.ifsc"
             value={formData.payment_details.bank.ifsc}
+            disabled={previousRegData.payment_details.bank.ifsc}
             onChange={handleChange}
             placeholder="IFSC Code"
             className={`w-full p-2 border rounded ${
@@ -814,6 +875,7 @@ const IndividualRegistrationForm = ({ previousData }) => {
             type="text"
             name="payment_details.bank.account_number"
             value={formData.payment_details.bank.account_number}
+            disabled={previousRegData.payment_details.bank.account_number}
             onChange={handleChange}
             placeholder="Account Number"
             className={`w-full p-2 border rounded ${

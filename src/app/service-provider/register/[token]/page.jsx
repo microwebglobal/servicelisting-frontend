@@ -1,22 +1,27 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Footer from "@components/Footer";
-import Image from "next/image";
 import Navbar from "@components/Navbar";
 import { jwtDecode } from "jwt-decode";
 import IndividualRegistrationForm from "@components/forms/registrationForms/IndividualRegistrationForm";
 import BusinessRegistrationForm from "@components/forms/registrationForms/BusinessRegistrationForm";
-import { providerAPI } from "@api/provider";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { providerAPI } from "@api/provider";
+import { useSearchParams } from "next/navigation";
 
 const Page = ({ params }) => {
+  const searchParams = useSearchParams();
   const [token, setToken] = useState(null);
   const [tokenData, setTokenData] = useState({
     enquiry_id: "",
     user_id: "",
     business_type: "",
   });
+
+  const isReRegistrationMode = searchParams?.get("reReg") === "true";
   const [inquiries, setInquiries] = useState();
+  const [previousRegData, setPreviousRegData] = useState({});
+
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,6 +37,22 @@ const Page = ({ params }) => {
   }, [params]);
 
   useEffect(() => {
+    // Function to fetch previous registration details
+    const fetchPreviousRegistration = async () => {
+      try {
+        const response = await providerAPI.getProviderByToken(token);
+        if (response.data) {
+          console.log(response.data);
+          setPreviousRegData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching previous registration", error);
+        setError(
+          "Unable to load previous registration details. Please try again later."
+        );
+      }
+    };
+
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
@@ -39,6 +60,7 @@ const Page = ({ params }) => {
           enquiry_id: decodedToken.eid,
           user_id: decodedToken.uid,
           business_type: decodedToken.t === "b" ? "business" : "individual",
+          previous_reg_id: decodedToken.rid || null,
         });
       } catch (error) {
         setError(
@@ -46,6 +68,8 @@ const Page = ({ params }) => {
         );
         console.error("Error decoding token:", error);
       }
+
+      if (isReRegistrationMode) fetchPreviousRegistration();
     }
   }, [token]);
 
@@ -111,9 +135,19 @@ const Page = ({ params }) => {
 
     switch (tokenData.business_type) {
       case "business":
-        return <BusinessRegistrationForm previousData={inquiries} />;
+        return (
+          <BusinessRegistrationForm
+            enquiryData={inquiries}
+            previousRegData={previousRegData}
+          />
+        );
       case "individual":
-        return <IndividualRegistrationForm previousData={inquiries} />;
+        return (
+          <IndividualRegistrationForm
+            enquiryData={inquiries}
+            previousRegData={previousRegData}
+          />
+        );
       default:
         return (
           <Alert variant="destructive" className="max-w-md mx-auto">
@@ -145,6 +179,17 @@ const Page = ({ params }) => {
               <h1 className="text-3xl font-bold text-gray-900 mb-6">
                 Complete Your Registration
               </h1>
+              {isReRegistrationMode && (
+                <p className="text-red-500 mb-4 border border-red-500 bg-red-500/5 p-3 rounded-lg">
+                  *You are re-registering as a{" "}
+                  {tokenData.business_type === "business"
+                    ? "business"
+                    : "individual"}
+                  . Please fill out only the empty fields to complete the
+                  registration process.
+                </p>
+              )}
+
               <div className="space-y-6">{renderContent()}</div>
             </div>
           </div>
