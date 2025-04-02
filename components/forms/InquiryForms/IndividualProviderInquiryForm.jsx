@@ -9,9 +9,7 @@ import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import { cn } from "@/lib/utils";
 
-const formDataCacheKey = "IndividualProviderInquiryFormData";
-
-const IndividualProviderInquiryForm = () => {
+const IndividualProviderInquiryForm = ({ formData, onFormDataChange }) => {
   const [step, setStep] = useState(1);
 
   // Calculate minimum age
@@ -32,36 +30,6 @@ const IndividualProviderInquiryForm = () => {
   )
     .toISOString()
     .split("T")[0];
-
-  // Retrieve form data from session storage
-  let cachedFormData = null;
-  if (typeof window !== "undefined") {
-    cachedFormData = sessionStorage.getItem(formDataCacheKey);
-  }
-
-  const [formData, setFormData] = useState(
-    cachedFormData
-      ? JSON.parse(cachedFormData)
-      : {
-          type: "individual",
-          name: "",
-          email: "",
-          mobile: "",
-          gender: "",
-          business_type: "individual",
-          dob: "",
-          years_experience: 0,
-          categories: [],
-          cities: [],
-          location: "",
-          skills: "",
-        }
-  );
-
-  // Save form data to session storage
-  useEffect(() => {
-    sessionStorage.setItem(formDataCacheKey, JSON.stringify(formData));
-  }, [formData]);
 
   const [citiesOptions, setCitiesOpions] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
@@ -121,9 +89,6 @@ const IndividualProviderInquiryForm = () => {
 
     fetchCities();
     fetchServices();
-
-    // Clear old form data cache on page load
-    sessionStorage.removeItem(formDataCacheKey);
   }, []);
 
   // Handle Input Change
@@ -174,7 +139,24 @@ const IndividualProviderInquiryForm = () => {
       }
     }
 
-    setFormData({ ...formData, [name]: value });
+    onFormDataChange({ ...formData, [name]: value });
+  };
+
+  // Handle Location Change
+  const handleLocationChange = (location) => {
+    if (!location) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        location: "Location is required",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        location: "",
+      }));
+    }
+
+    onFormDataChange({ ...formData, location: location });
   };
 
   //Handle Seelecte categories change
@@ -185,7 +167,7 @@ const IndividualProviderInquiryForm = () => {
         categories: "",
       }));
 
-      setFormData({
+      onFormDataChange({
         ...formData,
         categories: selectedCategories.map((category) => category.value),
       });
@@ -207,7 +189,7 @@ const IndividualProviderInquiryForm = () => {
         cities: "",
       }));
 
-      setFormData({
+      onFormDataChange({
         ...formData,
         cities: selectedCities.map((city) => city.value),
       });
@@ -243,7 +225,8 @@ const IndividualProviderInquiryForm = () => {
     let newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = "Full name is required";
-    if (!formData.email.match(/^\S+@\S+\.\S+$/))
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!formData.email.match(/^\S+@\S+\.\S+$/))
       newErrors.email = "Invalid email format";
     if (!formData.mobile.match(/^\d{10}$/))
       newErrors.mobile = "Phone number must be 10 digits";
@@ -272,7 +255,8 @@ const IndividualProviderInquiryForm = () => {
     if (!selectedServiceCategories.length)
       newErrors.categories = "Select at least one category";
 
-    if (formData.location === "") newErrors.location = "Location is required";
+    if (formData.location === null || formData.location === "")
+      newErrors.location = "Location is required";
     if (formData.skills === "") newErrors.skills = "Skills are required";
 
     setErrors(newErrors);
@@ -312,9 +296,6 @@ const IndividualProviderInquiryForm = () => {
         description: "Your inquiry was submitted successfully.",
         variant: "default",
       });
-
-      // Clear form data cache after successful submission
-      sessionStorage.removeItem(formDataCacheKey);
 
       router.push("/registration/sucess");
     } catch (error) {
@@ -495,9 +476,7 @@ const IndividualProviderInquiryForm = () => {
                     errors.location,
                 })}
                 location={formData.location}
-                setLocation={(newLocation) =>
-                  setFormData({ ...formData, location: newLocation })
-                }
+                setLocation={handleLocationChange}
                 required
               />
               {errors.location && (
@@ -517,13 +496,13 @@ const IndividualProviderInquiryForm = () => {
                 styles={{
                   control: (base, state) => ({
                     ...base,
-                    backgroundColor: errors.cities
+                    backgroundColor: errors.categories
                       ? "rgba(239, 68, 68, 0.05)"
                       : "#f3f4f6",
                     borderRadius: "0.375rem",
                     border: state.isFocused
                       ? "2px solid #3b82f6"
-                      : errors.cities
+                      : errors.categories
                       ? "1px solid #ef4444"
                       : "none",
                     boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",

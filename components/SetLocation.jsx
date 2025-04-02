@@ -71,6 +71,7 @@ const SetLocation = ({ location, setLocation, className }) => {
 
   const handlePlaceChanged = () => {
     const place = autocompleteRef.current.getPlace();
+
     if (place?.geometry?.location) {
       const newLocation = {
         type: "point",
@@ -115,6 +116,7 @@ const SetLocation = ({ location, setLocation, className }) => {
           fetchAddress(latitude, longitude);
         },
         (error) => {
+          setSearchInput("");
           let errorMsg;
           switch (error.code) {
             case error.PERMISSION_DENIED:
@@ -205,7 +207,14 @@ const SetLocation = ({ location, setLocation, className }) => {
               )}
               placeholder="Search for a location"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value === "") {
+                  setSearchInput("");
+                  setLocation(null);
+                } else {
+                  setSearchInput(e.target.value);
+                }
+              }}
             />
           </Autocomplete>
         </div>

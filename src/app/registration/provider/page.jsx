@@ -8,6 +8,43 @@ import Footer from "@/components/Footer";
 
 const ProviderReg = () => {
   const [providerType, setProviderType] = useState("individual");
+  const [individualFormData, setIndividualFormData] = useState({
+    type: "individual",
+    name: "",
+    email: "",
+    mobile: "",
+    gender: "",
+    business_type: "individual",
+    dob: "",
+    years_experience: 0,
+    categories: [],
+    cities: [],
+    location: "",
+    skills: "",
+  });
+
+  const [businessFormData, setBusinessFormData] = useState({
+    type: "business",
+    business_name: "",
+    name: "", // Authorized Person Name
+    mobile: "", // Authorized Person Contact
+    email: "",
+    gender: "", // Authorized Person Gender
+    business_type: "sole_proprietorship",
+    website: "",
+    location: "",
+    categories: [],
+    cities: [],
+    no_of_employee: "",
+  });
+
+  const handleIndividualFormDataChange = (data) => {
+    setIndividualFormData(data);
+  };
+
+  const handleBusinessFormDataChange = (data) => {
+    setBusinessFormData(data);
+  };
 
   return (
     <>
@@ -61,9 +98,15 @@ const ProviderReg = () => {
             {/* Form Section (Dynamic Height) */}
             <div className="w-full flex-grow">
               {providerType === "individual" ? (
-                <IndividualProviderInquiryForm />
+                <IndividualProviderInquiryForm
+                  formData={individualFormData}
+                  onFormDataChange={handleIndividualFormDataChange}
+                />
               ) : (
-                <BusinessProviderInquiryForm />
+                <BusinessProviderInquiryForm
+                  formData={businessFormData}
+                  onFormDataChange={handleBusinessFormDataChange}
+                />
               )}
             </div>
           </div>

@@ -11,37 +11,7 @@ import { cn } from "@/lib/utils";
 
 const formDataCacheKey = "BusinessProviderInquiryFormData";
 
-const BusinessProviderInquiryForm = () => {
-  // Retrieve form data from session storage
-  let cachedFormData = null;
-  if (typeof window !== "undefined") {
-    cachedFormData = sessionStorage.getItem(formDataCacheKey);
-  }
-
-  const [formData, setFormData] = useState(
-    cachedFormData
-      ? JSON.parse(cachedFormData)
-      : {
-          type: "business",
-          business_name: "",
-          name: "", // Authorized Person Name
-          mobile: "", // Authorized Person Contact
-          email: "",
-          gender: "", // Authorized Person Gender
-          business_type: "sole_proprietorship",
-          website: "",
-          location: "",
-          categories: [],
-          cities: [],
-          no_of_employee: "",
-        }
-  );
-
-  // Save form data to session storage
-  useEffect(() => {
-    sessionStorage.setItem(formDataCacheKey, JSON.stringify(formData));
-  }, [formData]);
-
+const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
   const [citiesOptions, setCitiesOpions] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
   const [serviceCategoriesOptions, setServiceCategoriesOptions] = useState([]);
@@ -142,7 +112,7 @@ const BusinessProviderInquiryForm = () => {
       }
     }
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    onFormDataChange((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle category change
@@ -153,7 +123,7 @@ const BusinessProviderInquiryForm = () => {
         categories: "",
       }));
 
-      setFormData((prev) => ({
+      onFormDataChange((prev) => ({
         ...prev,
         categories: selectedOptions.map((option) => option.value),
       }));
@@ -175,7 +145,7 @@ const BusinessProviderInquiryForm = () => {
         cities: "",
       }));
 
-      setFormData((prev) => ({
+      onFormDataChange((prev) => ({
         ...prev,
         cities: selectedOptions.map((option) => option.value),
       }));
@@ -201,8 +171,9 @@ const BusinessProviderInquiryForm = () => {
         ...prevErrors,
         location: "",
       }));
-      setFormData((prev) => ({ ...prev, location: location }));
     }
+
+    onFormDataChange({ ...formData, location: location });
   };
 
   const validateStep1 = () => {
@@ -254,15 +225,13 @@ const BusinessProviderInquiryForm = () => {
 
     if (!formData.email || formData.email === "") {
       newErrors.email = "Email is required";
-    }
-
-    if (formData.location === "") {
-      newErrors.location = "Location is required";
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    } else if (!emailRegex.test(formData.email)) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       newErrors.email = "Invalid email format";
+    }
+
+    if (formData.location === "" || formData.location === null) {
+      newErrors.location = "Location is required";
     }
 
     setErrors(newErrors);
@@ -319,7 +288,7 @@ const BusinessProviderInquiryForm = () => {
 
       router.push("/registration/sucess");
       // Reset form
-      setFormData({
+      onFormDataChange({
         type: "business",
         business_name: "",
         name: "",
