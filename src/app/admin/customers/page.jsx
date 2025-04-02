@@ -147,6 +147,32 @@ const CustomersPage = () => {
                         </TableCell>
                         <TableCell className="px-4 py-3 text-sm">
                           {customer.acc_balance || "N/A"}
+                          {customer.acc_balance < 0 && (
+                            <div className="flex gap-2 mt-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs h-6 px-2"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // Handle offer discount
+                                }}
+                              >
+                                Offer Discount
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs h-6 px-2"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // Handle settle
+                                }}
+                              >
+                                Settle
+                              </Button>
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-sm">
                           {customer.mobile}
@@ -229,6 +255,28 @@ const CustomersPage = () => {
                 </Label>
                 <Label className="text-sm font-medium text-gray-600">
                   <strong>Balance:</strong> {selectedCustomer.acc_balance}
+                  {selectedCustomer.acc_balance < 0 && (
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          // Handle offer discount
+                        }}
+                      >
+                        Offer Discount
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          // Handle settle
+                        }}
+                      >
+                        Settle
+                      </Button>
+                    </div>
+                  )}
                 </Label>
               </div>
 
