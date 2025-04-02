@@ -26,7 +26,7 @@ const Registration = () => {
       </Link> */}
 
       {/* <IndividualProviderInquiryForm /> */}
-      <BusinessProviderInquiryForm />
+      {/* <BusinessProviderInquiryForm /> */}
     </div>
   );
 };
