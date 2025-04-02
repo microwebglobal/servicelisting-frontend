@@ -6,29 +6,43 @@ import { toast } from "@hooks/use-toast";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import FileInput from "@/components/FileInput";
 
-const IndividualRegistrationForm = ({ previousData }) => {
+const spokenLanguages = [
+  { label: "Hindi", value: "hindi" },
+  { label: "Tamil", value: "tamil" },
+];
+
+const IndividualRegistrationForm = ({
+  enquiryData,
+  previousRegData,
+  rejectedFields,
+}) => {
+  const isReRegistration = previousRegData && rejectedFields?.length > 0;
+
   const [formData, setFormData] = useState({
-    enquiry_id: previousData?.enquiry_id || "",
-    name: previousData?.User?.name || "",
-    dob: previousData?.User?.dob || "",
-    nationality: "",
-    gender: previousData?.User?.gender || "",
-    qualification: "",
-    email: previousData?.User?.email || "",
-    phone: previousData?.User?.mobile || "",
-    whatsapp_number: "",
-    alternate_number: previousData?.alternate_number || "",
-    address: "",
-    emergency_contact_name: "",
-    reference_number: "",
-    reference_name: "",
-    aadhar_number: "",
-    pan_number: "",
-    languages_spoken: [],
-    service_radius: "",
-    availability_type: "full_time",
-    availability_hours: {
+    enquiry_id: enquiryData?.enquiry_id || "",
+    name: enquiryData?.User?.name || "",
+    dob: enquiryData?.User?.dob || "",
+    nationality: previousRegData?.nationality || "",
+    gender: enquiryData?.User?.gender || "",
+    qualification: enquiryData?.qualification || "",
+    email: enquiryData?.User?.email || "",
+    phone: enquiryData?.User?.mobile || "",
+    whatsapp_number: previousRegData?.whatsapp_number || "",
+    alternate_number: enquiryData?.alternate_number || "",
+    exact_address: previousRegData?.exact_address || "",
+    emergency_contact_name: previousRegData?.emergency_contact_name || "",
+    reference_number: previousRegData?.reference_number || "",
+    reference_name: previousRegData?.reference_name || "",
+    aadhar_number: previousRegData?.aadhar_number || "",
+    pan_number: previousRegData?.pan_number || "",
+    languages_spoken: previousRegData?.languages_spoken
+      ? JSON.parse(previousRegData?.languages_spoken)
+      : [],
+    service_radius: previousRegData?.service_radius || "",
+    availability_type: previousRegData?.availability_type || "full_time",
+    availability_hours: previousRegData?.availability_hours || {
       monday: { start: "09:00", end: "18:00", isOpen: true },
       tuesday: { start: "09:00", end: "18:00", isOpen: true },
       wednesday: { start: "09:00", end: "18:00", isOpen: true },
@@ -37,11 +51,11 @@ const IndividualRegistrationForm = ({ previousData }) => {
       saturday: { start: "09:00", end: "18:00", isOpen: true },
       sunday: { start: "09:00", end: "18:00", isOpen: false },
     },
-    years_experience: previousData?.years_experience || "",
-    specializations: previousData?.skills || [],
+    years_experience: enquiryData?.years_experience || "",
+    specializations: enquiryData?.skills || [],
 
-    profile_bio: "",
-    certificates_awards: "",
+    profile_bio: previousRegData?.profile_bio || "",
+    certificates_awards: previousRegData?.qualification || "",
 
     documents: {
       logo: null,
@@ -61,52 +75,46 @@ const IndividualRegistrationForm = ({ previousData }) => {
       instagram: "",
       linkedin: "",
     },
-    payment_method: "upi",
+    payment_method: previousRegData?.payment_method || "upi",
     payment_details: {
       upi: {
-        id: "",
-        display_name: "",
-        phone: "",
+        id: previousRegData?.payment_details?.upi?.id || "",
+        display_name: previousRegData?.payment_details?.upi?.display_name || "",
+        phone: previousRegData?.payment_details?.upi?.phone || "",
       },
       bank: {
-        name: "",
-        branch: "",
-        ifsc: "",
-        account_number: "",
+        name: previousRegData?.payment_details?.bank?.name || "",
+        branch: previousRegData?.payment_details?.bank?.branch || "",
+        ifsc: previousRegData?.payment_details?.bank?.ifsc || "",
+        account_number:
+          previousRegData?.payment_details?.bank?.account_number || "",
       },
     },
-    categories: (previousData?.ServiceCategories || []).map((cat) => ({
+    categories: (enquiryData?.ServiceCategories || []).map((cat) => ({
       id: cat.category_id || "",
       experience_years: 0,
       is_primary: false,
     })),
-    cities: (previousData?.Cities || []).map((city) => ({
+    cities: (enquiryData?.Cities || []).map((city) => ({
       id: city.city_id || "",
       service_radius: 0,
       is_primary: false,
     })),
-    primary_location: previousData?.primary_location || "",
+    primary_location: enquiryData?.primary_location || "",
   });
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [selectedLanguages, setSelectedLanguages] = useState([]);
-  const spokenLanguages = [
-    { label: "Hindi", value: "hindi" },
-    { label: "Tamil", value: "tamil" },
-  ];
+  const [selectedLanguages, setSelectedLanguages] = useState(
+    previousRegData.languages_spoken?.length
+      ? spokenLanguages.filter((lang) =>
+          JSON.parse(previousRegData.languages_spoken).includes(lang.value)
+        )
+      : []
+  );
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (previousData?.enquiry_id) {
-      setFormData((prev) => ({
-        ...prev,
-        enquiry_id: previousData.enquiry_id,
-      }));
-    }
-  }, [previousData]);
 
   const handleChange = (e) => {
     const { name, value, type, files, required } = e.target;
@@ -240,13 +248,15 @@ const IndividualRegistrationForm = ({ previousData }) => {
     switch (stepNumber) {
       case 1:
         if (!formData.nationality) newErrors.nationality = "Required";
+        else if (!formData.nationality.match(/^[a-zA-Z\s]+$/))
+          newErrors.nationality = "Only alphabets are allowed";
         if (!formData.aadhar_number) newErrors.aadhar_number = "Required";
         if (!formData.aadhar_number.match(/^\d{12}$/))
           newErrors.aadhar_number = "Invalid Aadhar Number";
         if (!formData.pan_number) newErrors.pan_number = "Required";
         if (!formData.pan_number.match(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/))
           newErrors.pan_number = "Invalid PAN Number";
-        if (!formData.address) newErrors.address = "Required";
+        if (!formData.exact_address) newErrors.exact_address = "Required";
         if (
           !formData.languages_spoken ||
           formData.languages_spoken.length === 0
@@ -266,15 +276,44 @@ const IndividualRegistrationForm = ({ previousData }) => {
         }
         break;
       case 3:
-        if (!formData.documents.logo) newErrors.logo = "Required";
-        if (!formData.documents.id_proof) newErrors.id_proof = "Required";
-        if (!formData.documents.aadhar) newErrors.aadhar = "Required";
-        if (!formData.documents.pan) newErrors.pan = "Required";
-        if (!formData.documents.address_proof)
-          newErrors.address_proof = "Required";
-        if (!formData.documents.agreement) newErrors.agreement = "Required";
-        if (!formData.documents.terms_acceptance)
-          newErrors.terms_acceptance = "Required";
+        if (isReRegistration) {
+          if (!formData.documents.logo && rejectedFields.includes("logo"))
+            newErrors.logo = "Required";
+          if (
+            !formData.documents.id_proof &&
+            rejectedFields.includes("id_proof")
+          )
+            newErrors.id_proof = "Required";
+          if (!formData.documents.aadhar && rejectedFields.includes("aadhar"))
+            newErrors.aadhar = "Required";
+          if (!formData.documents.pan && rejectedFields.includes("pan"))
+            newErrors.pan = "Required";
+          if (
+            !formData.documents.address_proof &&
+            rejectedFields.includes("address_proof")
+          )
+            newErrors.address_proof = "Required";
+          if (
+            !formData.documents.agreement &&
+            rejectedFields.includes("agreement")
+          )
+            newErrors.agreement = "Required";
+          if (
+            !formData.documents.terms_acceptance &&
+            rejectedFields.includes("terms_acceptance")
+          )
+            newErrors.terms_acceptance = "Required";
+        } else {
+          if (!formData.documents.logo) newErrors.logo = "Required";
+          if (!formData.documents.id_proof) newErrors.id_proof = "Required";
+          if (!formData.documents.aadhar) newErrors.aadhar = "Required";
+          if (!formData.documents.pan) newErrors.pan = "Required";
+          if (!formData.documents.address_proof)
+            newErrors.address_proof = "Required";
+          if (!formData.documents.agreement) newErrors.agreement = "Required";
+          if (!formData.documents.terms_acceptance)
+            newErrors.terms_acceptance = "Required";
+        }
         break;
       case 4:
         if (formData.payment_method === "upi") {
@@ -392,7 +431,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
         className={`p-2 border rounded w-full ${
           errors[name] ? "border-red-500 bg-red-500/5" : ""
         }`}
-        disabled={disabled}
+        disabled={
+          (isReRegistration && !rejectedFields.includes(name)) || disabled
+        }
         required={required}
       />
 
@@ -406,65 +447,23 @@ const IndividualRegistrationForm = ({ previousData }) => {
       ...prev,
       documents: {
         ...prev.documents,
-        [name]: null, // Set the selected file to null to remove it
+        [name]: null,
       },
     }));
   };
 
   const renderFileInput = (name, label, required = false) => {
-    const isFileSelected = formData.documents[name] !== null;
-
     return (
       <div className="space-y-2 w-full">
-        <label className="block">
-          {label}
-          {required && "*"}
-        </label>
-
-        <div className="flex items-center gap-2">
-          {isFileSelected && (
-            <a
-              target="_blank"
-              className="w-28 h-28 aspect-square"
-              href={URL.createObjectURL(formData.documents[name])}
-            >
-              <img
-                src={URL.createObjectURL(formData.documents[name])}
-                alt={name}
-                className="w-full h-full object-cover rounded-md"
-              />
-            </a>
-          )}
-
-          <div className={cn(!isFileSelected && "flex gap-1 items-center")}>
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png,.pdf" // Accespt PDF and image files only
-              name={name} // Ensure this matches the key in the `documents` object
-              onChange={handleChange}
-              className={`text-transparent w-28 ${
-                errors[name] ? "border-red-500 bg-red-500/5" : ""
-              }`}
-            />
-
-            {isFileSelected ? (
-              <p>
-                <span className="block">
-                  Selected File: {formData.documents[name].name}
-                </span>
-
-                <button
-                  onClick={() => handleRemoveFile(name)}
-                  className="text-sm text-red-500 font-medium"
-                >
-                  Remove
-                </button>
-              </p>
-            ) : (
-              <p>No file selected</p>
-            )}
-          </div>
-        </div>
+        <FileInput
+          name={name}
+          label={label}
+          required={required}
+          file={formData.documents[name]}
+          onFileChange={handleChange}
+          disabled={isReRegistration && !rejectedFields.includes(name)}
+          onFileRemove={() => handleRemoveFile(name)}
+        />
 
         {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
       </div>
@@ -504,6 +503,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
             isMulti
             options={spokenLanguages}
             value={selectedLanguages}
+            isDisabled={
+              isReRegistration && !rejectedFields.includes("languages")
+            }
             styles={{
               control: (base) => ({
                 ...base,
@@ -540,25 +542,30 @@ const IndividualRegistrationForm = ({ previousData }) => {
 
       <div className="space-y-2">
         <textarea
-          name="address"
-          value={formData.address}
+          name="exact_address"
+          value={formData.exact_address}
           onChange={handleChange}
           placeholder="Address*"
+          disabled={isReRegistration && !rejectedFields.includes("address")}
           className={`w-full p-2 border rounded ${
-            errors.address ? "border-red-500 bg-red-500/5" : ""
+            errors.exact_address ? "border-red-500 bg-red-500/5" : ""
           }`}
           rows="3"
         />
 
-        {errors.address && (
-          <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+        {errors.exact_address && (
+          <p className="text-red-500 text-sm mt-1">{errors.exact_address}</p>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {renderInputField("emergency_contact_name", "Emergency Contact Name")}
-        {renderInputField("reference_name", "Reference Name")}
-        {renderInputField("reference_number", "Reference Number")}
+        {renderInputField(
+          "emergency_contact_name",
+          "Emergency Contact Name",
+          "text"
+        )}
+        {renderInputField("reference_name", "Reference Name", "text")}
+        {renderInputField("reference_number", "Reference Number", "number")}
       </div>
     </div>
   );
@@ -579,6 +586,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
           value={formData.availability_type}
           onChange={handleChange}
           className="p-2 border rounded w-full h-11"
+          disabled={
+            isReRegistration && !rejectedFields.includes("availability")
+          }
         >
           <option value="full_time">Full Time</option>
           <option value="part_time">Part Time</option>
@@ -629,17 +639,20 @@ const IndividualRegistrationForm = ({ previousData }) => {
         name="specializations"
         value={formData.specializations}
         onChange={handleChange}
+        disabled={previousRegData.specializations}
         placeholder="Specializations/Skills"
         className="w-full p-2 border rounded"
         rows="3"
         required
       />
+
       <div className="space-y-2">
         <textarea
           name="profile_bio"
           value={formData.profile_bio}
           onChange={handleChange}
-          placeholder="Profile Bio"
+          placeholder="Profile Bio*"
+          disabled={isReRegistration && !rejectedFields.includes("profile_bio")}
           className={`w-full p-2 border rounded ${
             errors.profile_bio ? "border-red-500 bg-red-500/5" : ""
           }`}
@@ -651,12 +664,16 @@ const IndividualRegistrationForm = ({ previousData }) => {
           <p className="text-red-500 text-sm mt-1">{errors.profile_bio}</p>
         )}
       </div>
+
       <textarea
         name="certificates_awards"
         value={formData.certificates_awards}
         onChange={handleChange}
         placeholder="Certificates/Awards"
         className="w-full p-2 border rounded"
+        disabled={
+          isReRegistration && !rejectedFields.includes("certificates_awards")
+        }
         rows="3"
       />
     </div>
@@ -699,6 +716,9 @@ const IndividualRegistrationForm = ({ previousData }) => {
         value={formData.payment_method}
         onChange={handleChange}
         className="w-full p-2 border rounded"
+        disabled={
+          isReRegistration && !rejectedFields.includes("payment_method")
+        }
       >
         <option value="upi">UPI</option>
         <option value="bank">Bank Transfer</option>
@@ -711,6 +731,10 @@ const IndividualRegistrationForm = ({ previousData }) => {
             value={formData.payment_details.upi.id}
             onChange={handleChange}
             placeholder="UPI ID"
+            disabled={
+              isReRegistration &&
+              !rejectedFields.includes("payment_details.upi.id")
+            }
             className={`w-full p-2 border rounded ${
               errors["payment_details.upi.id"]
                 ? "border-red-500 bg-red-500/5"
@@ -728,6 +752,10 @@ const IndividualRegistrationForm = ({ previousData }) => {
             value={formData.payment_details.upi.display_name}
             onChange={handleChange}
             placeholder="Display Name"
+            disabled={
+              isReRegistration &&
+              !rejectedFields.includes("payment_details.upi.display_name")
+            }
             className={`w-full p-2 border rounded ${
               errors["payment_details.upi.display_name"]
                 ? "border-red-500 bg-red-500/5"
@@ -745,6 +773,10 @@ const IndividualRegistrationForm = ({ previousData }) => {
             value={formData.payment_details.upi.phone}
             onChange={handleChange}
             placeholder="UPI Phone Number"
+            disabled={
+              isReRegistration &&
+              !rejectedFields.includes("payment_details.upi.phone")
+            }
             className={`w-full p-2 border rounded ${
               errors["payment_details.upi.phone"]
                 ? "border-red-500 bg-red-500/5"
@@ -765,6 +797,10 @@ const IndividualRegistrationForm = ({ previousData }) => {
             value={formData.payment_details.bank.name}
             onChange={handleChange}
             placeholder="Bank Name"
+            disabled={
+              isReRegistration &&
+              !rejectedFields.includes("payment_details.bank.name")
+            }
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.name"]
                 ? "border-red-500 bg-red-500/5"
@@ -782,6 +818,10 @@ const IndividualRegistrationForm = ({ previousData }) => {
             value={formData.payment_details.bank.branch}
             onChange={handleChange}
             placeholder="Branch"
+            disabled={
+              isReRegistration &&
+              !rejectedFields.includes("payment_details.bank.branch")
+            }
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.branch"]
                 ? "border-red-500 bg-red-500/5"
@@ -799,6 +839,10 @@ const IndividualRegistrationForm = ({ previousData }) => {
             value={formData.payment_details.bank.ifsc}
             onChange={handleChange}
             placeholder="IFSC Code"
+            disabled={
+              isReRegistration &&
+              !rejectedFields.includes("payment_details.bank.ifsc")
+            }
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.ifsc"]
                 ? "border-red-500 bg-red-500/5"
@@ -816,6 +860,10 @@ const IndividualRegistrationForm = ({ previousData }) => {
             value={formData.payment_details.bank.account_number}
             onChange={handleChange}
             placeholder="Account Number"
+            disabled={
+              isReRegistration &&
+              !rejectedFields.includes("payment_details.bank.account_number")
+            }
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.account_number"]
                 ? "border-red-500 bg-red-500/5"

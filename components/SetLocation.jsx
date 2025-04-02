@@ -5,6 +5,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 const libraries = ["places"];
 const center = {
@@ -70,6 +71,7 @@ const SetLocation = ({ location, setLocation, className }) => {
 
   const handlePlaceChanged = () => {
     const place = autocompleteRef.current.getPlace();
+
     if (place?.geometry?.location) {
       const newLocation = {
         type: "point",
@@ -102,58 +104,85 @@ const SetLocation = ({ location, setLocation, className }) => {
 
   const handleCurrentLocation = async () => {
     if (navigator.geolocation) {
+      setSearchInput("Loading...");
+
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
           setSelectedLocation({ lat: latitude, lng: longitude });
-          const newLocation = {
-            type: "point",
-            coordinates: [latitude, longitude],
-          };
-          setLocation(newLocation);
+          setLocation({ type: "point", coordinates: [latitude, longitude] });
 
-          try {
-            const response = await axios.get(
-              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}`
-            );
-
-            if (response.data.results && response.data.results.length > 0) {
-              const place = response.data.results[0];
-
-              if (place.formatted_address) {
-                setSearchInput(place.formatted_address);
-              } else {
-                console.warn("No formatted address found for this location.");
-              }
-
-              const addressComponents = place.address_components || [];
-              const getAddressComponent = (type) => {
-                const component = addressComponents.find((comp) =>
-                  comp.types.includes(type)
-                );
-                return component ? component.long_name : "";
-              };
-
-              setAddressDetails({
-                street: getAddressComponent("route"),
-                city: getAddressComponent("locality"),
-                state: getAddressComponent("administrative_area_level_1"),
-                country: getAddressComponent("country"),
-                postalCode: getAddressComponent("postal_code"),
-              });
-            } else {
-              console.warn("No results found for the given coordinates.");
-            }
-          } catch (error) {
-            console.error("Error fetching address from coordinates:", error);
-          }
+          // Fetch address asynchronously in parallel
+          fetchAddress(latitude, longitude);
         },
         (error) => {
-          console.error("Error getting current location:", error);
+          setSearchInput("");
+          let errorMsg;
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMsg = "User denied the request for Geolocation.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMsg =
+                "Location information is unavailable, Check system settings.";
+              break;
+            case error.TIMEOUT:
+              errorMsg = "The request to get user location timed out.";
+              break;
+            default:
+              errorMsg = "An unknown error occurred.";
+          }
+
+          toast({
+            title: "Error",
+            description: errorMsg,
+            variant: "destructive",
+          });
         }
       );
     } else {
-      console.error("Geolocation is not supported by this browser.");
+      toast({
+        title: "Error",
+        description: "Geolocation is not supported by this browser.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchAddress = async (lat, lng) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}`
+      );
+
+      if (response.data.results?.length) {
+        const place = response.data.results[0];
+        setSearchInput(place.formatted_address || "");
+
+        const getAddressComponent = (type) =>
+          place.address_components?.find((comp) => comp.types.includes(type))
+            ?.long_name || "";
+
+        setAddressDetails({
+          street: getAddressComponent("route"),
+          city: getAddressComponent("locality"),
+          state: getAddressComponent("administrative_area_level_1"),
+          country: getAddressComponent("country"),
+          postalCode: getAddressComponent("postal_code"),
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "No address found for the given coordinates.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Error fetching address.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -178,7 +207,14 @@ const SetLocation = ({ location, setLocation, className }) => {
               )}
               placeholder="Search for a location"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value === "") {
+                  setSearchInput("");
+                  setLocation(null);
+                } else {
+                  setSearchInput(e.target.value);
+                }
+              }}
             />
           </Autocomplete>
         </div>

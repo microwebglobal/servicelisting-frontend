@@ -17,6 +17,7 @@ export const providerAPI = {
       },
     }),
   getProvider: (id) => api.get(`/provider/${id}`),
+  getProviderByToken: (token) => api.get(`/provider/token/${token}`),
   updateProvider: (id, data) => api.put(`/provider/${id}`, data),
   updateProviderProfile: (id, data) => api.put(`/provider/update/${id}`, data),
   deleteProvider: (id) => api.delete(`/provider/${id}`),
