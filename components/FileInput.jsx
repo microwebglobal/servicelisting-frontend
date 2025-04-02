@@ -10,6 +10,7 @@ const FileInput = ({
   file,
   onFileChange,
   disabled,
+  onFileRemove,
 }) => {
   const [previewURL, setPreviewURL] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,7 +77,8 @@ const FileInput = ({
             <p>
               <span className="block">Selected File: {file.name}</span>
               <button
-                onClick={() => onFileChange(null)}
+                type="button"
+                onClick={onFileRemove}
                 className="text-sm text-red-500 font-medium"
               >
                 Remove

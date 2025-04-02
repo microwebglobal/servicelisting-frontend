@@ -447,7 +447,7 @@ const IndividualRegistrationForm = ({
       ...prev,
       documents: {
         ...prev.documents,
-        [name]: null, // Set the selected file to null to remove it
+        [name]: null,
       },
     }));
   };
@@ -462,6 +462,7 @@ const IndividualRegistrationForm = ({
           file={formData.documents[name]}
           onFileChange={handleChange}
           disabled={isReRegistration && !rejectedFields.includes(name)}
+          onFileRemove={() => handleRemoveFile(name)}
         />
 
         {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
@@ -553,7 +554,7 @@ const IndividualRegistrationForm = ({
         />
 
         {errors.exact_address && (
-          <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.exact_address}</p>
         )}
       </div>
 

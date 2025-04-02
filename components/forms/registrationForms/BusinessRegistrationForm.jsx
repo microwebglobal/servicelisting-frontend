@@ -12,6 +12,8 @@ const BusinessRegistrationForm = ({
   rejectedFields,
   previousRegData,
 }) => {
+  const isReRegistration = previousRegData && rejectedFields?.length > 0;
+
   // Calculate minimum start
   const today = new Date();
   const minStartDate = today.toISOString().split("T")[0];
@@ -45,7 +47,7 @@ const BusinessRegistrationForm = ({
     business_start_date: previousRegData?.business_start_date || "",
     whatsapp_number: previousRegData?.whatsapp_number || "",
     service_radius: previousRegData?.service_radius || "",
-    address: previousRegData?.address || "", // Added missing address field
+    exact_address: previousRegData?.exact_address || "", // Added missing address field
     availability_type: previousRegData?.availability_type || "full_time",
     availability_hours: previousRegData?.availability_hours || {
       monday: { start: "09:00", end: "18:00", isOpen: true },
@@ -180,7 +182,7 @@ const BusinessRegistrationForm = ({
         ...prev,
         documents: {
           ...prev.documents,
-          [name]: files[0],
+          [name]: files[0] || null,
         },
       }));
       return;
@@ -316,19 +318,43 @@ const BusinessRegistrationForm = ({
       case 2:
         if (!formData.service_radius || formData.service_radius === 0)
           newErrors.service_radius = "Required";
-        if (!formData.address?.trim()) newErrors.address = "Required";
+        if (!formData.exact_address?.trim())
+          newErrors.exact_address = "Required";
         break;
       case 3:
         newErrors = validateEmployees(newErrors);
         break;
       case 4:
-        if (!formData.documents.business_registration)
-          newErrors.business_registration = "Required";
-        if (!formData.documents.address_proof)
-          newErrors.address_proof = "Required";
-        if (!formData.documents.terms_acceptance)
-          newErrors.terms_acceptance = "Required";
-        if (!formData.documents.agreement) newErrors.agreement = "Required";
+        if (isReRegistration) {
+          if (
+            !formData.documents.business_registration &&
+            rejectedFields.includes("business_registration")
+          )
+            newErrors.business_registration = "Required";
+          if (
+            !formData.documents.address_proof &&
+            rejectedFields.includes("address_proof")
+          )
+            newErrors.address_proof = "Required";
+          if (
+            !formData.documents.terms_acceptance &&
+            rejectedFields.includes("terms_acceptance")
+          )
+            newErrors.terms_acceptance = "Required";
+          if (
+            !formData.documents.agreement &&
+            rejectedFields.includes("agreement")
+          )
+            newErrors.agreement = "Required";
+        } else {
+          if (!formData.documents.business_registration)
+            newErrors.business_registration = "Required";
+          if (!formData.documents.address_proof)
+            newErrors.address_proof = "Required";
+          if (!formData.documents.terms_acceptance)
+            newErrors.terms_acceptance = "Required";
+          if (!formData.documents.agreement) newErrors.agreement = "Required";
+        }
         break;
       case 5:
         if (formData.payment_method === "upi") {
@@ -447,14 +473,12 @@ const BusinessRegistrationForm = ({
       ...prev,
       documents: {
         ...prev.documents,
-        [name]: null, // Set the selected file to null to remove it
+        [name]: null,
       },
     }));
   };
 
   const renderFileInput = (name, label, required = false) => {
-    const isFileSelected = formData.documents[name] !== null;
-
     return (
       <div className="space-y-2 w-full">
         <FileInput
@@ -463,6 +487,8 @@ const BusinessRegistrationForm = ({
           required={required}
           file={formData.documents[name]}
           onFileChange={handleChange}
+          onFileRemove={() => handleRemoveFile(name)}
+          disabled={isReRegistration && !rejectedFields.includes(name)}
         />
 
         {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
@@ -504,7 +530,7 @@ const BusinessRegistrationForm = ({
             name="tax_id"
             value={formData.tax_id}
             onChange={handleChange}
-            disabled={previousRegData.tax_id}
+            disabled={isReRegistration && !rejectedFields.includes("tax_id")}
             placeholder="Tax Identification Number*"
             className={`p-2 border rounded w-full ${
               errors.tax_id ? "border-red-500 bg-red-500/5 text-red-500" : ""
@@ -539,7 +565,9 @@ const BusinessRegistrationForm = ({
             type="number"
             name="whatsapp_number"
             value={formData.whatsapp_number}
-            disabled={previousRegData.whatsapp_number}
+            disabled={
+              isReRegistration && !rejectedFields.includes("whatsapp_number")
+            }
             onChange={handleChange}
             placeholder="WhatsApp Number*"
             className={`p-2 border rounded w-full ${
@@ -567,7 +595,9 @@ const BusinessRegistrationForm = ({
           max={minStartDate}
           name="business_start_date"
           value={formData.business_start_date}
-          disabled={previousRegData.business_start_date}
+          disabled={
+            isReRegistration && !rejectedFields.includes("business_start_date")
+          }
           onChange={handleChange}
           className={cn("p-2 border rounded w-full", {
             "border-red-500 bg-red-500/5 text-red-500":
@@ -594,7 +624,9 @@ const BusinessRegistrationForm = ({
             type="number"
             name="service_radius"
             value={formData.service_radius}
-            disabled={previousRegData.service_radius}
+            disabled={
+              isReRegistration && !rejectedFields.includes("service_radius")
+            }
             onChange={handleChange}
             placeholder="Service Radius (km)*"
             className={`p-2 border rounded w-full ${
@@ -610,18 +642,22 @@ const BusinessRegistrationForm = ({
       </div>
       <div>
         <textarea
-          name="address"
-          value={formData.address}
-          disabled={previousRegData.address}
+          name="exact_address"
+          value={formData.exact_address}
+          disabled={
+            isReRegistration && !rejectedFields.includes("exact_address")
+          }
           onChange={handleChange}
           placeholder="Business Address*"
           className={`w-full p-2 border rounded ${
-            errors.address ? "border-red-500 bg-red-500/5 text-red-500" : ""
+            errors.exact_address
+              ? "border-red-500 bg-red-500/5 text-red-500"
+              : ""
           }`}
           rows="3"
         />
-        {errors.address && (
-          <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+        {errors.exact_address && (
+          <p className="text-red-500 text-sm mt-1">{errors.exact_address}</p>
         )}
       </div>
     </div>
@@ -675,7 +711,7 @@ const BusinessRegistrationForm = ({
                 value={employee.name}
                 disabled={
                   previousRegData.ServiceProviderEmployees &&
-                  previousRegData.ServiceProviderEmployees[index]?.User?.name
+                  !rejectedFields.includes(`employees.${index}.name`)
                 }
                 onChange={(e) =>
                   handleEmployeeChange(index, "name", e.target.value)
@@ -697,8 +733,8 @@ const BusinessRegistrationForm = ({
             <select
               value={employee.gender}
               disabled={
-                previousRegData.ServiceProviderEmployees &&
-                previousRegData.ServiceProviderEmployees[index]?.User?.gender
+                isReRegistration &&
+                !rejectedFields.includes(`employees.${index}.gender`)
               }
               onChange={(e) =>
                 handleEmployeeChange(index, "gender", e.target.value)
@@ -717,8 +753,8 @@ const BusinessRegistrationForm = ({
             <input
               type="text"
               disabled={
-                previousRegData.ServiceProviderEmployees &&
-                previousRegData.ServiceProviderEmployees[index]?.qualification
+                isReRegistration &&
+                !rejectedFields.includes(`employees.${index}.qualification`)
               }
               value={employee.qualification}
               onChange={(e) =>
@@ -732,8 +768,8 @@ const BusinessRegistrationForm = ({
               type="text"
               value={employee.designation}
               disabled={
-                previousRegData.ServiceProviderEmployees &&
-                previousRegData.ServiceProviderEmployees[index]?.designation
+                isReRegistration &&
+                !rejectedFields.includes(`employees.${index}.designation`)
               }
               onChange={(e) =>
                 handleEmployeeChange(index, "designation", e.target.value)
@@ -746,8 +782,8 @@ const BusinessRegistrationForm = ({
               <input
                 type="number"
                 disabled={
-                  previousRegData.ServiceProviderEmployees &&
-                  previousRegData.ServiceProviderEmployees[index]?.User?.mobile
+                  isReRegistration &&
+                  !rejectedFields.includes(`employees.${index}.phone`)
                 }
                 value={employee.phone}
                 onChange={(e) =>
@@ -771,8 +807,8 @@ const BusinessRegistrationForm = ({
               <input
                 type="email"
                 disabled={
-                  previousRegData.ServiceProviderEmployees &&
-                  previousRegData.ServiceProviderEmployees[index]?.User?.email
+                  isReRegistration &&
+                  !rejectedFields.includes(`employees.${index}.email`)
                 }
                 value={employee.email}
                 required
@@ -796,8 +832,8 @@ const BusinessRegistrationForm = ({
             <input
               type="number"
               disabled={
-                previousRegData.ServiceProviderEmployees &&
-                previousRegData.ServiceProviderEmployees[index]?.whatsapp_number
+                isReRegistration &&
+                !rejectedFields.includes(`employees.${index}.whatsapp_number`)
               }
               value={employee.whatsapp_number}
               onChange={(e) =>
@@ -858,7 +894,9 @@ const BusinessRegistrationForm = ({
         value={formData.payment_method}
         onChange={handleChange}
         className="w-full p-2 border rounded"
-        disabled={previousRegData.payment_method}
+        disabled={
+          isReRegistration && !rejectedFields.includes("payment_method")
+        }
       >
         <option value="upi">UPI</option>
         <option value="bank">Bank Transfer</option>
@@ -871,7 +909,7 @@ const BusinessRegistrationForm = ({
               type="text"
               name="payment_details.upi.id"
               value={formData.payment_details.upi.id}
-              disabled={previousRegData.payment_details?.upi?.id}
+              disabled={isReRegistration && !rejectedFields.includes("upi.id")}
               onChange={handleChange}
               placeholder="UPI ID*"
               className={`w-full p-2 border rounded ${
@@ -891,7 +929,10 @@ const BusinessRegistrationForm = ({
               type="text"
               name="payment_details.upi.display_name"
               value={formData.payment_details.upi.display_name}
-              disabled={previousRegData.payment_details?.upi?.display_name}
+              disabled={
+                isReRegistration &&
+                !rejectedFields.includes("payment_details.upi.display_name")
+              }
               onChange={handleChange}
               placeholder="Display Name*"
               className={`w-full p-2 border rounded ${
@@ -911,7 +952,10 @@ const BusinessRegistrationForm = ({
               type="number"
               name="payment_details.upi.phone"
               value={formData.payment_details.upi.phone}
-              disabled={previousRegData.payment_details?.upi?.phone}
+              disabled={
+                isReRegistration &&
+                !rejectedFields.includes("payment_details.upi.phone")
+              }
               onChange={handleChange}
               placeholder="UPI Phone Number*"
               className={`w-full p-2 border rounded ${
@@ -934,7 +978,9 @@ const BusinessRegistrationForm = ({
               type="text"
               name="payment_details.bank.name"
               value={formData.payment_details.bank.name}
-              disabled={previousRegData.payment_details?.bank?.name}
+              disabled={
+                isReRegistration && !rejectedFields.includes("bank.name")
+              }
               onChange={handleChange}
               placeholder="Bank Name*"
               className={`w-full p-2 border rounded ${
@@ -954,7 +1000,9 @@ const BusinessRegistrationForm = ({
               type="text"
               name="payment_details.bank.branch"
               value={formData.payment_details.bank.branch}
-              disabled={previousRegData.payment_details?.bank?.branch}
+              disabled={
+                isReRegistration && !rejectedFields.includes("bank.branch")
+              }
               onChange={handleChange}
               placeholder="Branch*"
               className={`w-full p-2 border rounded ${
@@ -974,7 +1022,9 @@ const BusinessRegistrationForm = ({
               type="text"
               name="payment_details.bank.ifsc"
               value={formData.payment_details.bank.ifsc}
-              disabled={previousRegData.payment_details?.bank?.ifsc}
+              disabled={
+                isReRegistration && !rejectedFields.includes("bank.ifsc")
+              }
               onChange={handleChange}
               placeholder="IFSC Code*"
               className={`w-full p-2 border rounded ${
@@ -994,7 +1044,10 @@ const BusinessRegistrationForm = ({
               type="text"
               name="payment_details.bank.account_number"
               value={formData.payment_details.bank.account_number}
-              disabled={previousRegData.payment_details?.bank?.account_number}
+              disabled={
+                isReRegistration &&
+                !rejectedFields.includes("payment_details.bank.account_number")
+              }
               onChange={handleChange}
               placeholder="Account Number*"
               className={`w-full p-2 border rounded ${
