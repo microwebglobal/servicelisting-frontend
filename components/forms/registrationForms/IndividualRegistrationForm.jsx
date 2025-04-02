@@ -7,28 +7,34 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const IndividualRegistrationForm = ({ enquiryData, previousRegData }) => {
+const IndividualRegistrationForm = ({
+  enquiryData,
+  previousRegData,
+  rejectedFields,
+}) => {
+  const isReRegistration = previousRegData && rejectedFields?.length > 0;
+
   const [formData, setFormData] = useState({
     enquiry_id: enquiryData?.enquiry_id || "",
     name: enquiryData?.User?.name || "",
     dob: enquiryData?.User?.dob || "",
-    nationality: "",
+    nationality: previousRegData?.nationality || "",
     gender: enquiryData?.User?.gender || "",
-    qualification: "",
+    qualification: enquiryData?.qualification || "",
     email: enquiryData?.User?.email || "",
     phone: enquiryData?.User?.mobile || "",
-    whatsapp_number: "",
+    whatsapp_number: previousRegData?.whatsapp_number || "",
     alternate_number: enquiryData?.alternate_number || "",
-    address: "",
-    emergency_contact_name: "",
-    reference_number: "",
-    reference_name: "",
-    aadhar_number: "",
-    pan_number: "",
-    languages_spoken: [],
-    service_radius: "",
-    availability_type: "full_time",
-    availability_hours: {
+    address: previousRegData?.address || "",
+    emergency_contact_name: previousRegData?.emergency_contact_name || "",
+    reference_number: previousRegData?.reference_number || "",
+    reference_name: previousRegData?.reference_name || "",
+    aadhar_number: previousRegData?.aadhar_number || "",
+    pan_number: previousRegData?.pan_number || "",
+    languages_spoken: previousRegData?.languages_spoken || [],
+    service_radius: previousRegData?.service_radius || "",
+    availability_type: previousRegData?.availability_type || "full_time",
+    availability_hours: previousRegData?.availability_hours || {
       monday: { start: "09:00", end: "18:00", isOpen: true },
       tuesday: { start: "09:00", end: "18:00", isOpen: true },
       wednesday: { start: "09:00", end: "18:00", isOpen: true },
@@ -40,8 +46,8 @@ const IndividualRegistrationForm = ({ enquiryData, previousRegData }) => {
     years_experience: enquiryData?.years_experience || "",
     specializations: enquiryData?.skills || [],
 
-    profile_bio: "",
-    certificates_awards: "",
+    profile_bio: previousRegData?.profile_bio || "",
+    certificates_awards: previousRegData?.certificates_awards || "",
 
     documents: {
       logo: null,
@@ -61,18 +67,19 @@ const IndividualRegistrationForm = ({ enquiryData, previousRegData }) => {
       instagram: "",
       linkedin: "",
     },
-    payment_method: "upi",
+    payment_method: previousRegData?.payment_method || "upi",
     payment_details: {
       upi: {
-        id: "",
-        display_name: "",
-        phone: "",
+        id: previousRegData?.payment_details?.upi?.id || "",
+        display_name: previousRegData?.payment_details?.upi?.display_name || "",
+        phone: previousRegData?.payment_details?.upi?.phone || "",
       },
       bank: {
-        name: "",
-        branch: "",
-        ifsc: "",
-        account_number: "",
+        name: previousRegData?.payment_details?.bank?.name || "",
+        branch: previousRegData?.payment_details?.bank?.branch || "",
+        ifsc: previousRegData?.payment_details?.bank?.ifsc || "",
+        account_number:
+          previousRegData?.payment_details?.bank?.account_number || "",
       },
     },
     categories: (enquiryData?.ServiceCategories || []).map((cat) => ({
@@ -98,22 +105,6 @@ const IndividualRegistrationForm = ({ enquiryData, previousRegData }) => {
   ];
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (enquiryData?.enquiry_id) {
-      setFormData((prev) => ({
-        ...prev,
-        enquiry_id: enquiryData.enquiry_id,
-      }));
-    }
-
-    if (previousRegData) {
-      setFormData((prev) => ({
-        ...prev,
-        ...previousRegData,
-      }));
-    }
-  }, [enquiryData, previousRegData]);
 
   const handleChange = (e) => {
     const { name, value, type, files, required } = e.target;
@@ -517,7 +508,7 @@ const IndividualRegistrationForm = ({ enquiryData, previousRegData }) => {
             isMulti
             options={spokenLanguages}
             value={selectedLanguages}
-            isDisabled={previousRegData.languages_spoken}
+            isDisabled={false}
             styles={{
               control: (base) => ({
                 ...base,
@@ -640,7 +631,6 @@ const IndividualRegistrationForm = ({ enquiryData, previousRegData }) => {
                 name="availability_hours.start"
                 value={formData.availability_hours.start || ""}
                 onChange={handleChange}
-                disabled={previousRegData.availability_hours.start}
                 className={cn("p-2 border rounded w-full", {
                   "border-red-500 bg-red-500/5 text-red-500": errors.start_time,
                 })}
@@ -655,7 +645,6 @@ const IndividualRegistrationForm = ({ enquiryData, previousRegData }) => {
                 type="time"
                 name="availability_hours.end"
                 value={formData.availability_hours.end || ""}
-                disabled={previousRegData.availability_hours.end}
                 onChange={handleChange}
                 className={cn("p-2 border rounded w-full", {
                   "border-red-500 bg-red-500/5 text-red-500": errors.end_time,
