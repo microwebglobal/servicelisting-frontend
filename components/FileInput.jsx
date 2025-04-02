@@ -1,8 +1,16 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 
-const FileInput = ({ name, label, required = false, file, onFileChange }) => {
+const FileInput = ({
+  name,
+  label,
+  required = false,
+  file,
+  onFileChange,
+  disabled,
+}) => {
   const [previewURL, setPreviewURL] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -61,6 +69,7 @@ const FileInput = ({ name, label, required = false, file, onFileChange }) => {
             accept=".jpg,.jpeg,.png,.pdf"
             name={name}
             onChange={handleChange}
+            disabled={disabled}
             className="text-transparent w-28"
           />
           {file ? (
@@ -74,7 +83,9 @@ const FileInput = ({ name, label, required = false, file, onFileChange }) => {
               </button>
             </p>
           ) : (
-            <p>No file selected</p>
+            <p className={cn({ "text-gray-400": disabled })}>
+              {disabled ? "Disabled" : "No file selected"}
+            </p>
           )}
         </div>
       </div>
