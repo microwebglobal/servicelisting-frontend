@@ -6,6 +6,7 @@ import { toast } from "@hooks/use-toast";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import FileInput from "@/components/FileInput";
 
 const IndividualRegistrationForm = ({
   enquiryData,
@@ -410,59 +411,15 @@ const IndividualRegistrationForm = ({
   };
 
   const renderFileInput = (name, label, required = false) => {
-    const isFileSelected = formData.documents[name] !== null;
-
     return (
       <div className="space-y-2 w-full">
-        <label className="block">
-          {label}
-          {required && "*"}
-        </label>
-
-        <div className="flex items-center gap-2">
-          {isFileSelected && (
-            <a
-              target="_blank"
-              className="w-28 h-28 aspect-square"
-              href={URL.createObjectURL(formData.documents[name])}
-            >
-              <img
-                src={URL.createObjectURL(formData.documents[name])}
-                alt={name}
-                className="w-full h-full object-cover rounded-md"
-              />
-            </a>
-          )}
-
-          <div className={cn(!isFileSelected && "flex gap-1 items-center")}>
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png,.pdf" // Accespt PDF and image files only
-              name={name} // Ensure this matches the key in the `documents` object
-              onChange={handleChange}
-              className={`text-transparent w-28 ${
-                errors[name] ? "border-red-500 bg-red-500/5" : ""
-              }`}
-            />
-
-            {isFileSelected ? (
-              <p>
-                <span className="block">
-                  Selected File: {formData.documents[name].name}
-                </span>
-
-                <button
-                  onClick={() => handleRemoveFile(name)}
-                  className="text-sm text-red-500 font-medium"
-                >
-                  Remove
-                </button>
-              </p>
-            ) : (
-              <p>No file selected</p>
-            )}
-          </div>
-        </div>
+        <FileInput
+          name={name}
+          label={label}
+          required={required}
+          file={formData.documents[name]}
+          onFileChange={handleChange}
+        />
 
         {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
       </div>
