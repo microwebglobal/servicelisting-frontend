@@ -7,10 +7,8 @@ import IndividualRegistrationForm from "@components/forms/registrationForms/Indi
 import BusinessRegistrationForm from "@components/forms/registrationForms/BusinessRegistrationForm";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { providerAPI } from "@api/provider";
-import { useSearchParams } from "next/navigation";
 
 const Page = ({ params }) => {
-  const searchParams = useSearchParams();
   const [token, setToken] = useState(null);
   const [tokenData, setTokenData] = useState({
     enquiry_id: "",
@@ -18,8 +16,8 @@ const Page = ({ params }) => {
     business_type: "",
   });
 
-  const isReRegistrationMode = searchParams?.get("reReg") === "true";
   const [inquiries, setInquiries] = useState();
+  const [rejectedFields, setRejectedFields] = useState([]);
   const [previousRegData, setPreviousRegData] = useState({});
 
   const [error, setError] = useState(null);
@@ -38,12 +36,20 @@ const Page = ({ params }) => {
 
   useEffect(() => {
     // Function to fetch previous registration details
-    const fetchPreviousRegistration = async () => {
+    const fetchPreviousRegistration = async (rejected_fields) => {
       try {
         const response = await providerAPI.getProviderByToken(token);
         if (response.data) {
-          console.log(response.data);
-          setPreviousRegData(response.data);
+          const nonRejectedFields = Object.keys(response.data).filter(
+            (key) => !rejected_fields.includes(key)
+          );
+
+          const filteredData = nonRejectedFields.reduce((acc, key) => {
+            acc[key] = response.data[key];
+            return acc;
+          }, {});
+
+          setPreviousRegData(filteredData);
         }
       } catch (error) {
         console.error("Error fetching previous registration", error);
@@ -60,16 +66,17 @@ const Page = ({ params }) => {
           enquiry_id: decodedToken.eid,
           user_id: decodedToken.uid,
           business_type: decodedToken.t === "b" ? "business" : "individual",
-          previous_reg_id: decodedToken.rid || null,
         });
+
+        setRejectedFields(decodedToken.rf);
+
+        if (decodedToken.rf) fetchPreviousRegistration(decodedToken.rf);
       } catch (error) {
         setError(
           "Invalid registration link. Please check your email for the correct link."
         );
         console.error("Error decoding token:", error);
       }
-
-      if (isReRegistrationMode) fetchPreviousRegistration();
     }
   }, [token]);
 
@@ -138,6 +145,7 @@ const Page = ({ params }) => {
         return (
           <BusinessRegistrationForm
             enquiryData={inquiries}
+            rejectedFields={rejectedFields}
             previousRegData={previousRegData}
           />
         );
@@ -145,6 +153,7 @@ const Page = ({ params }) => {
         return (
           <IndividualRegistrationForm
             enquiryData={inquiries}
+            rejectedFields={rejectedFields}
             previousRegData={previousRegData}
           />
         );
@@ -179,7 +188,7 @@ const Page = ({ params }) => {
               <h1 className="text-3xl font-bold text-gray-900 mb-6">
                 Complete Your Registration
               </h1>
-              {isReRegistrationMode && (
+              {rejectedFields.length > 0 && (
                 <p className="text-red-500 mb-4 border border-red-500 bg-red-500/5 p-3 rounded-lg">
                   *You are re-registering as a{" "}
                   {tokenData.business_type === "business"
