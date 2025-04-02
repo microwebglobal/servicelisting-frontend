@@ -223,10 +223,10 @@ const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
       newErrors.no_of_employee = "Number of employees is required";
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email || formData.email === "") {
       newErrors.email = "Email is required";
     } else if (!emailRegex.test(formData.email)) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       newErrors.email = "Invalid email format";
     }
 
