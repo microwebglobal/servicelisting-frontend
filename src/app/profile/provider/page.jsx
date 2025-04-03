@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardImage, CardTitle } from "@/components/ui/card";
+import ProfileOverview from "@/components/serviceProvider/ProfileOverview";
 
 const Page = () => {
   const [userData, setUserData] = useState({});
+  const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -22,22 +24,23 @@ const Page = () => {
   const user = storedUser ? JSON.parse(storedUser) : null;
 
   useEffect(() => {
-    const fetchProviderData = async () => {
-      try {
-        const response = await providerAPI.getProviderByUserId(user.uId);
-        setProfileData(response.data);
-
-        setIsDialogOpen(
-          !response.data?.User?.email_verified && response.data?.User?.email
-        );
-        console.log(response.data);
-      } catch (error) {
-        console.error("An error occurred while fetching data:", error);
-      }
-    };
-
     fetchProviderData();
   }, []);
+
+  const fetchProviderData = async () => {
+    try {
+      const response = await providerAPI.getProviderByUserId(user.uId);
+      setProfileData(response.data);
+
+      setIsDialogOpen(
+        !response.data?.User?.email_verified && response.data?.User?.email
+      );
+
+      setLoading(false);
+    } catch (error) {
+      console.error("An error occurred while fetching data:", error);
+    }
+  };
 
   const handleEmailValidate = async () => {
     try {
@@ -56,70 +59,14 @@ const Page = () => {
 
   return (
     <>
-      <div className="pt-20 bg-gray-100">
-        <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-          <div className="lg:col-span-2">
-            <h2 className="text-3xl text-gray-800 mb-6 pb-2 ml-10">Services</h2>
-
-            {/* Service Categories */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 ml-10 mr-10">
-              {profileData.ServiceCategories?.length > 0 ? (
-                profileData.ServiceCategories.map((service) => (
-                  <Card
-                    key={service.category_id}
-                    className="cursor-pointer hover:shadow-md transition-shadow duration-300"
-                  >
-                    <CardImage
-                      src={
-                        process.env.NEXT_PUBLIC_API_ENDPOINT + service.icon_url
-                      }
-                      crossOrigin="anonymous"
-                      style={{
-                        height: "150px",
-                        objectFit: "cover",
-                        width: "100%",
-                      }}
-                      alt="card_image"
-                    />
-
-                    <CardHeader>
-                      <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
-                        {service.name}
-                      </CardTitle>
-                    </CardHeader>
-                  </Card>
-                ))
-              ) : (
-                <p className="text-center text-gray-600 col-span-2">
-                  No services added yet.
-                </p>
-              )}
-            </div>
-
-            {/* Additional Details */}
-            <div className="mt-10 ml-10 mr-10">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                Additional Details
-              </h3>
-              <p className="text-sm text-gray-600 mb-2">
-                <span className="font-semibold">Business Name:</span>{" "}
-                {profileData.business_name || "Not Available"}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">
-                <span className="font-semibold">Experience:</span>{" "}
-                {profileData.years_experience || 0} years
-              </p>
-              <p className="text-sm text-gray-600 mb-2">
-                <span className="font-semibold">Contact:</span>{" "}
-                {profileData.mobile || "N/A"} /{" "}
-                {profileData.whatsapp_number || "N/A"}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">
-                <span className="font-semibold">Payment Method:</span>{" "}
-                {profileData.payment_method || "Not Specified"}
-              </p>
-            </div>
-          </div>
+      <div>
+        <div className="flex flex-col md:flex-row min-h-screen ">
+          {!loading && (
+            <ProfileOverview
+              userData={profileData}
+              onSettle={fetchProviderData}
+            />
+          )}
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>

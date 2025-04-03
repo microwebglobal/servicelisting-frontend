@@ -2,7 +2,9 @@ import { api } from "../utils/api";
 
 export const profileAPI = {
   // User Profile
-  getProfile: () => api.get("/users/profile"),
+  getAllCustomers: () => api.get("/customers/all"),
+  updateCustomerProfileStatus: (id, data) =>
+    api.put(`/customer/status/${id}`, data),
   getProfileByUserId: (id) => api.get(`/customer-profiles/user/${id}`),
   updateProfile: (data, id) => api.put(`/users/profile/${id}`, data),
   uploadPhoto: (formData) =>
@@ -30,4 +32,6 @@ export const profileAPI = {
   changePassword: (data) => api.put("/users/password", data),
   deactivateAccount: () => api.put("/users/deactivate"),
   deleteAccount: () => api.delete("/users/account"),
+  getAccBalance: () => api.get("/payout/acc-balance"),
+  settleProviderAccBalance: () => api.put("/payout/acc-balance/settle"),
 };

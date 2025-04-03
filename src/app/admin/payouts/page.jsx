@@ -1,6 +1,7 @@
 "use client";
 import { adminBookingService } from "@/api/adminBookingService";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/utils/bookingUtils";
 import React, { useEffect, useState } from "react";
 
 const Page = () => {
@@ -117,7 +118,7 @@ const Page = () => {
                   <td className="border p-3">{log.log_id}</td>
                   <td className="border p-3">{log.provider_id || "N/A"}</td>
                   <td className="border p-3 text-green-600 font-semibold">
-                    ${log.payout_amount}
+                    {formatCurrency(log.payout_amount)}
                   </td>
                   <td
                     className={`border p-3 font-medium ${
