@@ -24,7 +24,9 @@ import {
   SelectTrigger,
   SelectContent,
   SelectItem,
+  SelectValue,
 } from "@radix-ui/react-select";
+import { adminBookingService } from "@/api/adminBookingService";
 
 const CustomersPage = () => {
   const [customers, setCustomers] = useState([]);
@@ -34,6 +36,9 @@ const CustomersPage = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [settleDialogOpen, setSettleDialogOpen] = useState(false);
+  const [settleAmount, setSettleAmount] = useState("");
+  const [customerToSettle, setCustomerToSettle] = useState(null);
 
   useEffect(() => {
     fetchAllCustomers();
@@ -88,6 +93,32 @@ const CustomersPage = () => {
       setStatus(newStatus);
     } catch (err) {
       setError("Failed to update customer status.");
+    }
+  };
+
+  const handleSettleClick = (customer, e) => {
+    e.stopPropagation();
+    setCustomerToSettle(customer);
+    setSettleAmount(Math.abs(customer.acc_balance).toString());
+    setSettleDialogOpen(true);
+  };
+
+  const handleSettleConfirm = async () => {
+    if (!customerToSettle || !settleAmount) return;
+
+    try {
+      await adminBookingService.settleCustomerAccBalance(
+        customerToSettle.u_id,
+        { settleAmount }
+      );
+
+      fetchAllCustomers();
+
+      setSettleDialogOpen(false);
+      setCustomerToSettle(null);
+      setSettleAmount("");
+    } catch (err) {
+      setError("Failed to settle amount.");
     }
   };
 
@@ -153,21 +184,7 @@ const CustomersPage = () => {
                                 variant="outline"
                                 size="sm"
                                 className="text-xs h-6 px-2"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // Handle offer discount
-                                }}
-                              >
-                                Offer Discount
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-xs h-6 px-2"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // Handle settle
-                                }}
+                                onClick={(e) => handleSettleClick(customer, e)}
                               >
                                 Settle
                               </Button>
@@ -269,8 +286,9 @@ const CustomersPage = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          // Handle settle
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSettleClick(selectedCustomer, e);
                         }}
                       >
                         Settle
@@ -288,10 +306,9 @@ const CustomersPage = () => {
                 <Select
                   value={status}
                   onValueChange={(newStatus) => setStatus(newStatus)}
-                  className="w-full"
                 >
                   <SelectTrigger className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400">
-                    <button>{status || "Select Status"}</button>
+                    <SelectValue placeholder="Select Status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
@@ -320,6 +337,85 @@ const CustomersPage = () => {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Settle Dialog */}
+      <Dialog open={settleDialogOpen} onOpenChange={setSettleDialogOpen}>
+        <DialogContent className="max-w-md p-6 rounded-lg shadow-xl bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-gray-800">
+              Settle Balance
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {customerToSettle && (
+              <>
+                <div>
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    Customer: {customerToSettle.name}
+                  </Label>
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    Current Balance: {customerToSettle.acc_balance}
+                  </Label>
+                </div>
+                <div>
+                  <Label
+                    htmlFor="settleAmount"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Amount to Settle
+                  </Label>
+                  <Input
+                    id="settleAmount"
+                    type="number"
+                    value={settleAmount}
+                    onChange={(e) => setSettleAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    min="0"
+                    max={
+                      customerToSettle.acc_balance < 0
+                        ? Math.abs(customerToSettle.acc_balance)
+                        : undefined
+                    }
+                    className="w-full"
+                  />
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="text-xs p-0 mt-1 h-auto"
+                    onClick={() =>
+                      setSettleAmount(
+                        Math.abs(customerToSettle.acc_balance).toString()
+                      )
+                    }
+                  >
+                    Settle full amount ({Math.abs(customerToSettle.acc_balance)}
+                    )
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="mt-6 flex justify-end gap-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSettleDialogOpen(false);
+                setSettleAmount("");
+              }}
+              className="py-2 text-gray-700 border border-gray-300"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="py-2 text-white bg-blue-600 hover:bg-blue-700"
+              onClick={handleSettleConfirm}
+              disabled={!settleAmount || parseFloat(settleAmount) <= 0}
+            >
+              Confirm Settle
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
