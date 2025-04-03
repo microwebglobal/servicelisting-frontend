@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
+import { Label } from "../ui/label";
 
 const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
   const [category, setCategory] = useState(null);
@@ -19,6 +20,10 @@ const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
   const [preCheckedItems, setPreCheckedItems] = useState(new Set());
   const [step, setStep] = useState("edit");
   const [otp, setOtp] = useState("");
+  const [showCustomItemForm, setShowCustomItemForm] = useState(false);
+  const [customItemName, setCustomItemName] = useState("");
+  const [customItemPrice, setCustomItemPrice] = useState("");
+  const [customItems, setCustomItems] = useState([]);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -59,12 +64,34 @@ const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
     });
   };
 
+  const handleAddCustomItem = () => {
+    if (customItemName && customItemPrice) {
+      const newItem = {
+        item_id: `custom-${Date.now()}`,
+        name: customItemName,
+        base_price: parseFloat(customItemPrice),
+        isCustom: true,
+      };
+
+      setCustomItems([...customItems, newItem]);
+      setSelectedItems(new Set([...selectedItems, newItem]));
+      setCustomItemName("");
+      setCustomItemPrice("");
+      setShowCustomItemForm(false);
+    }
+  };
+
   const handleConfirmEdit = async () => {
     try {
       await providerAPI.sendBookingEditOtp({
         mobile: booking?.customer?.mobile,
         bookingId: booking?.booking_id,
-        addOns: Array.from(selectedItems),
+        addOns: Array.from(selectedItems).map((item) => ({
+          item_id: item.item_id,
+          name: item.name,
+          base_price:
+            item.CitySpecificPr || item.SpecialPricing || item.base_price,
+        })),
       });
       setStep("otp");
     } catch (error) {
@@ -76,7 +103,12 @@ const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
     try {
       await providerAPI.bookingEditVerify({
         bookingId: booking?.booking_id,
-        addOns: Array.from(selectedItems),
+        addOns: Array.from(selectedItems).map((item) => ({
+          item_id: item.item_id,
+          name: item.name,
+          base_price:
+            item.base_price || item.SpecialPricing || item.CitySpecificPr,
+        })),
         otp,
       });
       setStep("success");
@@ -103,17 +135,87 @@ const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
             transition={{ duration: 0.3 }}
             className="space-y-10"
           >
-            {category ? (
-              <div className="p-6 bg-white rounded-lg shadow-md border border-gray-300 hover:shadow-lg transition-shadow">
-                <h2 className="text-xl font-semibold text-gray-700">
-                  Category
-                </h2>
-                <p className="text-md text-gray-600">
-                  {category.category_id}: {category.name}
-                </p>
+            <div className="flex justify-between items-center">
+              {category ? (
+                <div className="p-6 bg-white rounded-lg shadow-md border border-gray-300 hover:shadow-lg transition-shadow">
+                  <h2 className="text-xl font-semibold text-gray-700">
+                    Category
+                  </h2>
+                  <p className="text-md text-gray-600">
+                    {category.category_id}: {category.name}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-gray-600">Loading category...</p>
+              )}
+
+              <Button
+                onClick={() => setShowCustomItemForm(!showCustomItemForm)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {showCustomItemForm ? "Cancel" : "Add Custom Item"}
+              </Button>
+            </div>
+
+            {showCustomItemForm && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+              >
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <Label htmlFor="customItemName">Item Name</Label>
+                    <Input
+                      id="customItemName"
+                      value={customItemName}
+                      onChange={(e) => setCustomItemName(e.target.value)}
+                      placeholder="Enter custom item name"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="customItemPrice">Price</Label>
+                    <Input
+                      id="customItemPrice"
+                      type="number"
+                      value={customItemPrice}
+                      onChange={(e) => setCustomItemPrice(e.target.value)}
+                      placeholder="Enter price"
+                    />
+                  </div>
+                </div>
+                <Button
+                  onClick={handleAddCustomItem}
+                  disabled={!customItemName || !customItemPrice}
+                  className="w-full"
+                >
+                  Add Item
+                </Button>
+              </motion.div>
+            )}
+
+            {/* Display custom items */}
+            {customItems.length > 0 && (
+              <div className="p-4 bg-white rounded-lg shadow-md border border-gray-300">
+                <h3 className="text-lg font-semibold mb-2">Custom Items</h3>
+                {customItems.map((item) => (
+                  <label
+                    key={item.item_id}
+                    className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md transition"
+                  >
+                    <Checkbox
+                      checked={selectedItems.has(item)}
+                      onCheckedChange={() => handleItemToggle(item)}
+                      className="cursor-pointer"
+                    />
+                    <span className="text-gray-700">{item.name}</span>
+                    <span className="text-lg font-semibold">
+                      ₹{item.base_price}
+                    </span>
+                  </label>
+                ))}
               </div>
-            ) : (
-              <p className="text-gray-600">Loading category...</p>
             )}
 
             {category?.SubCategories?.map((sub) => (

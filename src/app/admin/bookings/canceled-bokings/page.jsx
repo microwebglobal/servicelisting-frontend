@@ -6,6 +6,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  TextField,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
 } from "@mui/material";
 import { Button } from "@components/ui/button";
 import { toast } from "@hooks/use-toast";
@@ -23,9 +28,12 @@ const Page = () => {
   const [cancelledBookings, setCancelledBookings] = useState([]);
   const [expandedBooking, setExpandedBooking] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openWaveOffDialog, setOpenWaveOffDialog] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [selectedType, setSelectedType] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [waveOffType, setWaveOffType] = useState("full");
+  const [waveOffAmount, setWaveOffAmount] = useState("");
 
   useEffect(() => {
     fetchCancelledBookings();
@@ -51,10 +59,23 @@ const Page = () => {
     setOpenDialog(true);
   };
 
+  const handleOpenWaveOffDialog = (booking) => {
+    setSelectedBooking(booking);
+    setWaveOffAmount(booking.penalty_amount.toString());
+    setOpenWaveOffDialog(true);
+  };
+
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedBooking(null);
     setSelectedType("");
+  };
+
+  const handleCloseWaveOffDialog = () => {
+    setOpenWaveOffDialog(false);
+    setSelectedBooking(null);
+    setWaveOffType("full");
+    setWaveOffAmount("");
   };
 
   const handleConfirmPenalty = async () => {
@@ -74,6 +95,40 @@ const Page = () => {
       toast({
         title: "Success!",
         description: `Penalty Handled successfully`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "An error occurred while processing the request.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleConfirmWaveOff = async () => {
+    try {
+      if (!selectedBooking) return;
+
+      const amount =
+        waveOffType === "full"
+          ? selectedBooking.penalty_amount
+          : parseFloat(waveOffAmount);
+
+      const reqBody = {
+        bookingId: selectedBooking.booking_id,
+        type: "wave_off",
+        penaltyAmount: amount,
+      };
+
+      await adminBookingService.handleCancelledBookingPanalty(reqBody);
+
+      fetchCancelledBookings();
+      handleCloseWaveOffDialog();
+      toast({
+        title: "Success!",
+        description: `Penalty waived off successfully`,
         variant: "default",
       });
     } catch (error) {
@@ -131,6 +186,12 @@ const Page = () => {
                   <span>Penalty Status: {booking.penalty_status}</span>
                 </div>
               </div>
+              <div className="mt-2 bg-slate-100 p-4 rounded-lg">
+                <h2 className="font-semibold">Customer Details</h2>
+                <p>Customer Id: {booking.customer.u_id}</p>
+                <p>Customer Name: {booking.customer.name}</p>
+                <p>Advance Payment: {booking.customer.mobile}</p>
+              </div>
               <div className="mt-2 text-gray-500">
                 <p>Total Amount: ₹{booking.BookingPayment.total_amount}</p>
                 <p>Penalty Amount: ₹{booking.penalty_amount}</p>
@@ -176,6 +237,14 @@ const Page = () => {
                         Settle In Next Booking
                       </button>
                     )}
+                    {booking.BookingPayment.payment_status === "pending" && (
+                      <button
+                        className="ml-5 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                        onClick={() => handleOpenWaveOffDialog(booking)}
+                      >
+                        Wave Off
+                      </button>
+                    )}
                   </div>
                 )}
             </div>
@@ -185,7 +254,7 @@ const Page = () => {
         <p className="text-gray-500">No cancelled bookings found.</p>
       )}
 
-      {/* Dialog for Confirmation */}
+      {/* Dialog for Penalty Settlement Confirmation */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Confirm Penalty Settlement</DialogTitle>
         <DialogContent>
@@ -202,6 +271,63 @@ const Page = () => {
             Cancel
           </Button>
           <Button onClick={handleConfirmPenalty}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog for Wave Off Confirmation */}
+      <Dialog open={openWaveOffDialog} onClose={handleCloseWaveOffDialog}>
+        <DialogTitle>Wave Off Penalty</DialogTitle>
+        <DialogContent>
+          {selectedBooking && (
+            <div className="space-y-4">
+              <FormControl component="fieldset">
+                <RadioGroup
+                  value={waveOffType}
+                  onChange={(e) => {
+                    setWaveOffType(e.target.value);
+                    if (e.target.value === "full") {
+                      setWaveOffAmount(
+                        selectedBooking.penalty_amount.toString()
+                      );
+                    }
+                  }}
+                >
+                  <FormControlLabel
+                    value="full"
+                    control={<Radio />}
+                    label={`Wave off full amount (₹${selectedBooking.penalty_amount})`}
+                  />
+                  <FormControlLabel
+                    value="partial"
+                    control={<Radio />}
+                    label="Wave off partial amount"
+                  />
+                </RadioGroup>
+              </FormControl>
+
+              {waveOffType === "partial" && (
+                <TextField
+                  label="Amount to wave off"
+                  type="number"
+                  fullWidth
+                  value={waveOffAmount}
+                  onChange={(e) => setWaveOffAmount(e.target.value)}
+                  inputProps={{
+                    min: 0,
+                    max: selectedBooking.penalty_amount,
+                    step: "any",
+                  }}
+                  helperText={`Maximum: ₹${selectedBooking.penalty_amount}`}
+                />
+              )}
+            </div>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseWaveOffDialog} variant="destractive">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmWaveOff}>Confirm Wave Off</Button>
         </DialogActions>
       </Dialog>
     </div>

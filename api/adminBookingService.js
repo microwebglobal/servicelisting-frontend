@@ -157,4 +157,18 @@ export const adminBookingService = {
       );
     }
   },
+
+  settleCustomerAccBalance: async (cusId, data) => {
+    try {
+      const response = await api.put(
+        `/payout//customer/account/settle/${cusId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch payout logs"
+      );
+    }
+  },
 };
