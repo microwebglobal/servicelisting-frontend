@@ -30,7 +30,8 @@ const IndividualRegistrationForm = ({
     email: enquiryData?.User?.email || "",
     phone: enquiryData?.User?.mobile || "",
     whatsapp_number: previousRegData?.whatsapp_number || "",
-    alternate_number: enquiryData?.alternate_number || "",
+    alternate_number:
+      previousRegData?.alternate_number || enquiryData?.alternate_number || "",
     exact_address: previousRegData?.exact_address || "",
     emergency_contact_name: previousRegData?.emergency_contact_name || "",
     reference_number: previousRegData?.reference_number || "",
@@ -587,7 +588,7 @@ const IndividualRegistrationForm = ({
           onChange={handleChange}
           className="p-2 border rounded w-full h-11"
           disabled={
-            isReRegistration && !rejectedFields.includes("availability")
+            isReRegistration && !rejectedFields.includes("availability_hours")
           }
         >
           <option value="full_time">Full Time</option>
@@ -602,6 +603,10 @@ const IndividualRegistrationForm = ({
                 type="time"
                 name="availability_hours.start"
                 value={formData.availability_hours.start || ""}
+                disabled={
+                  isReRegistration &&
+                  !rejectedFields.includes("availability_hours")
+                }
                 onChange={handleChange}
                 className={cn("p-2 border rounded w-full", {
                   "border-red-500 bg-red-500/5 text-red-500": errors.start_time,
@@ -617,6 +622,10 @@ const IndividualRegistrationForm = ({
                 type="time"
                 name="availability_hours.end"
                 value={formData.availability_hours.end || ""}
+                disabled={
+                  isReRegistration &&
+                  !rejectedFields.includes("availability_hours")
+                }
                 onChange={handleChange}
                 className={cn("p-2 border rounded w-full", {
                   "border-red-500 bg-red-500/5 text-red-500": errors.end_time,
@@ -639,7 +648,9 @@ const IndividualRegistrationForm = ({
         name="specializations"
         value={formData.specializations}
         onChange={handleChange}
-        disabled={previousRegData.specializations}
+        disabled={
+          isReRegistration && !rejectedFields.includes("specializations")
+        }
         placeholder="Specializations/Skills"
         className="w-full p-2 border rounded"
         rows="3"
@@ -672,7 +683,7 @@ const IndividualRegistrationForm = ({
         placeholder="Certificates/Awards"
         className="w-full p-2 border rounded"
         disabled={
-          isReRegistration && !rejectedFields.includes("certificates_awards")
+          isReRegistration && !rejectedFields.includes("qualifications")
         }
         rows="3"
       />
@@ -717,7 +728,7 @@ const IndividualRegistrationForm = ({
         onChange={handleChange}
         className="w-full p-2 border rounded"
         disabled={
-          isReRegistration && !rejectedFields.includes("payment_method")
+          isReRegistration && !rejectedFields.includes("payment_details")
         }
       >
         <option value="upi">UPI</option>
@@ -732,8 +743,7 @@ const IndividualRegistrationForm = ({
             onChange={handleChange}
             placeholder="UPI ID"
             disabled={
-              isReRegistration &&
-              !rejectedFields.includes("payment_details.upi.id")
+              isReRegistration && !rejectedFields.includes("payment_details")
             }
             className={`w-full p-2 border rounded ${
               errors["payment_details.upi.id"]
@@ -753,8 +763,7 @@ const IndividualRegistrationForm = ({
             onChange={handleChange}
             placeholder="Display Name"
             disabled={
-              isReRegistration &&
-              !rejectedFields.includes("payment_details.upi.display_name")
+              isReRegistration && !rejectedFields.includes("payment_details")
             }
             className={`w-full p-2 border rounded ${
               errors["payment_details.upi.display_name"]
@@ -774,8 +783,7 @@ const IndividualRegistrationForm = ({
             onChange={handleChange}
             placeholder="UPI Phone Number"
             disabled={
-              isReRegistration &&
-              !rejectedFields.includes("payment_details.upi.phone")
+              isReRegistration && !rejectedFields.includes("payment_details")
             }
             className={`w-full p-2 border rounded ${
               errors["payment_details.upi.phone"]
@@ -798,8 +806,7 @@ const IndividualRegistrationForm = ({
             onChange={handleChange}
             placeholder="Bank Name"
             disabled={
-              isReRegistration &&
-              !rejectedFields.includes("payment_details.bank.name")
+              isReRegistration && !rejectedFields.includes("payment_details")
             }
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.name"]
@@ -819,8 +826,7 @@ const IndividualRegistrationForm = ({
             onChange={handleChange}
             placeholder="Branch"
             disabled={
-              isReRegistration &&
-              !rejectedFields.includes("payment_details.bank.branch")
+              isReRegistration && !rejectedFields.includes("payment_details")
             }
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.branch"]
@@ -840,8 +846,7 @@ const IndividualRegistrationForm = ({
             onChange={handleChange}
             placeholder="IFSC Code"
             disabled={
-              isReRegistration &&
-              !rejectedFields.includes("payment_details.bank.ifsc")
+              isReRegistration && !rejectedFields.includes("payment_details")
             }
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.ifsc"]
@@ -861,8 +866,7 @@ const IndividualRegistrationForm = ({
             onChange={handleChange}
             placeholder="Account Number"
             disabled={
-              isReRegistration &&
-              !rejectedFields.includes("payment_details.bank.account_number")
+              isReRegistration && !rejectedFields.includes("payment_details")
             }
             className={`w-full p-2 border rounded ${
               errors["payment_details.bank.account_number"]

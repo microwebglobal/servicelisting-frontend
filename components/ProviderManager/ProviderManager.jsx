@@ -26,11 +26,9 @@ import { toast } from "@hooks/use-toast";
 import Select from "react-select";
 
 // Rejectable fields
-const rejectedFieldOptions = [
+const individualRejectableFields = [
   { value: "aadhar_number", label: "Aadhar Number" },
   { value: "aadhar", label: "Aadhar Card" },
-  { value: "email", label: "Email" },
-  { value: "mobile", label: "Mobile" },
   { value: "pan_number", label: "PAN Number" },
   { value: "pan", label: "PAN Card" },
   { value: "id_proof", label: "ID Proof" },
@@ -42,6 +40,37 @@ const rejectedFieldOptions = [
   { value: "terms_acceptance", label: "Signed Terms & Conditions" },
   { value: "logo", label: "Business Logo" },
   { value: "business_registration", label: "Business Registration Document" },
+  { value: "payment_details", label: "Payment Details" },
+  { value: "nationality", label: "Nationality" },
+  { value: "phone", label: "Phone Number" },
+  { value: "languages_spoken", label: "Languages Spoken" },
+  { value: "whatsapp_number", label: "WhatsApp Number" },
+  { value: "alternate_number", label: "Alternate Number" },
+  { value: "exact_address", label: "Business Address" },
+  { value: "availability_hours", label: "Availability Hours" },
+  { value: "specializations", label: "Specializations" },
+  { value: "profile_bio", label: "Profile Bio" },
+  { value: "qualifications", label: "Qualifications" },
+];
+
+const businessRejectableFields = [
+  { value: "tax_id", label: "Tax Identification Number" },
+  {
+    value: "business_registration_number",
+    label: "Business Registration Number",
+  },
+  { value: "whatsapp_number", label: "WhatsApp Number" },
+  { value: "business_start_date", label: "Business Start Date" },
+  { value: "service_radius", label: "Service Radius" },
+  { value: "exact_address", label: "Business Address" },
+  { value: "ServiceProviderEmployees", label: "Service Employee Details" },
+  { value: "payment_details", label: "Payment Details" },
+  { value: "business_registration", label: "Business Registration Document" },
+  { value: "address_proof", label: "Address Proof" },
+  { value: "insurance", label: "Employee Insurance Documents" },
+  { value: "agreement", label: "Signed Agreement" },
+  { value: "terms_acceptance", label: "Signed Terms & Conditions" },
+  { value: "logo", label: "Business Logo" },
 ];
 
 const getDisplayValue = (value, defaultValue = "N/A") => {
@@ -94,11 +123,29 @@ const ProviderManager = () => {
   // Rejected fields
   const [rejectedFields, setRejectedFields] = useState([]);
 
+  console.log(rejectingProvider);
+
   useEffect(() => {
     fetchProviders();
   }, [isDialogOpen, isDocDialogOpen]);
 
   const handleReject = async () => {
+    if (!rejectionReason) {
+      toast({
+        title: "Please enter a rejection reason.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (rejectedFields.length === 0) {
+      toast({
+        title: "Please select at least one rejected field.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       await handleStatusUpdate(
         rejectingProvider.provider_id,
@@ -156,7 +203,8 @@ const ProviderManager = () => {
     providerId,
     newStatus,
     rejectionReason = null,
-    rejectedFields = []
+    rejectedFields = [],
+    providerType = null
   ) => {
     try {
       setIsApproving(true);
@@ -166,7 +214,10 @@ const ProviderManager = () => {
 
       if (newStatus === "rejected") {
         if (!rejectionReason) {
-          setRejectingProvider({ provider_id: providerId });
+          setRejectingProvider({
+            provider_id: providerId,
+            provider_type: providerType,
+          });
           setIsRejectDialogOpen(true);
           return;
         }
@@ -392,7 +443,10 @@ const ProviderManager = () => {
                             onClick={() =>
                               handleStatusUpdate(
                                 provider.provider_id,
-                                "rejected"
+                                "rejected",
+                                null,
+                                [],
+                                provider.business_type
                               )
                             }
                           >
@@ -479,7 +533,11 @@ const ProviderManager = () => {
             placeholder="Select rejected fields"
             value={rejectedFields}
             onChange={setRejectedFields}
-            options={rejectedFieldOptions}
+            options={
+              rejectingProvider?.provider_type === "individual"
+                ? individualRejectableFields
+                : businessRejectableFields
+            }
           />
 
           <div>
@@ -502,7 +560,11 @@ const ProviderManager = () => {
             <Button
               variant="destructive"
               onClick={handleReject}
-              disabled={!rejectionReason.trim() || isApproving}
+              disabled={
+                !rejectionReason.trim() ||
+                rejectedFields.length === 0 ||
+                isApproving
+              }
             >
               {isApproving ? "Rejecting..." : "Reject Registration "}
             </Button>

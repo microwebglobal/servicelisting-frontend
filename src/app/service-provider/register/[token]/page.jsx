@@ -188,7 +188,7 @@ const Page = ({ params }) => {
               <h1 className="text-3xl font-bold text-gray-900 mb-6">
                 Complete Your Registration
               </h1>
-              {rejectedFields?.length > 0 && (
+              {rejectedFields?.length > 0 && !error && (
                 <p className="text-red-500 mb-4 border border-red-500 bg-red-500/5 p-3 rounded-lg">
                   *You are re-registering as a{" "}
                   {tokenData.business_type === "business"

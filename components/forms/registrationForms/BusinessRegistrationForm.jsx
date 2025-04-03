@@ -74,7 +74,7 @@ const BusinessRegistrationForm = ({
           name: emp.User.name,
           gender: emp.User.gender,
           qualification: emp.qualification,
-          designation: emp.designation,
+          designation: emp.role,
           phone: emp.User.mobile,
           whatsapp_number: emp.whatsapp_number,
           email: emp.User.email,
@@ -88,7 +88,7 @@ const BusinessRegistrationForm = ({
         qualification: "",
         designation: "",
         phone: "",
-        whatsapp_number: "",
+        whatsapp_number: null,
         email: "",
         service_category: "",
         experience: "",
@@ -264,6 +264,7 @@ const BusinessRegistrationForm = ({
         errors[`employees.${index}.phone`] = "Required";
       if (!employee.email?.match(/^\S+@\S+\.\S+$/))
         errors[`employees.${index}.email`] = "Required";
+      if (!employee.gender) errors[`employees.${index}.gender`] = "Required";
     });
 
     if (Object.keys(errors).length === 0) {
@@ -711,7 +712,7 @@ const BusinessRegistrationForm = ({
                 value={employee.name}
                 disabled={
                   previousRegData.ServiceProviderEmployees &&
-                  !rejectedFields.includes(`employees.${index}.name`)
+                  !rejectedFields.includes("ServiceProviderEmployees")
                 }
                 onChange={(e) =>
                   handleEmployeeChange(index, "name", e.target.value)
@@ -730,31 +731,39 @@ const BusinessRegistrationForm = ({
               )}
             </div>
 
-            <select
-              value={employee.gender}
-              disabled={
-                isReRegistration &&
-                !rejectedFields.includes(`employees.${index}.gender`)
-              }
-              onChange={(e) =>
-                handleEmployeeChange(index, "gender", e.target.value)
-              }
-              className={cn("p-2 border rounded w-full h-11", {
-                "border-red-500 bg-red-500/5 text-red-500":
-                  errors[`employees.${index}.gender`],
-              })}
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
+            <div className="space-y-2">
+              <select
+                value={employee.gender}
+                disabled={
+                  isReRegistration &&
+                  !rejectedFields.includes("ServiceProviderEmployees")
+                }
+                onChange={(e) =>
+                  handleEmployeeChange(index, "gender", e.target.value)
+                }
+                className={cn("p-2 border rounded w-full h-11", {
+                  "border-red-500 bg-red-500/5 text-red-500":
+                    errors[`employees.${index}.gender`],
+                })}
+              >
+                <option value="">Select Gender*</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+
+              {errors[`employees.${index}.gender`] && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors[`employees.${index}.gender`]}
+                </p>
+              )}
+            </div>
 
             <input
               type="text"
               disabled={
                 isReRegistration &&
-                !rejectedFields.includes(`employees.${index}.qualification`)
+                !rejectedFields.includes("ServiceProviderEmployees")
               }
               value={employee.qualification}
               onChange={(e) =>
@@ -769,7 +778,7 @@ const BusinessRegistrationForm = ({
               value={employee.designation}
               disabled={
                 isReRegistration &&
-                !rejectedFields.includes(`employees.${index}.designation`)
+                !rejectedFields.includes("ServiceProviderEmployees")
               }
               onChange={(e) =>
                 handleEmployeeChange(index, "designation", e.target.value)
@@ -783,7 +792,7 @@ const BusinessRegistrationForm = ({
                 type="number"
                 disabled={
                   isReRegistration &&
-                  !rejectedFields.includes(`employees.${index}.phone`)
+                  !rejectedFields.includes("ServiceProviderEmployees")
                 }
                 value={employee.phone}
                 onChange={(e) =>
@@ -808,14 +817,14 @@ const BusinessRegistrationForm = ({
                 type="email"
                 disabled={
                   isReRegistration &&
-                  !rejectedFields.includes(`employees.${index}.email`)
+                  !rejectedFields.includes("ServiceProviderEmployees")
                 }
                 value={employee.email}
                 required
                 onChange={(e) =>
                   handleEmployeeChange(index, "email", e.target.value)
                 }
-                placeholder="Email"
+                placeholder="Email*"
                 className={`p-2 border rounded w-full h-11 ${
                   errors[`employees.${index}.email`]
                     ? "border-red-500 bg-red-500/5 text-red-500"
@@ -833,7 +842,7 @@ const BusinessRegistrationForm = ({
               type="number"
               disabled={
                 isReRegistration &&
-                !rejectedFields.includes(`employees.${index}.whatsapp_number`)
+                !rejectedFields.includes("ServiceProviderEmployees")
               }
               value={employee.whatsapp_number}
               onChange={(e) =>
@@ -895,7 +904,7 @@ const BusinessRegistrationForm = ({
         onChange={handleChange}
         className="w-full p-2 border rounded"
         disabled={
-          isReRegistration && !rejectedFields.includes("payment_method")
+          isReRegistration && !rejectedFields.includes("payment_details")
         }
       >
         <option value="upi">UPI</option>
@@ -909,7 +918,9 @@ const BusinessRegistrationForm = ({
               type="text"
               name="payment_details.upi.id"
               value={formData.payment_details.upi.id}
-              disabled={isReRegistration && !rejectedFields.includes("upi.id")}
+              disabled={
+                isReRegistration && !rejectedFields.includes("payment_details")
+              }
               onChange={handleChange}
               placeholder="UPI ID*"
               className={`w-full p-2 border rounded ${
@@ -930,8 +941,7 @@ const BusinessRegistrationForm = ({
               name="payment_details.upi.display_name"
               value={formData.payment_details.upi.display_name}
               disabled={
-                isReRegistration &&
-                !rejectedFields.includes("payment_details.upi.display_name")
+                isReRegistration && !rejectedFields.includes("payment_details")
               }
               onChange={handleChange}
               placeholder="Display Name*"
@@ -953,8 +963,7 @@ const BusinessRegistrationForm = ({
               name="payment_details.upi.phone"
               value={formData.payment_details.upi.phone}
               disabled={
-                isReRegistration &&
-                !rejectedFields.includes("payment_details.upi.phone")
+                isReRegistration && !rejectedFields.includes("payment_details")
               }
               onChange={handleChange}
               placeholder="UPI Phone Number*"
@@ -979,7 +988,7 @@ const BusinessRegistrationForm = ({
               name="payment_details.bank.name"
               value={formData.payment_details.bank.name}
               disabled={
-                isReRegistration && !rejectedFields.includes("bank.name")
+                isReRegistration && !rejectedFields.includes("payment_details")
               }
               onChange={handleChange}
               placeholder="Bank Name*"
@@ -1001,7 +1010,7 @@ const BusinessRegistrationForm = ({
               name="payment_details.bank.branch"
               value={formData.payment_details.bank.branch}
               disabled={
-                isReRegistration && !rejectedFields.includes("bank.branch")
+                isReRegistration && !rejectedFields.includes("payment_details")
               }
               onChange={handleChange}
               placeholder="Branch*"
@@ -1023,7 +1032,7 @@ const BusinessRegistrationForm = ({
               name="payment_details.bank.ifsc"
               value={formData.payment_details.bank.ifsc}
               disabled={
-                isReRegistration && !rejectedFields.includes("bank.ifsc")
+                isReRegistration && !rejectedFields.includes("payment_details")
               }
               onChange={handleChange}
               placeholder="IFSC Code*"
@@ -1045,8 +1054,7 @@ const BusinessRegistrationForm = ({
               name="payment_details.bank.account_number"
               value={formData.payment_details.bank.account_number}
               disabled={
-                isReRegistration &&
-                !rejectedFields.includes("payment_details.bank.account_number")
+                isReRegistration && !rejectedFields.includes("payment_details")
               }
               onChange={handleChange}
               placeholder="Account Number*"
