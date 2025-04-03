@@ -2,41 +2,21 @@ import React from "react";
 
 const ServiceCard = ({ name, description, icon }) => {
   return (
-    <div className="h-64 w-full mx-auto max-w-64 bg-transparent cursor-pointer group rounded-3xl perspective-1000 p-1">
-      {/* Card Container */}
-      <div className="relative w-full h-full transform-style-preserve-3d transition-transform duration-700 group-hover:rotate-y-180">
-        {/* Front Side */}
-        <div className="absolute inset-0 bg-black rounded-3xl flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 shadow-2xl backface-hidden overflow-hidden">
+    <div className="w-full mx-auto bg-transparent group perspective-1000 p-1">
+      <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 gap-4 backface-hidden overflow-hidden">
+        <div className="h-64 max-w-64 aspect-square overflow-hidden rounded-xl">
           {icon && (
             <img
               src={process.env.NEXT_PUBLIC_API_ENDPOINT + icon}
               alt={`${name} Icon`}
-              className="absolute inset-0 w-full h-full object-cover rounded-3xl"
+              className="w-full h-full object-cover rounded-xl shadow-md hover:scale-110 transition-transform duration-300"
               crossOrigin="anonymous"
             />
           )}
-
-          <div className="absolute inset-0 bg-black bg-opacity-40 rounded-3xl"></div>
-
-          <div className="relative z-10 mt-auto w-full text-center">
-            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl font-semibold text-white text-center">
-              {name}
-            </h3>
-          </div>
         </div>
 
-        {/* Back Side */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-3xl flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 text-white space-y-3 sm:space-y-4 md:space-y-5 rotate-y-180 backface-hidden shadow-2xl overflow-hidden">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl font-semibold text-center truncate">
-            Coming <br />
-            Soon
-          </h3>
-
-          <div className="flex space-x-2">
-            <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-100"></div>
-            <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-200"></div>
-          </div>
+        <div className="relative z-10 w-full text-center">
+          <h3 className="text-xl font-semibold text-center">{name}</h3>
         </div>
       </div>
     </div>
