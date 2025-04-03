@@ -67,7 +67,7 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className="bg-primary py-4 px-6 md:px-10 fixed w-full z-20 flex items-center justify-between"
+        className="bg-primary h-20 py-4 px-6 md:px-10 fixed w-full z-20 flex items-center justify-between"
         style={{ backgroundColor: "#5f60b9" }}
       >
         {/* Logo (Left Side) */}

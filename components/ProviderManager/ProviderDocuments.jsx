@@ -92,12 +92,13 @@ const ProviderDocuments = ({ provider }) => {
                     className="w-full h-40 object-cover rounded-lg shadow-sm"
                   />
                 ) : isPDF(doc.document_url) ? (
-                  <iframe
+                  <embed
                     src={documentUrl}
-                    crossOrigin="anonymous"
-                    title={doc.document_type}
-                    className="w-full h-40 rounded-lg shadow-sm"
-                  ></iframe>
+                    type="application/pdf"
+                    width="100%"
+                    height="160px"
+                    className="rounded-lg shadow-sm"
+                  />
                 ) : (
                   <p className="text-gray-500 text-sm">
                     Preview not available for this file type.

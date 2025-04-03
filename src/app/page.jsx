@@ -23,6 +23,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SparklesIcon } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -286,17 +293,32 @@ const Home = () => {
         >
           Our Services
         </motion.h2>
-        <div className="max-w-6xl mx-auto space-y-14">
+        <div className="max-w-6xl mx-auto space-y-2">
           {/* First Row: Display 3 cards */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="grid grid-cols-1 md:max-w-xl mx-auto md:grid-cols-2 lg:grid-cols-4 lg:max-w-7xl gap-6"
+            className="mx-auto max-w-xs md:max-w-xl lg:max-w-5xl xl:max-w-7xl"
           >
-            {categories.slice(0, 10).map((serv, index) => (
-              <ServiceCard key={index} name={serv.name} icon={serv.icon_url} />
-            ))}
+            <Carousel>
+              <CarouselContent>
+                {categories.slice(0, 10).map((serv, index) => (
+                  <CarouselItem
+                    key={index}
+                    className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  >
+                    <ServiceCard
+                      key={index}
+                      name={serv.name}
+                      icon={serv.icon_url}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
           </motion.div>
 
           <motion.button

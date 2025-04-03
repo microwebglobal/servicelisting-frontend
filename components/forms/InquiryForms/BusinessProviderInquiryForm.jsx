@@ -9,8 +9,6 @@ import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import { cn } from "@/lib/utils";
 
-const formDataCacheKey = "BusinessProviderInquiryFormData";
-
 const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
   const [citiesOptions, setCitiesOpions] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
@@ -84,9 +82,6 @@ const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
 
     fetchCities();
     fetchServices();
-
-    // Clear form data cache on page load
-    sessionStorage.removeItem(formDataCacheKey);
   }, []);
 
   const handleChange = (e) => {
