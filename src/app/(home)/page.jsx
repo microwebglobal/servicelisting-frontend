@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Navbar from "@components/Navbar";
 import Image from "next/image";
-import Footer from "@components/Footer";
 import CitySelector from "@components/home/CitySelector";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion } from "framer-motion";
@@ -92,11 +90,8 @@ const Home = () => {
 
   return (
     <div className="overflow-x-hidden">
-      {/* Navbar */}
-      <Navbar />
-
       {/* Hero Section */}
-      <section className="relative mt-10 py-24 flex flex-col justify-center items-center text-white overflow-hidden">
+      <section className="relative mt-10 py-32 flex flex-col justify-center items-center text-white overflow-hidden">
         {/* Background Image Slider */}
         <div className="absolute inset-0 -z-10 w-full h-full">
           <Swiper
@@ -155,7 +150,7 @@ const Home = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-28 sm:pb-32 md:pb-40 space-y-8 sm:space-y-10"
+          className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-28 space-y-8 sm:space-y-10"
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
             Find Trusted Professionals <br className="hidden sm:block" /> In
@@ -481,9 +476,6 @@ const Home = () => {
           </motion.div>
         </DialogContent>
       </Dialog>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };
