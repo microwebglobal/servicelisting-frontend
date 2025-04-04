@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import React, { useState, useEffect } from "react";
 import IndividualRegistrationForm from "@components/forms/registrationForms/IndividualRegistrationForm";
 import BusinessRegistrationForm from "@components/forms/registrationForms/BusinessRegistrationForm";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -168,8 +168,8 @@ const Page = ({ params }) => {
   };
 
   return (
-    <div className="mt-12 flex-1 bg-gray-50 py-8 lg:py-12">
-      <div className="container mx-auto px-4">
+    <div className="flex-1 bg-gray-50 py-8 lg:py-12">
+      <div className="container mt-12 mx-auto px-4">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
           <div className="lg:w-1/2 relative">
             <div
