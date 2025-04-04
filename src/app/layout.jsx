@@ -4,7 +4,7 @@ import { ToastProvider } from "@components/ui/toast";
 import { Toaster } from "@components/ui/toaster";
 import { AuthProvider } from "@src/context/AuthContext";
 
-const workSans = Poppins({ subsets: ["latin"], weight: ["400", "700"] });
+const poppins = Poppins({ subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata = {
   title: "",
@@ -13,7 +13,7 @@ export const metadata = {
 
 const RootLayout = ({ children }) => (
   <html lang="en">
-    <body className={workSans.className}>
+    <body className={`${poppins.className} antialiased`}>
       <ToastProvider>
         <AuthProvider>
           <div className="main">
