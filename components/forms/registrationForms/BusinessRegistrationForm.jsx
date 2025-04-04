@@ -260,6 +260,8 @@ const BusinessRegistrationForm = ({
     formData.employees.forEach((employee, index) => {
       if (!employee.name?.trim())
         errors[`employees.${index}.name`] = "Required";
+      else if (!employee.name?.match(/^[a-zA-Z\s]+$/))
+        errors[`employees.${index}.name`] = "Invalid name";
       if (!employee.phone?.match(/^\d{10}$/))
         errors[`employees.${index}.phone`] = "Required";
       if (!employee.email?.match(/^\S+@\S+\.\S+$/))
@@ -307,6 +309,8 @@ const BusinessRegistrationForm = ({
         if (!formData.business_registration_number?.trim())
           newErrors.business_registration_number = "Required";
         if (!formData.tax_id?.trim()) newErrors.tax_id = "Required";
+        else if (!formData.tax_id?.match(/^\d{11}$/))
+          newErrors.tax_id = "Invalid TIN";
         if (!formData.whatsapp_number?.match(/^\d{10}$/))
           newErrors.whatsapp_number = "Required";
         if (!formData.business_start_date)
