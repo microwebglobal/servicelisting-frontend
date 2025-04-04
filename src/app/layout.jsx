@@ -1,10 +1,10 @@
 import "@styles/globals.css";
-import { Work_Sans } from "next/font/google";
+import { Poppins, Work_Sans } from "next/font/google";
 import { ToastProvider } from "@components/ui/toast";
 import { Toaster } from "@components/ui/toaster";
 import { AuthProvider } from "@src/context/AuthContext";
 
-const workSans = Work_Sans({ subsets: ["latin"], weight: ["400", "700"] });
+const workSans = Poppins({ subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata = {
   title: "",
