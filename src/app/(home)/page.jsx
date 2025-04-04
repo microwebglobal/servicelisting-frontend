@@ -29,6 +29,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Link from "next/link";
+import PageSection from "@/components/PageSection";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -224,67 +225,60 @@ const Home = () => {
       </section>
 
       {/* Steps Section */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white px-4 flex justify-center">
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-20 justify-between items-center max-w-7xl py-2">
-          {/* Left Side - Image */}
-          <div className="lg:w-1/2 h-full">
-            <Image
-              src="/assets/images/how_app_work.jpg"
-              alt="Professional"
-              width={440}
-              height={418}
-              className="w-full h-full object-cover drop-shadow-lg rounded-xl"
-            />
-          </div>
-
-          {/* Right Side - Steps */}
-          <motion.div
-            initial={{ opacity: 0, x: 30, transform: "none" }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="w-full lg:w-1/2"
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-center lg:text-left font-bold mb-10 text-gray-900 p-3">
-              How does <span className="text-indigo-600">QProz</span> work?
-            </h2>
-
-            <ul className="text-lg">
-              {steps.map((step, index) => (
-                <li key={index} className="mb-10 list-item">
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0, x: 0 }}
-                    transition={{ duration: 0.8, delay: index * 0.3 }}
-                    className="flex flex-col lg:flex-row gap-4 lg:gap-8 items-center text-center lg:text-left"
-                  >
-                    {/* Icon */}
-                    <div className="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
-                      {step.icon}
-                    </div>
-
-                    {/* Text Content */}
-                    <div>
-                      <span className="font-bold text-xl text-gray-900">
-                        {step.title}
-                      </span>
-                      <p className="text-gray-600 lg:pr-16">
-                        {step.description}
-                      </p>
-                    </div>
-                  </motion.div>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+      <PageSection className="bg-gradient-to-b from-gray-50 to-white">
+        {/* Left Side - Image */}
+        <div className="lg:w-1/2 h-full">
+          <Image
+            src="/assets/images/how_app_work.jpg"
+            alt="Professional"
+            width={440}
+            height={418}
+            className="w-full h-full object-cover drop-shadow-lg rounded-xl"
+          />
         </div>
-      </section>
+
+        {/* Right Side - Steps */}
+        <motion.div
+          initial={{ opacity: 0, x: 30, transform: "none" }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="w-full lg:w-1/2"
+        >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-center lg:text-left font-bold mb-10 text-gray-900 p-3">
+            How does <span className="text-indigo-600">QProz</span> work?
+          </h2>
+
+          <ul className="text-lg">
+            {steps.map((step, index) => (
+              <li key={index} className="mb-10 list-item">
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0, x: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.3 }}
+                  className="flex flex-col lg:flex-row gap-4 lg:gap-8 items-center text-center lg:text-left"
+                >
+                  {/* Icon */}
+                  <div className="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
+                    {step.icon}
+                  </div>
+
+                  {/* Text Content */}
+                  <div>
+                    <span className="font-bold text-xl text-gray-900">
+                      {step.title}
+                    </span>
+                    <p className="text-gray-600 lg:pr-16">{step.description}</p>
+                  </div>
+                </motion.div>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      </PageSection>
 
       {/* Services Section */}
-      <section
-        id="services-section"
-        className="bg-gray-100 py-20 px-4 items-center justify-center text-center"
-      >
+      <section className="bg-gray-100 py-20 px-4 items-center justify-center text-center">
         <motion.h2
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -334,12 +328,12 @@ const Home = () => {
       </section>
 
       {/* Professionals Section */}
-      <section className="py-16 bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA] px-4 flex justify-center">
+      <PageSection className="bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA]">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col items-center lg:flex-row gap-10 lg:gap-20 max-w-7xl"
+          className="flex flex-col items-center lg:flex-row gap-10 lg:gap-20"
         >
           <div className="w-full lg:w-1/2 text-center lg:text-left">
             <motion.h2
@@ -399,7 +393,7 @@ const Home = () => {
             />
           </div>
         </motion.div>
-      </section>
+      </PageSection>
 
       {/* CTA Section */}
       <motion.section className="text-center flex justify-center  bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-16 md:px-16">
