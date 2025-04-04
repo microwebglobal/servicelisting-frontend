@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Navbar from "@components/Navbar";
 import Image from "next/image";
-import Footer from "@components/Footer";
 import CitySelector from "@components/home/CitySelector";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion } from "framer-motion";
@@ -30,6 +28,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import Link from "next/link";
+import PageSection from "@/components/PageSection";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -91,11 +91,8 @@ const Home = () => {
 
   return (
     <div className="overflow-x-hidden">
-      {/* Navbar */}
-      <Navbar />
-
       {/* Hero Section */}
-      <section className="relative mt-10 h-[calc(100vh-40px)] flex flex-col justify-center items-center text-white overflow-hidden">
+      <section className="relative mt-10 py-32 flex flex-col justify-center items-center text-white overflow-hidden">
         {/* Background Image Slider */}
         <div className="absolute inset-0 -z-10 w-full h-full">
           <Swiper
@@ -154,23 +151,23 @@ const Home = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 py-8 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-24 sm:pb-32 md:pb-40 space-y-8 sm:space-y-10"
+          className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-28 space-y-8 sm:space-y-10"
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
             Find Trusted Professionals <br className="hidden sm:block" /> In
             Just a Click!
           </h1>
 
-          <p className="mb-6 sm:mb-8 md:mb-10 text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
-            Discover a world of trusted professionals ready to transform your
-            home with top-notch services tailored to your needs. Simply search
-            your city below to explore the services available in your area and
-            start your hassle-free booking journey today!
-          </p>
-
           {/* Search Bar */}
-          <div className="w-full max-w-3xl">
+          <div className="w-full max-w-3xl space-y-5">
             <CitySelector />
+
+            <p className="text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
+              Need help finding the right service for you?{" "}
+              <Link href="" className="underline font-medium">
+                Chat with us
+              </Link>
+            </p>
           </div>
 
           <motion.button
@@ -195,7 +192,7 @@ const Home = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white bg-opacity-90 shadow-md"
         >
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-black text-sm sm:text-base md:text-lg px-4 sm:px-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-black text-sm sm:text-base md:text-lg px-4 sm:px-8 max-w-7xl mx-auto">
             <div className="flex flex-col items-center">
               <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
                 <CountUp start={0} end={2400} duration={2.75} suffix=" +" />
@@ -228,15 +225,15 @@ const Home = () => {
       </section>
 
       {/* Steps Section */}
-      <section className="flex flex-col lg:flex-row gap-10 lg:gap-20 justify-between items-center py-16 bg-gradient-to-b from-gray-50 to-white px-4">
+      <PageSection className="bg-gradient-to-b from-gray-50 to-white">
         {/* Left Side - Image */}
-        <div className="lg:w-1/2">
+        <div className="lg:w-1/2 h-full">
           <Image
             src="/assets/images/how_app_work.jpg"
             alt="Professional"
             width={440}
             height={418}
-            className="w-full drop-shadow-lg rounded-xl"
+            className="w-full h-full object-cover drop-shadow-lg rounded-xl"
           />
         </div>
 
@@ -245,13 +242,13 @@ const Home = () => {
           initial={{ opacity: 0, x: 30, transform: "none" }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2 lg:mr-20"
+          className="w-full lg:w-1/2"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl text-center lg:text-left font-bold mb-16 text-gray-900 p-3">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-center lg:text-left font-bold mb-10 text-gray-900 p-3">
             How does <span className="text-indigo-600">QProz</span> work?
           </h2>
 
-          <ul className="lg:pl-8 text-lg">
+          <ul className="text-lg">
             {steps.map((step, index) => (
               <li key={index} className="mb-10 list-item">
                 <motion.div
@@ -271,25 +268,22 @@ const Home = () => {
                     <span className="font-bold text-xl text-gray-900">
                       {step.title}
                     </span>
-                    <p className="text-gray-600 pr-5">{step.description}</p>
+                    <p className="text-gray-600 lg:pr-16">{step.description}</p>
                   </div>
                 </motion.div>
               </li>
             ))}
           </ul>
         </motion.div>
-      </section>
+      </PageSection>
 
       {/* Services Section */}
-      <section
-        id="services-section"
-        className="bg-gray-100 py-20 px-4 items-center justify-center text-center"
-      >
+      <section className="bg-gray-100 py-20 px-4 items-center justify-center text-center">
         <motion.h2
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center text-3xl md:text-4xl lg:text-5xl font-bold mb-10"
+          className="text-center text-3xl md:text-4xl lg:text-5xl font-bold mb-5"
         >
           Our Services
         </motion.h2>
@@ -334,12 +328,12 @@ const Home = () => {
       </section>
 
       {/* Professionals Section */}
-      <section className="py-16 bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA] px-4">
+      <PageSection className="bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA]">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col items-center lg:flex-row gap-10 lg:gap-20 max-w-6xl mx-auto"
+          className="flex flex-col items-center lg:flex-row gap-10 lg:gap-20"
         >
           <div className="w-full lg:w-1/2 text-center lg:text-left">
             <motion.h2
@@ -350,6 +344,7 @@ const Home = () => {
             >
               Trusted Professionals for Your Home Services
             </motion.h2>
+
             <p className="text-gray-600 mb-8 text-lg">
               Finding reliable professionals for your home services has never
               been easier. Our team of skilled experts is committed to
@@ -357,6 +352,7 @@ const Home = () => {
               you require repairs, installations, or maintenance, we ensure a
               seamless and stress-free experience.
             </p>
+
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 items-center -ml-8 lg:items-start textl-lg">
               <div>
                 <ul className="list-inside pl-5 text-gray-600 space-y-4">
@@ -387,57 +383,59 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="w-full lg:w-1/2">
+          <div className="w-full h-full lg:w-1/2">
             <Image
               src="/assets/images/roof_work.jpg"
               alt="Professional"
               width={600}
               height={600}
-              className="w-full rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+              className="w-full h-full object-cover rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
             />
           </div>
         </motion.div>
-      </section>
+      </PageSection>
 
       {/* CTA Section */}
-      <motion.section className="text-center flex flex-col lg:flex-row justify-between items-center bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-16 md:px-16">
-        <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
-          <Image
-            src="/assets/images/download-app.jpg"
-            alt="Professional"
-            width={666}
-            height={455}
-            className="w-full rounded-3xl shadow-xl transition-transform transform hover:scale-105 duration-500"
-          />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2 lg:ml-24"
-        >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-left text-gray-900 leading-tight">
-            Download the <br />
-            mobile app today!
-          </h2>
-          <p className="text-lg text-left pr-10 md:text-xl tracking-tight text-gray-600 mb-6 leading-relaxed">
-            Experience seamless services at your fingertips. Get instant access,
-            connect with top professionals, and manage everything
-            effortlessly—all in one place.
-          </p>
-
-          <div className="flex mt-10 gap-4 justify-center lg:justify-start">
-            <button className="bg-black text-white h-14 px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
-              <FaGooglePlay size={24} />
-              Google Play
-            </button>
-            <button className="bg-black text-white h-14 px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
-              <FaAppStore size={24} />
-              App Store
-            </button>
+      <motion.section className="text-center flex justify-center  bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-16 md:px-16">
+        <div className="flex flex-col lg:flex-row justify-between items-center max-w-7xl">
+          <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
+            <Image
+              src="/assets/images/download-app.jpg"
+              alt="Professional"
+              width={666}
+              height={455}
+              className="w-full rounded-3xl shadow-xl transition-transform transform hover:scale-105 duration-500"
+            />
           </div>
-        </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="w-full lg:w-1/2 lg:ml-24 -mr-10"
+          >
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-left text-gray-900 leading-tight">
+              Download the <br />
+              mobile app today!
+            </h2>
+            <p className="text-lg text-left pr-10 md:text-xl tracking-tight text-gray-600 mb-6 leading-relaxed">
+              Experience seamless services at your fingertips. Get instant
+              access, connect with top professionals, and manage everything
+              effortlessly—all in one place.
+            </p>
+
+            <div className="flex mt-10 gap-4 justify-center lg:justify-start -ml-10 sm:ml-0">
+              <button className="bg-black text-white h-14 px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
+                <FaGooglePlay size={24} />
+                Google Play
+              </button>
+              <button className="bg-black text-white h-14 px-6 py-2 rounded-md flex items-center gap-3 transition-transform transform hover:scale-105 duration-300">
+                <FaAppStore size={24} />
+                App Store
+              </button>
+            </div>
+          </motion.div>
+        </div>
       </motion.section>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -472,9 +470,6 @@ const Home = () => {
           </motion.div>
         </DialogContent>
       </Dialog>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

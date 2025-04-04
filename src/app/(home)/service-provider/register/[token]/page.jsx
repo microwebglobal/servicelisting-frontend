@@ -1,7 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Footer from "@components/Footer";
-import Navbar from "@components/Navbar";
 import { jwtDecode } from "jwt-decode";
 import IndividualRegistrationForm from "@components/forms/registrationForms/IndividualRegistrationForm";
 import BusinessRegistrationForm from "@components/forms/registrationForms/BusinessRegistrationForm";
@@ -170,41 +168,37 @@ const Page = ({ params }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <div className="mt-12 flex-1 bg-gray-50 py-8 lg:py-12">
-        <div className="container mx-auto px-4">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
-            <div className="lg:w-1/2 relative">
-              <div
-                className="absolute inset-0 bg-cover bg-center backdrop-blur-2xl"
-                style={{
-                  backgroundImage: "url('/assets/images/become-provider.jpg')",
-                }}
-              ></div>
-            </div>
-            {/* Form Section */}
-            <div className="lg:w-1/2 p-3 lg:p-8 flex flex-col justify-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-6">
-                Complete Your Registration
-              </h1>
-              {rejectedFields?.length > 0 && !error && (
-                <p className="text-red-500 mb-4 border border-red-500 bg-red-500/5 p-3 rounded-lg">
-                  *You are re-registering as a{" "}
-                  {tokenData.business_type === "business"
-                    ? "business"
-                    : "individual"}
-                  . Please fill out only the empty fields to complete the
-                  registration process.
-                </p>
-              )}
+    <div className="mt-12 flex-1 bg-gray-50 py-8 lg:py-12">
+      <div className="container mx-auto px-4">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
+          <div className="lg:w-1/2 relative">
+            <div
+              className="absolute inset-0 bg-cover bg-center backdrop-blur-2xl"
+              style={{
+                backgroundImage: "url('/assets/images/become-provider.jpg')",
+              }}
+            ></div>
+          </div>
+          {/* Form Section */}
+          <div className="lg:w-1/2 p-3 lg:p-8 flex flex-col justify-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-6">
+              Complete Your Registration
+            </h1>
+            {rejectedFields?.length > 0 && !error && (
+              <p className="text-red-500 mb-4 border border-red-500 bg-red-500/5 p-3 rounded-lg">
+                *You are re-registering as a{" "}
+                {tokenData.business_type === "business"
+                  ? "business"
+                  : "individual"}
+                . Please fill out only the empty fields to complete the
+                registration process.
+              </p>
+            )}
 
-              <div className="space-y-6">{renderContent()}</div>
-            </div>
+            <div className="space-y-6">{renderContent()}</div>
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -11,8 +11,8 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { app } from "../../../utils/firebase.js";
 import ProviderServices from "@components/ProviderServices.jsx";
+import { app } from "@/src/app/utils/firebase";
 
 const BusinessRegister = () => {
   const router = useRouter();
