@@ -49,13 +49,13 @@ const ProviderReg = () => {
       <div className="bg-white flex flex-col lg:flex-row gap-10 p-6 sm:p-8 rounded-lg shadow-md w-full max-w-6xl">
         {/* Image Section (Fixed Size) */}
         <div className="flex justify-center items-center w-full lg:w-1/2">
-          <div className="relative w-full lg:w-auto">
+          <div className="relative w-full h-full lg:w-auto">
             <Image
               src="/assets/images/become-provider.jpg"
               alt="Registration Illustration"
               width={600}
               height={900}
-              className="rounded-2xl border-opacity-25 object-cover min-h-[400px] lg:min-h-[650px] w-full lg:w-[600px]"
+              className="rounded-2xl border-opacity-25 object-cover min-h-[400px] lg:min-h-[650px] w-full h-full lg:w-[600px]"
             />
           </div>
         </div>

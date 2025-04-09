@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
+import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const FileInput = ({
   name,
@@ -30,9 +31,22 @@ const FileInput = ({
   }, [file]);
 
   const handleChange = (e) => {
-    if (e && e.target && e.target.files && e.target.files.length > 0) {
-      onFileChange(e);
+    const fileInput = e?.target?.files;
+    if (!fileInput || fileInput.length === 0) return;
+
+    const file = fileInput[0];
+    const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
+
+    if (file.size > maxFileSize) {
+      toast({
+        title: "File size limit exceeded",
+        description: "Please select a file less than 2MB in size.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    onFileChange(e);
   };
 
   return (

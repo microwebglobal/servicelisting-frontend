@@ -321,7 +321,7 @@ const IndividualProviderInquiryForm = ({ formData, onFormDataChange }) => {
       <form onSubmit={handleSubmit}>
         {/* Step 1: General Information */}
         {step === 1 && (
-          <div className="space-y-3">
+          <div className="flex flex-col space-y-4">
             <div className="space-y-2">
               <label className="block">Full Name</label>
               <input
@@ -426,7 +426,7 @@ const IndividualProviderInquiryForm = ({ formData, onFormDataChange }) => {
             <button
               type="button"
               onClick={nextStep}
-              className="w-full bg-indigo-500 text-white p-2 rounded mt-4"
+              className="w-full bg-indigo-500 text-white p-2 rounded"
             >
               Next
             </button>
@@ -435,7 +435,7 @@ const IndividualProviderInquiryForm = ({ formData, onFormDataChange }) => {
 
         {/* Step 2: Service Details */}
         {step === 2 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="space-y-2">
               <label className="block">Cities/Regions of Service</label>
 
@@ -559,19 +559,22 @@ const IndividualProviderInquiryForm = ({ formData, onFormDataChange }) => {
               {errors.skills && <p className="text-red-500">{errors.skills}</p>}
             </div>
 
-            <button
-              type="button"
-              onClick={prevStep}
-              className="bg-indigo-500 text-white p-2 rounded mr-2"
-            >
-              Back
-            </button>
-            <button
-              type="submit"
-              className="bg-green-500 text-white p-2 rounded"
-            >
-              Submit
-            </button>
+            <div className="w-full flex gap-2 pt-3">
+              <button
+                type="button"
+                onClick={prevStep}
+                className="bg-indigo-500 text-white p-2 rounded w-1/2"
+              >
+                Back
+              </button>
+
+              <button
+                type="submit"
+                className="bg-green-500 text-white p-2 rounded w-1/2"
+              >
+                Submit
+              </button>
+            </div>
           </div>
         )}
       </form>
