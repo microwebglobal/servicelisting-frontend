@@ -330,7 +330,7 @@ const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
       )}
       <form onSubmit={handleSubmit}>
         {step === 1 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="space-y-2">
               <label className="block">Business Name</label>
               <input
@@ -450,7 +450,7 @@ const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
         )}
 
         {step === 2 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="space-y-2">
               <label className="block">Business Website</label>
               <input
@@ -581,18 +581,19 @@ const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
               )}
             </div>
 
-            <div className="flex justify-between mt-10">
+            <div className="flex gap-2 pt-3">
               <button
                 type="button"
                 onClick={handlePreviousStep}
-                className="bg-indigo-500 text-white p-2 rounded mr-2"
+                className="bg-indigo-500 text-white p-2 rounded w-1/2"
               >
                 Previous
               </button>
+              
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-green-500 text-white p-2 rounded"
+                className="bg-green-500 text-white p-2 rounded w-1/2"
               >
                 {isSubmitting ? "Submitting..." : "Submit Registration"}
               </button>

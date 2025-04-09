@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
+import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const FileInput = ({
   name,
@@ -30,9 +31,22 @@ const FileInput = ({
   }, [file]);
 
   const handleChange = (e) => {
-    if (e && e.target && e.target.files && e.target.files.length > 0) {
-      onFileChange(e);
+    const fileInput = e?.target?.files;
+    if (!fileInput || fileInput.length === 0) return;
+
+    const file = fileInput[0];
+    const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
+
+    if (file.size > maxFileSize) {
+      toast({
+        title: "File size limit exceeded",
+        description: "Please select a file less than 2MB in size.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    onFileChange(e);
   };
 
   return (
@@ -60,6 +74,14 @@ const FileInput = ({
                 alt="PDF Thumbnail"
                 className="w-full h-full object-cover rounded-md"
               />
+            ) : file.type === "application/msword" ||
+              file.type ===
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
+              <img
+                src="/assets/images/docx_icon.png"
+                alt="DOCX Thumbnail"
+                className="w-full h-full object-cover rounded-md"
+              />
             ) : null}
           </div>
         )}
@@ -67,7 +89,7 @@ const FileInput = ({
         <div className={!file ? "flex gap-1 items-center" : ""}>
           <input
             type="file"
-            accept=".jpg,.jpeg,.png,.pdf"
+            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
             name={name}
             onChange={handleChange}
             disabled={disabled}
@@ -114,7 +136,7 @@ const FileInput = ({
                 alt="Full Preview"
                 className="w-full h-auto rounded-md"
               />
-            ) : (
+            ) : file.type === "application/pdf" ? (
               <div className="w-full h-[50vh] sm:h-[500px] rounded-md overflow-auto">
                 <object
                   data={previewURL}
@@ -136,6 +158,20 @@ const FileInput = ({
                   </p>
                 </object>
               </div>
+            ) : (
+              <p className="p-4 text-center">
+                Unsupported file type.
+                <br />
+                <a
+                  href={previewURL}
+                  download={file.name}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline"
+                >
+                  Click here to download the file.
+                </a>
+              </p>
             )}
           </div>
         </div>
