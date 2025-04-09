@@ -264,8 +264,10 @@ const BusinessRegistrationForm = ({
         errors[`employees.${index}.name`] = "Invalid name";
       if (!employee.phone?.match(/^\d{10}$/))
         errors[`employees.${index}.phone`] = "Required";
-      if (!employee.email?.match(/^\S+@\S+\.\S+$/))
+      if (!employee.email?.trim() === "" || !employee.email)
         errors[`employees.${index}.email`] = "Required";
+      else if (!employee.email?.match(/^\S+@\S+\.\S+$/))
+        errors[`employees.${index}.email`] = "Invalid email";
       if (!employee.gender) errors[`employees.${index}.gender`] = "Required";
     });
 
