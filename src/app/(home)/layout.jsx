@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
 
 export default async function HomeLayout({ children }) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const city = cookieStore.get("current-location")?.value;
 
   return (
