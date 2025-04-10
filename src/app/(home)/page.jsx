@@ -97,7 +97,7 @@ const Home = () => {
         <div className="absolute inset-0 -z-10 w-full h-full">
           <Swiper
             modules={[Autoplay, Pagination]}
-            spaceBetween={10}
+            spaceBetween={0}
             slidesPerView={1}
             autoplay={{ delay: 3000, disableOnInteraction: false }}
             pagination={{ clickable: true }}
