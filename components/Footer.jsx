@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { BiWorld } from "react-icons/bi";
 import { FaFacebook, FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";

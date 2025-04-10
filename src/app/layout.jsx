@@ -1,5 +1,5 @@
 import "@styles/globals.css";
-import { Poppins, Work_Sans } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { ToastProvider } from "@components/ui/toast";
 import { Toaster } from "@components/ui/toaster";
 import { AuthProvider } from "@src/context/AuthContext";
