@@ -3,19 +3,28 @@
 import { useState, useEffect } from "react";
 
 export function useUserLocation() {
-  const [city, setCity] = (useState < string) | (undefined > undefined);
+  const [city, setCity] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const cookies = document.cookie.split("; ");
-    const userCityCookie = cookies.find((cookie) =>
-      cookie.startsWith("user-city=")
-    );
+    if (typeof document !== "undefined") {
+      const cookies = document.cookie.split("; ");
+      const locationCookie = cookies.find((cookie) =>
+        cookie.startsWith("current-location=")
+      );
 
-    if (userCityCookie) {
-      const cityValue = userCityCookie.split("=")[1];
-      setCity(decodeURIComponent(cityValue));
+      if (locationCookie) {
+        const value = locationCookie.split("=")[1];
+        try {
+          setCity(decodeURIComponent(value));
+        } catch (err) {
+          console.error("Failed to decode city from cookie:", err);
+        }
+      }
+
+      setLoading(false);
     }
   }, []);
 
-  return city;
+  return { city, loading };
 }
