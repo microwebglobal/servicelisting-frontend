@@ -8,7 +8,7 @@ export default async function HomeLayout({ children }) {
   const city = cookieStore.get("current-location")?.value;
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       {!city ? (
         <LocationInitializer />
       ) : (
