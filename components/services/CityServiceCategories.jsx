@@ -109,79 +109,75 @@ export function CityServiceCategories({ cityName = "" }) {
   }
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <div className=" bg-gray-50 p-20">
-        <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20 mt-14">
-          <div className="w-full lg:w-2/5">
-            <h1 className="text-4xl font-bold mb-2 capitalize">
-              Services in {cityName}, India
-            </h1>
-            <hr className="mb-10" />
+    <div className="max-w-7xl mx-auto">
+      <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20 mt-14">
+        <div className="w-full lg:w-2/5">
+          <h1 className="text-4xl font-bold mb-2 capitalize">
+            Services in {cityName}, India
+          </h1>
+          <hr className="mb-10" />
 
-            {categories.length === 0 ? (
-              <div className="text-center py-8">
-                No services available in this city
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {categories.map((category) => (
-                  <Card
-                    key={category.category_id}
-                    className="cursor-pointer hover:shadow-md transition-shadow duration-300"
-                    onClick={() => handleCategoryClick(category.slug)}
-                  >
-                    <CardImage
-                      src={
-                        process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url
-                      }
-                      crossOrigin="anonymous"
-                      style={{
-                        height: "150px",
-                        objectFit: "cover",
-                        width: "100%",
-                      }}
-                      alt="card_image"
-                    />
+          {categories.length === 0 ? (
+            <div className="text-center py-8">
+              No services available in this city
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {categories.map((category) => (
+                <Card
+                  key={category.category_id}
+                  className="cursor-pointer hover:shadow-md transition-shadow duration-300"
+                  onClick={() => handleCategoryClick(category.slug)}
+                >
+                  <CardImage
+                    src={
+                      process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url
+                    }
+                    crossOrigin="anonymous"
+                    style={{
+                      height: "150px",
+                      objectFit: "cover",
+                      width: "100%",
+                    }}
+                    alt="card_image"
+                  />
 
-                    <CardHeader>
-                      <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
-                        {category.name}
-                      </CardTitle>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="w-full lg:w-3/5">
-            <Image
-              src="/assets/images/hair_clean.png"
-              alt="Professional Services"
-              width={800}
-              height={700}
-              className="rounded-xl mb-10"
-              priority
-            />
-            <hr />
-            <h2 className="text-2xl mt-5 mb-10">Featured Services</h2>
-            <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
-              {[1, 2, 3, 4].map((index) => (
-                <FeaturedCard
-                  key={index}
-                  imageSrc="/assets/images/hair_clean.png"
-                  badgeText="123"
-                  price="5000"
-                  title="Home Repair Service"
-                  rating={4.5}
-                />
+                  <CardHeader>
+                    <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
+                      {category.name}
+                    </CardTitle>
+                  </CardHeader>
+                </Card>
               ))}
             </div>
+          )}
+        </div>
+
+        <div className="w-full lg:w-3/5">
+          <Image
+            src="/assets/images/hair_clean.png"
+            alt="Professional Services"
+            width={800}
+            height={700}
+            className="rounded-xl mb-10"
+            priority
+          />
+          <hr />
+          <h2 className="text-2xl mt-5 mb-10">Featured Services</h2>
+          <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
+            {[1, 2, 3, 4].map((index) => (
+              <FeaturedCard
+                key={index}
+                imageSrc="/assets/images/hair_clean.png"
+                badgeText="123"
+                price="5000"
+                title="Home Repair Service"
+                rating={4.5}
+              />
+            ))}
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
