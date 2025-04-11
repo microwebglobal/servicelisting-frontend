@@ -15,25 +15,25 @@ const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchBookingData = async () => {
-      try {
-        const response = await cartService.getCustomerBookings();
-        setBookingData(response);
-        console.log(response);
-      } catch (error) {
-        console.error("Error fetching booking data:", error);
-      }
-    };
-
     fetchBookingData();
   }, []);
+
+  const fetchBookingData = async () => {
+    try {
+      const response = await cartService.getCustomerBookings();
+      setBookingData(response);
+      console.log(response);
+    } catch (error) {
+      console.error("Error fetching booking data:", error);
+    }
+  };
 
   const filteredBookings = selectedStatus
     ? bookingData.filter((booking) => booking.status === selectedStatus)
     : bookingData;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen ml-20 bg-gray-50">
       {!selectedBooking ? (
         <div className="flex flex-col md:flex-row">
           {/* Sidebar */}
@@ -58,6 +58,7 @@ const Page = () => {
                     key={booking.booking_id || index}
                     booking={booking}
                     onClick={() => setSelectedBooking(booking)}
+                    onCancell={() => fetchBookingData()}
                   />
                 ))}
               </div>
