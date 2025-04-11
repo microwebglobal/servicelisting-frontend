@@ -381,10 +381,10 @@ const IndividualProviderInquiryForm = ({ formData, onFormDataChange }) => {
                 <CalendarSearch className="size-5" />
 
                 <DatePicker
-                  selected={formData.dob}
+                  selected={formData.dob || ""}
                   minDate={maxAgeDate}
                   maxDate={minAgeDate}
-                  placeholderText="mm/dd/yyyy"
+                  placeholderText="Select a date"
                   onChange={(date) =>
                     handleChange({ target: { name: "dob", value: date } })
                   }
