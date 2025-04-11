@@ -4,9 +4,8 @@ import { Card, CardHeader, CardImage, CardTitle } from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
 import FeaturedCard from "@/components/ui/featuredCard";
-import Footer from "@/components/Footer";
+import { LocationSwitcher } from "./LocationSwitcher";
 
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
@@ -112,10 +111,13 @@ export function CityServiceCategories({ cityName = "" }) {
     <div className="max-w-7xl mx-auto">
       <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20 mt-14">
         <div className="w-full lg:w-2/5">
-          <h1 className="text-4xl font-bold mb-2 capitalize">
+          <h1 className="text-4xl font-bold mb-5 capitalize">
             Services in {cityName}, India
           </h1>
-          <hr className="mb-10" />
+
+          <LocationSwitcher />
+
+          <hr className="mb-10 mt-5" />
 
           {categories.length === 0 ? (
             <div className="text-center py-8">
