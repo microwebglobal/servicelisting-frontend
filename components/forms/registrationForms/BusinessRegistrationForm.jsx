@@ -634,7 +634,7 @@ const BusinessRegistrationForm = ({
               isReRegistration &&
               !rejectedFields.includes("business_start_date")
             }
-            placeholderText="mm/dd/yyyy"
+            placeholderText="Select a date"
             onChange={(date) =>
               handleChange({
                 target: { name: "business_start_date", value: date },
