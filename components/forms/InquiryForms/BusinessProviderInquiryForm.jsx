@@ -423,7 +423,7 @@ const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
             <div className="space-y-2">
               <label className="block">Authorized Person Contact</label>
               <input
-                type="tel"
+                type="number"
                 name="mobile"
                 value={formData.mobile}
                 onChange={handleChange}
@@ -589,7 +589,7 @@ const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
               >
                 Previous
               </button>
-              
+
               <button
                 type="submit"
                 disabled={isSubmitting}

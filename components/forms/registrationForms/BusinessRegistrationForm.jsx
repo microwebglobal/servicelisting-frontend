@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import { cn } from "@/lib/utils";
 import FileInput from "@/components/FileInput";
+import { CalendarSearch } from "lucide-react";
+import DatePicker from "react-datepicker";
 
 const BusinessRegistrationForm = ({
   enquiryData,
@@ -596,22 +598,35 @@ const BusinessRegistrationForm = ({
           Business Start Date
         </label>
 
-        <input
-          type="date"
-          min={maxStartDate}
-          max={minStartDate}
-          name="business_start_date"
-          value={formData.business_start_date}
-          disabled={
-            isReRegistration && !rejectedFields.includes("business_start_date")
-          }
-          onChange={handleChange}
-          className={cn("p-2 border rounded w-full", {
-            "border-red-500 bg-red-500/5 text-red-500":
-              errors.business_start_date,
-          })}
-          placeholder="Business Start Date"
-        />
+        <div
+          className={cn(
+            "flex items-center gap-2 bg-gray-100 px-3 rounded-md focus-within:ring-2 focus-within:ring-blue-500",
+            {
+              "bg-red-500/5 border border-red-500/50 text-red-500":
+                errors.business_start_date,
+            }
+          )}
+        >
+          <CalendarSearch className="size-5" />
+
+          <DatePicker
+            selected={formData.dob}
+            minDate={maxStartDate}
+            maxDate={minStartDate}
+            disabled={
+              isReRegistration &&
+              !rejectedFields.includes("business_start_date")
+            }
+            placeholderText="mm/dd/yyyy"
+            onChange={(date) =>
+              handleChange({
+                target: { name: "business_start_date", value: date },
+              })
+            }
+            wrapperClassName="w-full"
+            className="w-full bg-transparent h-10 focus:outline-none"
+          />
+        </div>
 
         {errors.business_start_date && (
           <p className="text-red-500 text-sm mt-1">

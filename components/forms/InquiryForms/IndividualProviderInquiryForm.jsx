@@ -8,6 +8,8 @@ import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
 import { cn } from "@/lib/utils";
+import DatePicker from "react-datepicker";
+import { CalendarSearch } from "lucide-react";
 
 const IndividualProviderInquiryForm = ({ formData, onFormDataChange }) => {
   const [step, setStep] = useState(1);
@@ -366,22 +368,31 @@ const IndividualProviderInquiryForm = ({ formData, onFormDataChange }) => {
 
             <div className="space-y-2">
               <label className="block">Date Of Birth</label>
-              <input
-                type="date"
-                name="dob"
-                min={maxAgeDate}
-                max={minAgeDate}
-                value={formData.dob}
-                onChange={handleChange}
-                required
+
+              <div
                 className={cn(
-                  "w-full bg-gray-100 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  "flex items-center gap-2 bg-gray-100 px-3 rounded-md focus-within:ring-2 focus-within:ring-blue-500",
                   {
                     "bg-red-500/5 border border-red-500/50 text-red-500":
                       errors.dob,
                   }
                 )}
-              />
+              >
+                <CalendarSearch className="size-5" />
+
+                <DatePicker
+                  selected={formData.dob}
+                  minDate={maxAgeDate}
+                  maxDate={minAgeDate}
+                  placeholderText="mm/dd/yyyy"
+                  onChange={(date) =>
+                    handleChange({ target: { name: "dob", value: date } })
+                  }
+                  wrapperClassName="w-full"
+                  className="w-full bg-transparent h-10 focus:outline-none"
+                />
+              </div>
+
               {errors.dob && <p className="text-red-500">{errors.dob}</p>}
             </div>
 
