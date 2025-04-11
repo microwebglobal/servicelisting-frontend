@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { cartService } from "@/api/cartService";
 
-const BookingCard = ({ booking, onClick }) => {
+const BookingCard = ({ booking, onClick, onCancell }) => {
   const [open, setOpen] = useState(false);
   const [bookingToCancell, setBookingToCancell] = useState();
   const [penaltyDetails, setPenaltyDetails] = useState({
@@ -50,6 +50,7 @@ const BookingCard = ({ booking, onClick }) => {
     } finally {
       setOpen(false);
       setBookingToCancell(null);
+      onCancell();
     }
   };
 

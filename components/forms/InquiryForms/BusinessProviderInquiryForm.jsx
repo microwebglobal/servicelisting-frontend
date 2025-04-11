@@ -301,22 +301,15 @@ const BusinessProviderInquiryForm = ({ formData, onFormDataChange }) => {
       setStep(1);
     } catch (error) {
       console.error("Submission error:", error);
-      if (error.response?.data?.error === "Duplicate entry") {
-        toast({
-          title: "Error",
-          description: "An account with this email already exists.",
-          variant: "destructive",
-        });
-      } else {
-        const errorMessage =
-          error.response?.data?.details ||
-          "Failed to submit inquiry. Please try again.";
-        toast({
-          title: "Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
+
+      const errorMessage =
+        error.response?.data?.details ||
+        "Failed to submit inquiry. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
       setIsLoading(false);
