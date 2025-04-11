@@ -412,11 +412,27 @@ const IndividualRegistrationForm = ({
       }
     } catch (error) {
       console.error("Registration error:", error);
+
+      const validationErrors = error.response?.data?.validation;
+      let validationErrorString = "";
+      if (validationErrors?.length) {
+        validationErrors.forEach((error) => {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            [error.field]: error.message,
+          }));
+
+          validationErrorString += `${error.message}\n`;
+        });
+      }
+
       const errorMessage =
-        error.response?.data?.details ||
-        error.response?.data?.message ||
-        error.message ||
-        "Registration failed. Please try again.";
+        validationErrorString !== ""
+          ? validationErrorString
+          : error.response?.data?.details ||
+            error.response?.data?.message ||
+            error.message ||
+            "Registration failed. Please try again.";
 
       toast({
         title: "Error",

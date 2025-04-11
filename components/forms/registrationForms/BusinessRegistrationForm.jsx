@@ -228,14 +228,14 @@ const BusinessRegistrationForm = ({
     if (value === "") {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [`employees.${index}.${field}`]: `${field
+        [`employees[${index}].${field}`]: `${field
           .split("_")
           .join(" ")} is required`,
       }));
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [`employees.${index}.${field}`]: "",
+        [`employees[${index}].${field}`]: "",
       }));
     }
 
@@ -261,23 +261,23 @@ const BusinessRegistrationForm = ({
   const validateEmployees = (errors) => {
     formData.employees.forEach((employee, index) => {
       if (!employee.name?.trim())
-        errors[`employees.${index}.name`] = "Required";
+        errors[`employees[${index}].name`] = "Required";
       else if (!employee.name?.match(/^[a-zA-Z\s]+$/))
-        errors[`employees.${index}.name`] = "Invalid name";
+        errors[`employees[${index}].name`] = "Invalid name";
       if (!employee.phone?.match(/^\d{10}$/))
-        errors[`employees.${index}.phone`] = "Required";
+        errors[`employees[${index}].phone`] = "Required";
       if (!employee.email?.trim() === "" || !employee.email)
-        errors[`employees.${index}.email`] = "Required";
+        errors[`employees[${index}].email`] = "Required";
       else if (!employee.email?.match(/^\S+@\S+\.\S+$/))
-        errors[`employees.${index}.email`] = "Invalid email";
-      if (!employee.gender) errors[`employees.${index}.gender`] = "Required";
+        errors[`employees[${index}].email`] = "Invalid email";
+      if (!employee.gender) errors[`employees[${index}].gender`] = "Required";
     });
 
     if (Object.keys(errors).length === 0) {
       const emails = new Set();
       formData.employees.forEach((employee, index) => {
         if (emails.has(employee.email)) {
-          errors[`employees.${index}.email`] = "Email already used";
+          errors[`employees[${index}].email`] = "Email already used";
         } else {
           emails.add(employee.email);
         }
@@ -286,7 +286,7 @@ const BusinessRegistrationForm = ({
       const phones = new Set();
       formData.employees.forEach((employee, index) => {
         if (phones.has(employee.phone)) {
-          errors[`employees.${index}.phone`] = "Phone number already used";
+          errors[`employees[${index}].phone`] = "Phone number already used";
         } else {
           phones.add(employee.phone);
         }
@@ -414,7 +414,8 @@ const BusinessRegistrationForm = ({
         if (
           key !== "documents" &&
           formData[key] !== undefined &&
-          formData[key] !== null
+          formData[key] !== null &&
+          key !== "business_start_date"
         ) {
           formDataToSend.append(
             key,
@@ -422,6 +423,9 @@ const BusinessRegistrationForm = ({
               ? JSON.stringify(formData[key])
               : formData[key]
           );
+        } else if (key === "business_start_date") {
+          const dateString = formData[key]?.toISOString().split("T")[0];
+          formDataToSend.append(key, dateString);
         }
       });
 
@@ -458,13 +462,26 @@ const BusinessRegistrationForm = ({
     } catch (error) {
       console.error("Registration error:", error);
 
-      setErrors(error.response?.data?.validation || {});
+      const validationErrors = error.response?.data?.validation;
+      let validationErrorString = "";
+      if (validationErrors?.length) {
+        validationErrors.forEach((error) => {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            [error.field]: error.message,
+          }));
+
+          validationErrorString += `${error.message}\n`;
+        });
+      }
 
       const errorMessage =
-        error.response?.data?.details ||
-        error.response?.data?.message ||
-        error.message ||
-        "Registration failed. Please try again.";
+        validationErrorString !== ""
+          ? validationErrorString
+          : error.response?.data?.details ||
+            error.response?.data?.message ||
+            error.message ||
+            "Registration failed. Please try again.";
 
       toast({
         title: "Error",
@@ -600,9 +617,9 @@ const BusinessRegistrationForm = ({
 
         <div
           className={cn(
-            "flex items-center gap-2 bg-gray-100 px-3 rounded-md focus-within:ring-2 focus-within:ring-blue-500",
+            "flex items-center gap-2 border px-3 rounded-md focus-within:ring-2 focus-within:ring-blue-500",
             {
-              "bg-red-500/5 border border-red-500/50 text-red-500":
+              "bg-red-500/5 border border-red-500 text-red-500":
                 errors.business_start_date,
             }
           )}
@@ -610,7 +627,7 @@ const BusinessRegistrationForm = ({
           <CalendarSearch className="size-5" />
 
           <DatePicker
-            selected={formData.dob}
+            selected={formData.business_start_date}
             minDate={maxStartDate}
             maxDate={minStartDate}
             disabled={
@@ -821,14 +838,14 @@ const BusinessRegistrationForm = ({
                 }
                 placeholder="Phone Number*"
                 className={`p-2 border rounded w-full ${
-                  errors[`employees.${index}.phone`]
+                  errors[`employees[${index}].phone`]
                     ? "border-red-500 bg-red-500/5 text-red-500"
                     : ""
                 }`}
               />
-              {errors[`employees.${index}.phone`] && (
+              {errors[`employees[${index}].phone`] && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors[`employees.${index}.phone`]}
+                  {errors[`employees[${index}].phone`]}
                 </p>
               )}
             </div>
@@ -847,14 +864,14 @@ const BusinessRegistrationForm = ({
                 }
                 placeholder="Email*"
                 className={`p-2 border rounded w-full h-11 ${
-                  errors[`employees.${index}.email`]
+                  errors[`employees[${index}].email`]
                     ? "border-red-500 bg-red-500/5 text-red-500"
                     : ""
                 }`}
               />
-              {errors[`employees.${index}.email`] && (
+              {errors[`employees[${index}].email`] && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors[`employees.${index}.email`]}
+                  {errors[`employees[${index}].email`]}
                 </p>
               )}
             </div>
