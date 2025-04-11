@@ -886,6 +886,11 @@ const BusinessRegistrationForm = ({
         </a>
       </div>
 
+      <p className="py-2">
+        Supported File Types: PDF, JPG, PNG, doc/docx (2MB max file size for
+        each)
+      </p>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {renderFileInput(
           "business_registration",
