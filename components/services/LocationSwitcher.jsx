@@ -64,7 +64,7 @@ export function LocationSwitcher() {
         >
           <div className="flex flex-1 items-center">
             <MapPin className="mr-2 h-4 w-4 text-[#5f60b9]" />
-            {value ? value : "Select your city"}
+            {value && cities?.includes(value) ? value : "Select your city"}
           </div>
 
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
