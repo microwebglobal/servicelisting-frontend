@@ -243,6 +243,19 @@ const IndividualRegistrationForm = ({
     if (start > end) return "Start time cannot be after end time";
   };
 
+  // Set default part-time availability hours
+  useEffect(() => {
+    if (formData.availability_type === "part_time") {
+      setFormData((prev) => ({
+        ...prev,
+        availability_hours: {
+          start: "08:00",
+          end: "17:00",
+        },
+      }));
+    }
+  }, [formData.availability_type]);
+
   const validateStep = (stepNumber) => {
     let newErrors = {};
 
@@ -399,11 +412,27 @@ const IndividualRegistrationForm = ({
       }
     } catch (error) {
       console.error("Registration error:", error);
+
+      const validationErrors = error.response?.data?.validation;
+      let validationErrorString = "";
+      if (validationErrors?.length) {
+        validationErrors.forEach((error) => {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            [error.field]: error.message,
+          }));
+
+          validationErrorString += `${error.message}\n`;
+        });
+      }
+
       const errorMessage =
-        error.response?.data?.details ||
-        error.response?.data?.message ||
-        error.message ||
-        "Registration failed. Please try again.";
+        validationErrorString !== ""
+          ? validationErrorString
+          : error.response?.data?.details ||
+            error.response?.data?.message ||
+            error.message ||
+            "Registration failed. Please try again.";
 
       toast({
         title: "Error",
@@ -602,7 +631,7 @@ const IndividualRegistrationForm = ({
               <input
                 type="time"
                 name="availability_hours.start"
-                value={formData.availability_hours.start || ""}
+                value={formData.availability_hours.start}
                 disabled={
                   isReRegistration &&
                   !rejectedFields.includes("availability_hours")
@@ -704,6 +733,12 @@ const IndividualRegistrationForm = ({
           Download Agreement
         </a>
       </div>
+
+      <p className="py-2">
+        Supported File Types: PDF, JPG, PNG, doc/docx (2MB max file size for
+        each)
+      </p>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {renderFileInput("logo", "Profile Picture", true)}
         {renderFileInput("id_proof", "ID Proof", true)}

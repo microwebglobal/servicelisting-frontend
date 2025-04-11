@@ -1,13 +1,13 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@src/context/AuthContext";
 import { profileAPI } from "@/api/profile";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import ProfileSidebar from '@components/profile/sidebar';
-import ProfileContent from '@components/profile/ProfileContent';
-import EmailVerificationDialog from '@components/profile/EmailVerificationDialog';
+import ProfileSidebar from "@components/profile/sidebar";
+import ProfileContent from "@components/profile/ProfileContent";
+import EmailVerificationDialog from "@components/profile/EmailVerificationDialog";
 import withAuth from "@/components/isAuth";
 
 const CustomerProfile = () => {
@@ -18,7 +18,10 @@ const CustomerProfile = () => {
   const router = useRouter();
   const { logout } = useAuth();
 
-  const user = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem("user")) : null;
+  const user =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user"))
+      : null;
 
   useEffect(() => {
     fetchUserProfile();
@@ -28,7 +31,9 @@ const CustomerProfile = () => {
     try {
       const response = await profileAPI.getProfileByUserId(user.uId);
       setUserData(response.data);
-      setIsEmailDialogOpen(!response.data.email_verified && response.data.email);
+      setIsEmailDialogOpen(
+        !response.data.email_verified && response.data.email
+      );
       setIsLoading(false);
     } catch (error) {
       toast({
@@ -56,15 +61,9 @@ const CustomerProfile = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-      <ProfileSidebar 
-        userData={userData}
-        setUserData={setUserData}
-        onLogout={handleLogout}
-        onProfileUpdate={fetchUserProfile}
-      />
+    <div className="flex ml-20 flex-col md:flex-row min-h-screen bg-gray-50">
       <ProfileContent userData={userData} />
-      
+
       <EmailVerificationDialog
         isOpen={isEmailDialogOpen}
         setIsOpen={setIsEmailDialogOpen}

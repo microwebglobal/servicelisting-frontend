@@ -34,4 +34,7 @@ export const profileAPI = {
   deleteAccount: () => api.delete("/users/account"),
   getAccBalance: () => api.get("/payout/acc-balance"),
   settleProviderAccBalance: () => api.put("/payout/acc-balance/settle"),
+
+  //User Notifications
+  getUserNotifications: () => api.get("/notification/"),
 };

@@ -237,14 +237,14 @@ const Page = () => {
                         Settle In Next Booking
                       </button>
                     )}
-                    {booking.BookingPayment.payment_status === "pending" && (
+                    {
                       <button
                         className="ml-5 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                         onClick={() => handleOpenWaveOffDialog(booking)}
                       >
                         Wave Off
                       </button>
-                    )}
+                    }
                   </div>
                 )}
             </div>

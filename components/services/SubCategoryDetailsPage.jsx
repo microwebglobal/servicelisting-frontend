@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import { ServiceList } from "./ServiceList";
 import { PackageList } from "./PackageList";
 import { BookingPage } from "./BookingPage";
-import Navbar from "@components/Navbar";
-import Footer from "@components/Footer";
 import DOMPurify from "dompurify";
 import Modal from "react-modal";
 
@@ -258,7 +256,6 @@ export function SubCategoryDetailsPage({
   if (showBooking) {
     return (
       <div>
-        <Navbar />
         <BookingPage
           cityName={cityName}
           categorySlug={categorySlug}
@@ -267,14 +264,12 @@ export function SubCategoryDetailsPage({
           onBack={handleBack}
           cityId={cityId}
         />
-        <Footer />
       </div>
     );
   }
 
   return (
     <div>
-      <Navbar />
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-6xl mx-auto">
           <Button variant="ghost" className="mb-4" onClick={handleBack}>
@@ -384,8 +379,6 @@ export function SubCategoryDetailsPage({
           }}
         />
       </Modal>
-
-      <Footer />
     </div>
   );
 }
