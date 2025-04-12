@@ -14,6 +14,7 @@ export function CityServiceCategories({ cityName = "" }) {
   const [city, setCity] = useState(null);
   const router = useRouter();
   const { toast } = useToast();
+  const [isNotInServiceArea, setIsNotInServiceArea] = useState(false);
 
   // Fetch city and categories in a single useEffect
   useEffect(() => {
@@ -34,12 +35,7 @@ export function CityServiceCategories({ cityName = "" }) {
         );
 
         if (!matchedCity) {
-          setError("City not found");
-          toast({
-            title: "Error",
-            description: "City not found in our database",
-            variant: "destructive",
-          });
+          setIsNotInServiceArea(true);
           return;
         }
 
@@ -80,6 +76,23 @@ export function CityServiceCategories({ cityName = "" }) {
         <div className="text-center py-8">
           <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto"></div>
           <p className="mt-4">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isNotInServiceArea) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="text-center py-8 space-y-8">
+          <h2 className="text-2xl font-semibold">
+            Sorry, We do not provide services in {cityName}.
+          </h2>
+
+          <div className="space-y-4 max-w-md mx-auto">
+            <p>Please select a different city.</p>
+            <LocationSwitcher />
+          </div>
         </div>
       </div>
     );
