@@ -357,7 +357,7 @@ const InquiryManager = () => {
 
               <Button
                 type="button"
-                className="flex-1"
+                className="w-full"
                 onClick={closeConfirmModal}
                 disabled={isApproving}
               >

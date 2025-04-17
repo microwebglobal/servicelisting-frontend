@@ -125,6 +125,7 @@ const ProviderManager = () => {
   // Rejected fields
   const [rejectedFields, setRejectedFields] = useState([]);
   const [registrationLink, setRegistrationLink] = useState(null);
+  const [accountUpdateLinks, setAccountUpdateLinks] = useState([]);
 
   console.log(rejectingProvider);
 
@@ -231,9 +232,15 @@ const ProviderManager = () => {
         }
       }
 
-      await providerAPI
-        .updateProvider(providerId, updateData)
-        .then((res) => setRegistrationLink(res.data.registration_link));
+      await providerAPI.updateProvider(providerId, updateData).then((res) => {
+        if (res.data.registration_link) {
+          setRegistrationLink(res.data.registration_link);
+        }
+
+        if (res.data.password_links) {
+          setAccountUpdateLinks(res.data.password_links);
+        }
+      });
 
       const updatedProviders = providers.map((provider) =>
         provider.provider_id === providerId
@@ -269,7 +276,6 @@ const ProviderManager = () => {
       });
     } finally {
       setIsApproving(false);
-      closeConfirmModal();
     }
   };
 
@@ -573,7 +579,7 @@ const ProviderManager = () => {
 
             <Button
               type="button"
-              className="flex-1"
+              className="w-full"
               onClick={closeRejectModal}
               disabled={isApproving}
             >
@@ -639,15 +645,29 @@ const ProviderManager = () => {
         className="m-10 bg-white p-8 rounded-lg shadow-xl w-96 max-w-lg"
         overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
       >
-        {registrationLink ? (
+        {accountUpdateLinks && accountUpdateLinks.length ? (
           <div className="space-y-4">
-            <p className="font-semibold">Registration link:</p>
-            <CopyToClipboard value={registrationLink} />
+            <div className="space-y-1">
+              <p className="font-semibold text-xl">
+                Continue with Account Setup
+              </p>
+              <p className="text-sm">
+                Use following links to continue with user account setup.
+              </p>
+            </div>
+
+            {accountUpdateLinks.map((item, index) => (
+              <div key={index} className="space-y-2">
+                <p className="text-sm capitalize">
+                  {item.type}: {item.name}
+                </p>
+                <CopyToClipboard value={item.link} />
+              </div>
+            ))}
 
             <Button
               type="button"
-              variant="outline"
-              className="flex-1"
+              className="w-full"
               onClick={closeConfirmModal}
               disabled={isApproving}
             >
