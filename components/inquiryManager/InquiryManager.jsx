@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { providerAPI } from "@api/provider";
 import InquiryPopup from "@components/popups/InquiryPopup";
 import { toast } from "@hooks/use-toast";
+import TableActionsMenu from "../menus/TableActionsMenu";
 
 const InquiryManager = () => {
   const [inquirys, setInqirys] = useState([]);
@@ -184,6 +185,31 @@ const InquiryManager = () => {
     }
   };
 
+  const handleDeleteInquiry = async (inquiry) => {
+    try {
+      await providerAPI.deleteEnquiry(inquiry.enquiry_id);
+
+      const updatedInquiries = inquirys.filter(
+        (item) => item.enquiry_id !== inquiry.enquiry_id
+      );
+
+      setInqirys(updatedInquiries);
+
+      toast({
+        title: "Success!",
+        description: "Inquiry deleted successfully!",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error deleting inquiry", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete inquiry!",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between mb-4 mt-4">
@@ -260,7 +286,7 @@ const InquiryManager = () => {
                       {inquiry.status}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right w-56">
                     <div className="flex justify-end gap-2">
                       <>
                         {inquiry.status === "pending" && (
@@ -297,6 +323,13 @@ const InquiryManager = () => {
                         )}
                       </>
                     </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <TableActionsMenu
+                      moduleName="inquiry"
+                      onConfirm={() => handleDeleteInquiry(inquiry)}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

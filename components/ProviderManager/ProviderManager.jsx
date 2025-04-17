@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import { AlertCircle, CheckCircle, PenBoxIcon, XCircle } from "lucide-react";
 import {
@@ -24,6 +24,7 @@ import ProviderDocuments from "./ProviderDocuments";
 import Modal from "react-modal";
 import { toast } from "@hooks/use-toast";
 import Select from "react-select";
+import TableActionsMenu from "../menus/TableActionsMenu";
 
 // Rejectable fields
 const individualRejectableFields = [
@@ -316,6 +317,34 @@ const ProviderManager = () => {
     console.log(filteredProviders);
   };
 
+  const handleDeleteProvider = async (provider) => {
+    try {
+      await providerAPI.deleteProvider(provider.provider_id);
+
+      setFilteredProviders((prevProviders) =>
+        prevProviders.filter(
+          (provider) => provider.provider_id !== provider.provider_id
+        )
+      );
+
+      toast({
+        title: "Success!",
+        description: "Provider deleted successfully!",
+        variant: "default",
+      });
+
+      console.log("Deleted", provider);
+    } catch (error) {
+      console.error("Error deleting provider:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to delete provider!",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     filterProviders();
   }, [tabValue, businessTypeFilter, sortDate, selectedDate, providers]);
@@ -408,7 +437,8 @@ const ProviderManager = () => {
                       {provider.status}
                     </span>
                   </TableCell>
-                  <TableCell>
+
+                  <TableCell className="w-56">
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -419,6 +449,7 @@ const ProviderManager = () => {
                       >
                         Docs
                       </Button>
+
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -428,6 +459,7 @@ const ProviderManager = () => {
                       >
                         View Details
                       </Button>
+
                       {provider.status === "pending_approval" && (
                         <>
                           <Button
@@ -455,6 +487,13 @@ const ProviderManager = () => {
                         </>
                       )}
                     </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <TableActionsMenu
+                      moduleName="provider"
+                      onConfirm={() => handleDeleteProvider(provider)}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
