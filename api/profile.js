@@ -37,4 +37,9 @@ export const profileAPI = {
 
   //User Notifications
   getUserNotifications: () => api.get("/notification/"),
+  readNotification: (id) => api.put(`/notification/${id}/read`),
+  readAllNotifications: () => api.put(`/notification/read-all`),
+  deleteNotification: (id) => api.delete(`/notification/${id}`),
+  deleteAllNotifications: () => api.delete(`/notification/delete-all`),
+  filterNotifications: (params) => api.get("/notification/filter", { params }),
 };
