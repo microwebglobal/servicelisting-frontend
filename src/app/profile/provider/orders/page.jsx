@@ -43,6 +43,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import ProviderBookingEditModel from "@/components/business-employee/ProviderBookingEditModel";
 import BookingStopModal from "@/components/business-employee/BookingStopModal";
+import { io } from "socket.io-client";
 
 const CountdownTimer = ({ targetDate }) => {
   const [timeLeft, setTimeLeft] = useState({
@@ -370,6 +371,7 @@ const Page = () => {
   const [ongoingBookings, setOngoingBookings] = useState([]);
   const [isBookingEdit, setIsBookingEdit] = useState(false);
   const [compleatedBookings, setCompleatedBookings] = useState();
+  const [socket, setSocket] = useState(null);
 
   const localizer = momentLocalizer(moment);
 
@@ -401,6 +403,25 @@ const Page = () => {
     };
 
     fetchProviderId();
+  }, []);
+
+  useEffect(() => {
+    // Initialize Socket.IO connection when component mounts
+    const newSocket = io(
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
+      {
+        path: "/socket.io/",
+        withCredentials: true,
+        transports: ["websocket", "polling"],
+      }
+    );
+
+    setSocket(newSocket);
+
+    // Clean up on unmount
+    return () => {
+      if (newSocket) newSocket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -561,8 +582,13 @@ const Page = () => {
     try {
       await providerAPI.sendBookingStartOtp({
         bookingId: booking.booking_id,
+        userId: booking?.user_id,
         mobile: booking?.customer?.mobile,
       });
+      // Join the booking room
+      if (socket) {
+        socket.emit("join-booking", booking.user_id);
+      }
       setSelectedBookingForStart(booking);
       setStartModalOpen(true);
     } catch (error) {
@@ -575,8 +601,13 @@ const Page = () => {
     try {
       await providerAPI.stopOngoingBooking({
         bookingId: booking?.booking_id,
+        userId: booking?.user_id,
         mobile: booking?.customer?.mobile,
       });
+      // Join the booking room
+      if (socket) {
+        socket.emit("join-booking", booking.user_id);
+      }
       setStopModalOpen(true);
     } catch (error) {
       console.error("Error Sending Otp", error);

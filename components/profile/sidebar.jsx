@@ -10,12 +10,14 @@ import { useAuth } from "@src/context/AuthContext";
 import { Camera, LogOut, MapPin, Calendar } from "lucide-react";
 import AddressManager from "./AddressManager";
 import ProfileForm from "./ProfileForm";
+import { useSocket } from "@src/context/SocketContext";
 
 const ProfileSidebar = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
   const router = useRouter();
   const { logout } = useAuth();
+  const socket = useSocket();
   const user =
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("user"))
@@ -44,6 +46,9 @@ const ProfileSidebar = () => {
 
   const handleLogout = () => {
     logout();
+    if (socket) {
+      socket.disconnect();
+    }
     router.push("/login");
   };
 

@@ -41,6 +41,7 @@ import { Button } from "@/components/ui/button";
 import BookingStartModal from "@/components/business-employee/BookingStartModal";
 import { LoginAPI } from "@/api/login";
 import BookingStopModal from "@/components/business-employee/BookingStopModal";
+import { io } from "socket.io-client";
 
 const BookingDetailsModal = ({ booking }) => {
   if (!booking) return null;
@@ -297,7 +298,7 @@ const BusinessEmployeeProfile = () => {
   const [selectedBookingForStart, setSelectedBookingForStart] = useState(null);
   const [ongoingBookings, setOngoingBookings] = useState([]);
   const [isStopModalOpen, setStopModalOpen] = useState(false);
-
+  const [socket, setSocket] = useState(null);
   const localizer = momentLocalizer(moment);
 
   const router = useRouter();
@@ -358,6 +359,25 @@ const BusinessEmployeeProfile = () => {
     }
   }, [profileData, fetchBookings]);
 
+  useEffect(() => {
+    // Initialize Socket.IO connection when component mounts
+    const newSocket = io(
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
+      {
+        path: "/socket.io/",
+        withCredentials: true,
+        transports: ["websocket", "polling"],
+      }
+    );
+
+    setSocket(newSocket);
+
+    // Clean up on unmount
+    return () => {
+      if (newSocket) newSocket.disconnect();
+    };
+  }, []);
+
   const handleEventSelect = (event) => {
     setSelectedBooking(event.details);
     setDialogOpen(true);
@@ -367,8 +387,15 @@ const BusinessEmployeeProfile = () => {
     try {
       await providerAPI.sendBookingStartOtp({
         bookingId: booking.id,
+        userId: booking?.details?.user_id,
         mobile: booking?.details?.customer?.mobile,
       });
+
+      console.log(booking);
+      // Join the booking room
+      if (socket) {
+        socket.emit("join-booking", booking?.details?.user_id);
+      }
       setSelectedBookingForStart(booking);
       setStartModalOpen(true);
     } catch (error) {
@@ -389,12 +416,16 @@ const BusinessEmployeeProfile = () => {
   };
 
   const handleStopBooking = async (booking) => {
-    console.log(booking);
     try {
       await providerAPI.stopOngoingBooking({
         bookingId: booking?.details?.booking_id,
-        mobile: booking?.customer?.mobile,
+        userId: booking?.details?.user_id,
+        mobile: booking?.details?.customer?.mobile,
       });
+
+      if (socket) {
+        socket.emit("join-booking", booking?.details?.user_id);
+      }
       setStopModalOpen(true);
     } catch (error) {
       console.error("Error Sending Otp", error);

@@ -12,6 +12,9 @@ export const PackageForm = ({ mode, data, selectedData, onClose }) => {
     type_id: selectedData.typeId,
     duration_hours: data?.duration_hours || 0,
     duration_minutes: data?.duration_minutes || 0,
+    grace_period: data?.grace_period || 0,
+    penalty_percentage: data?.penalty_percentage || 0,
+    advance_percentage: data?.advance_percentage || 0,
     sections: data?.PackageSections || [],
   });
   const [image, setImage] = useState();
@@ -26,6 +29,9 @@ export const PackageForm = ({ mode, data, selectedData, onClose }) => {
     formDataToSend.append("type_id", formData.type_id);
     formDataToSend.append("duration_hours", formData.duration_hours);
     formDataToSend.append("duration_minutes", formData.duration_minutes);
+    formDataToSend.append("grace_period", formData.grace_period);
+    formDataToSend.append("penalty_percentage", formData.penalty_percentage);
+    formDataToSend.append("advance_percentage", formData.advance_percentage);
     formDataToSend.append("sections", formData.sections);
 
     if (image) {
@@ -143,14 +149,54 @@ export const PackageForm = ({ mode, data, selectedData, onClose }) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Package Icon</label>
+          <label className="block text-sm font-medium mb-1">
+            Penalty Percentage
+          </label>
           <Input
-            id="image"
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
+            placeholder="Penalty Percentage"
+            value={formData.penalty_percentage}
+            onChange={(e) =>
+              setFormData({ ...formData, penalty_percentage: e.target.value })
+            }
+            required
           />
         </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Advance Percentage
+          </label>
+          <Input
+            placeholder="Advance Percentage"
+            value={formData.advance_percentage}
+            onChange={(e) =>
+              setFormData({ ...formData, advance_percentage: e.target.value })
+            }
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Package Grace Period
+          </label>
+          <Input
+            placeholder="Grace Period"
+            value={formData.grace_period}
+            onChange={(e) =>
+              setFormData({ ...formData, grace_period: e.target.value })
+            }
+            required
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Package Icon</label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+          required
+        />
       </div>
       <Button type="submit">Submit</Button>
     </form>
