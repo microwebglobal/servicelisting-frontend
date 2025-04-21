@@ -34,7 +34,7 @@ const AddressManager = () => {
     city: "",
     state: "",
     postal_code: "",
-    map_location: null,
+    location: null,
   });
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const AddressManager = () => {
       city: locationData.details.city,
       state: locationData.details.state,
       postal_code: locationData.details.postalCode,
-      map_location: {
+      location: {
         type: "Point",
         coordinates: locationData.coordinates,
       },
@@ -71,7 +71,7 @@ const AddressManager = () => {
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
 
-    if (!addressForm.map_location) {
+    if (!addressForm.location) {
       toast({
         title: "Error",
         description: "Please select a location",
@@ -116,7 +116,7 @@ const AddressManager = () => {
         city: address.city,
         state: address.state,
         postal_code: address.postal_code,
-        map_location: address.map_location,
+        location: address.location,
       });
     } else {
       setSelectedAddress(null);
@@ -127,7 +127,7 @@ const AddressManager = () => {
         city: "",
         state: "",
         postal_code: "",
-        map_location: null,
+        location: null,
       });
     }
     setIsAddressModalOpen(true);

@@ -100,7 +100,9 @@ const SetLocationWithMap = ({
       setMarkerPosition({ lat, lng });
       map?.panTo({ lat, lng });
       fetchAddress(lat, lng);
+      console.log(lat, lng);
     }
+    setSearchInput(place.formatted_address || "");
   };
 
   const handleCurrentLocation = () => {
