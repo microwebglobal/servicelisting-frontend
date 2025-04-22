@@ -86,7 +86,7 @@ export function CityServiceCategories({ cityName = "" }) {
       <div className="min-h-screen bg-gray-50 p-10">
         <div className="text-center py-8 space-y-8">
           <h2 className="text-2xl font-semibold">
-            Sorry, We do not provide services in {cityName}.
+            Sorry, We do not provide services in {cityName.replace("%20", " ")}.
           </h2>
 
           <div className="space-y-4 max-w-md mx-auto">

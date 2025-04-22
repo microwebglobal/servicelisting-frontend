@@ -4,13 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Progress } from "./ui/progress";
 
-export function setCookie(name, value, days) {
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  const expiresStr = `expires=${expires.toUTCString()}`;
-  document.cookie = `${name}=${encodeURIComponent(
-    value
-  )}; ${expiresStr}; path=/`;
+// Cookie helper
+export function setCookie(name, value) {
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/`;
 }
 
 export default function LocationInitializer() {
@@ -19,27 +15,65 @@ export default function LocationInitializer() {
 
   useEffect(() => {
     const detectCity = async () => {
+      let interval = null;
+      // Progress
+      interval = setInterval(() => {
+        setProgress((prev) => (prev >= 90 ? prev : prev + 10));
+      }, 100);
+
       try {
-        const interval = setInterval(() => {
-          setProgress((prev) => {
-            if (prev >= 100) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+
+            if (!latitude || !longitude) {
+              console.error("No coordinates available.");
+              setProgress(100);
               clearInterval(interval);
-              return 100;
+              setCookie("current-location", "Unknown");
+              return;
             }
-            return prev + 10;
-          });
-        }, 100);
 
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
-        const city = data?.city || "Unknown";
+            const res = await fetch(
+              `/api/location?latitude=${latitude}&longitude=${longitude}`
+            );
 
-        setCookie("current-location", city, 30);
+            if (!res.ok) {
+              console.error("Failed to fetch location from server.");
+              setProgress(100);
+              clearInterval(interval);
+              setCookie("current-location", "Unknown");
+              return;
+            }
 
-        router.refresh();
-      } catch (e) {
-        console.error("Failed to detect city", e);
+            const data = await res.json();
+            const city = data.city || "Unknown";
+
+            setProgress(100);
+            clearInterval(interval);
+
+            setCookie("current-location", city);
+            setTimeout(() => router.refresh(), 500);
+          },
+          (error) => {
+            console.warn("Geolocation failed, defaulting to 'Unknown'", error);
+            setProgress(100);
+            clearInterval(interval);
+            setCookie("current-location", "Unknown");
+            setTimeout(() => router.refresh(), 500);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
+          }
+        );
+      } catch (error) {
+        console.error("Unexpected error:", error);
         setProgress(100);
+        clearInterval(interval);
+        setCookie("current-location", "Unknown");
+        setTimeout(() => router.refresh(), 500);
       }
     };
 
