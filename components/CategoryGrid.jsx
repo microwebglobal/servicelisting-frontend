@@ -4,6 +4,7 @@ import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "@hooks/use-outside-click";
 import { useRouter } from "next/navigation";
+import { Badge } from "./ui/badge";
 
 export function ExpandableCategory({ categories, cityName }) {
   const [active, setActive] = useState(null);
@@ -48,6 +49,7 @@ export function ExpandableCategory({ categories, cityName }) {
           />
         )}
       </AnimatePresence>
+
       <AnimatePresence>
         {active && typeof active === "object" ? (
           <div className="fixed inset-0  grid place-items-center z-[100]">
@@ -69,10 +71,11 @@ export function ExpandableCategory({ categories, cityName }) {
               className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6"
               onClick={() => setActive(null)}
             ></motion.button>
+
             <motion.div
               layoutId={`card-${active.name}-${id}`}
               ref={ref}
-              className="w-full max-w-[500px]  h-full md:h-fit md:max-h-[90%]  flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
+              className="w-full max-w-[500px]  h-full md:h-fit md:max-h-[90%]  flex flex-col bg-white dark:bg-neutral-900 sm:rounded-lg overflow-hidden"
             >
               <motion.div layoutId={`image-${active.title}-${id}`}>
                 <img
@@ -90,15 +93,16 @@ export function ExpandableCategory({ categories, cityName }) {
                   <div className="">
                     <motion.h3
                       layoutId={`title-${active.name}-${id}`}
-                      className="font-medium text-neutral-700 dark:text-neutral-200 text-base"
+                      className="font-semibold text-neutral-700 dark:text-neutral-200 text-base"
                     >
                       {active.name}
                     </motion.h3>
+
                     <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
                       {active.SubCategories?.map((sub, idx) => (
                         <motion.div
                           key={idx}
-                          className="flex flex-col items-center gap-2 text-center p-3 bg-neutral-100 dark:bg-neutral-800 rounded-lg"
+                          className="flex flex-col items-center cursor-pointer gap-2 text-center p-3 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 rounded-lg"
                           onClick={() =>
                             handleSubCategoryClick(active.slug, sub.slug)
                           }
@@ -125,34 +129,51 @@ export function ExpandableCategory({ categories, cityName }) {
           </div>
         ) : null}
       </AnimatePresence>
-      <ul className="max-w-2xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 items-start gap-4">
+
+      <ul className="max-w-2xl mx-auto w-full items-start gap-4 flex">
         {categories.map((card, index) => (
           <motion.div
             layoutId={`card-${card.name}-${id}`}
             key={card.name}
             onClick={() => setActive(card)}
-            className="p-4 flex flex-col  hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
+            className="py-4"
           >
-            <div className="flex gap-4 text-center items-center flex-col  w-full">
-              <motion.div layoutId={`image-${card.name}-${id}`}>
+            {/* <div className="flex gap-4 h-14 border text-center items-center w-full rounded-md overflow-hidden hover:bg-neutral-50 dark:hover:bg-neutral-800 cursor-pointer">
+              <motion.div
+                layoutId={`image-${card.name}-${id}`}
+                className="w-1/3"
+              >
                 <img
-                  width={80}
-                  height={80}
                   crossOrigin="anonymous"
                   src={process.env.NEXT_PUBLIC_API_ENDPOINT + card.icon_url}
                   alt={card.title}
-                  className="rounded-full object-cover object-top"
+                  className="object-cover object-center w-full h-full aspect-square border-r"
                 />
               </motion.div>
+
               <div className="flex justify-center items-center flex-col">
                 <motion.h3
                   layoutId={`title-${card.name}-${id}`}
-                  className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left text-base"
+                  className="text-sm font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left"
                 >
                   {card.name}
                 </motion.h3>
               </div>
-            </div>
+            </div> */}
+
+            <Badge
+              variant="secondary"
+              className="cursor-pointer h-10 gap-2 pr-4"
+            >
+              <img
+                crossOrigin="anonymous"
+                src={process.env.NEXT_PUBLIC_API_ENDPOINT + card.icon_url}
+                alt={card.title}
+                className="object-cover object-center aspect-square w-7 h-7 rounded-full"
+              />
+
+              {card.name}
+            </Badge>
           </motion.div>
         ))}
       </ul>

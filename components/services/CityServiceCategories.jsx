@@ -137,9 +137,13 @@ export function CityServiceCategories({ cityName = "" }) {
               No services available in this city
             </div>
           ) : (
-            <>
+            <div className="pt-8">
+              <Label className="font-semibold text-muted-foreground">
+                Explore our services,
+              </Label>
+
               <ExpandableCategory categories={categories} cityName={cityName} />
-            </>
+            </div>
           )}
         </div>
 
