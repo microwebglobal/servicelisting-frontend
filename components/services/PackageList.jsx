@@ -22,9 +22,9 @@ export function PackageList({ typeId, cityId, addToCart }) {
       setLoading(true);
       setError(null);
       const response = await serviceAPI.getPackagesByType(typeId);
-      
+
       const packagesData = response.data?.data || response.data;
-      
+
       if (Array.isArray(packagesData)) {
         setPackages(packagesData);
       } else {
@@ -41,7 +41,9 @@ export function PackageList({ typeId, cityId, addToCart }) {
       setError(error);
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to load packages. Please try again.",
+        description:
+          error.response?.data?.message ||
+          "Failed to load packages. Please try again.",
         variant: "destructive",
       });
     } finally {

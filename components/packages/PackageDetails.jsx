@@ -26,16 +26,22 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
     }
   }, [pkg]);
 
+  console.log(pkg);
+
   const fetchPackageSections = async () => {
     try {
       const response = await serviceAPI.getSectionsByPackage(pkg.package_id);
       // Extract the sections array from the response.data.data
-      const sectionsData = Array.isArray(response.data?.data) ? response.data.data : [];
+      const sectionsData = Array.isArray(response.data?.data)
+        ? response.data.data
+        : [];
 
       if (!Array.isArray(response.data?.data)) {
-        console.warn('Response data is not an array:', response.data);
+        console.warn("Response data is not an array:", response.data);
         return;
       }
+
+      console.log(sectionsData);
 
       // Initialize variables for tracking default selections and total
       let defaultItemsTotal = 0;
@@ -45,8 +51,8 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
       const sectionsWithPricing = await Promise.all(
         sectionsData.map(async (section) => {
           // Ensure PackageItems is an array
-          const packageItems = Array.isArray(section.PackageItems) 
-            ? section.PackageItems 
+          const packageItems = Array.isArray(section.PackageItems)
+            ? section.PackageItems
             : [];
 
           const itemsWithPricing = await Promise.all(
@@ -54,6 +60,7 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
               const cityPrice = item.CitySpecificPricings?.find(
                 (pricing) => pricing.city_id === cityId
               )?.price;
+
               const specialPrice = item.SpecialPricings?.find(
                 (pricing) => pricing.city_id === cityId
               )?.special_price;

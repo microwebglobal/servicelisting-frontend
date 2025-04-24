@@ -23,6 +23,7 @@ export const profileAPI = {
   deleteAddress: (addressId) => api.delete(`/users/addresses/${addressId}`),
   setPrimaryAddress: (addressId) =>
     api.put(`/users/addresses/${addressId}/primary`),
+  getAddressBelongsToCity: (city) => api.get(`/users/city/${city}/addresses`),
 
   // User Settings
   updateSettings: (data) => api.put("/users/settings", data),
