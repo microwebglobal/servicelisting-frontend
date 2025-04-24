@@ -135,6 +135,7 @@ export function BookingPage({
             <div className="mt-8">
               <BookingForm
                 onBookingSubmit={handleBookingSubmit}
+                city={cityName}
                 loading={loading}
               />
             </div>

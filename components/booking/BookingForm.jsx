@@ -17,7 +17,7 @@ import { Clock, MapPin, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { profileAPI } from "@/api/profile";
 
-const BookingForm = ({ onBookingSubmit }) => {
+const BookingForm = ({ onBookingSubmit, city }) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [savedAddresses, setSavedAddress] = useState([]);
@@ -58,7 +58,7 @@ const BookingForm = ({ onBookingSubmit }) => {
   useEffect(() => {
     const fetchUserAddresses = async () => {
       try {
-        const response = await profileAPI.getAddresses();
+        const response = await profileAPI.getAddressBelongsToCity(city);
         setSavedAddress(response.data);
         console.log(response.data);
       } catch (error) {

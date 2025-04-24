@@ -124,6 +124,11 @@ const ServiceProviderSideBar = () => {
       icon: Settings,
       path: "/profile/provider/configurations",
     },
+    {
+      label: "Notification",
+      icon: BookCheck,
+      path: "/profile/provider/notifications",
+    },
   ];
 
   return (
