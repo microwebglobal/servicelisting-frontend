@@ -3,18 +3,11 @@ import { useRouter } from "next/navigation";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import FeaturedCard from "@/components/ui/featuredCard";
 import { LocationSwitcher } from "./LocationSwitcher";
-import { Button } from "../ui/button";
+
+import { ExpandableCategory } from "../CategoryGrid";
+import FeaturedSection from "./FeaturedSection";
 import { Label } from "../ui/label";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "../ui/carousel";
-import { Bookmark } from "lucide-react";
 
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
@@ -130,7 +123,7 @@ export function CityServiceCategories({ cityName = "" }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10">
+    <div className="max-w-7xl mx-auto space-y-20">
       <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20 mt-14">
         <div className="w-full lg:w-2/5">
           <h1 className="text-4xl font-bold mb-5 capitalize">
@@ -144,97 +137,58 @@ export function CityServiceCategories({ cityName = "" }) {
               No services available in this city
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* {categories.map((category) => (
-                <Card
-                  key={category.category_id}
-                  className="cursor-pointer hover:shadow-md transition-shadow duration-300"
-                  onClick={() => handleCategoryClick(category.slug)}
-                >
-                  <CardImage
-                    src={
-                      process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url
-                    }
-                    crossOrigin="anonymous"
-                    style={{
-                      height: "150px",
-                      objectFit: "cover",
-                      width: "100%",
-                    }}
-                    alt="card_image"
-                  />
-
-                  <CardHeader>
-                    <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
-                      {category.name}
-                    </CardTitle>
-                  </CardHeader>
-                </Card>
-              ))} */}
-            </div>
+            <>
+              <ExpandableCategory categories={categories} />
+            </>
           )}
         </div>
 
         <div className="w-full lg:w-3/5">
           <Image
-            src="/assets/images/hair_clean.png"
-            alt="Professional Services"
+            src="/assets/images/home_repair.webp"
+            alt="service_banner"
             width={1280}
             height={768}
-            className="rounded-xl mb-10 min-h-[420px] object-cover"
+            className="rounded-md min-h-[420px] object-cover"
             priority
+            style={{
+              WebkitMaskImage:
+                "linear-gradient(to right, transparent 0%, black 70%)",
+              maskImage: "linear-gradient(to right, transparent 0%, black 70%)",
+              WebkitMaskSize: "100% 100%",
+              maskSize: "100% 100%",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+            }}
           />
         </div>
       </div>
 
-      <div className="space-y-10">
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <Bookmark className="size-8" />
-              <Label className="text-2xl font-semibold">
-                Featured Services
-              </Label>
-            </div>
+      <FeaturedSection />
 
-            <p className="text-sm text-muted-foreground">
-              A trusted choice offering exceptional value, backed by positive
-              reviews and real-world results.
-            </p>
+      {/* {categories.map((category) => (
+        <div key={category.category_id} className="space-y-10">
+          <Label className="text-xl font-semibold">{category.name}</Label>
+
+          <div>
+            {category.SubCategories.length &&
+              category.SubCategories.map((sub) => (
+                <div
+                  key={sub.sub_category_id}
+                  className="w-56 h-56 relative rounded-md overflow-hidden"
+                >
+                  <Image
+                    src={process.env.NEXT_PUBLIC_API_ENDPOINT + sub.icon_url}
+                    alt={sub.name}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+              ))}
           </div>
-
-          <Button
-            variant="secondary"
-            className="bg-[#5f60b9]/10 text-[#5f60b9] font-semibold"
-          >
-            Show All
-          </Button>
         </div>
-
-        <Carousel>
-          <CarouselContent className="pl-8">
-            {[1, 2, 3, 4].map((index) => (
-              <CarouselItem
-                key={index}
-                className="md:basis-1/3 lg:basis-1/4 -ml-8"
-              >
-                <FeaturedCard
-                  imageSrc="/assets/images/hair_clean.png"
-                  badgeText="123"
-                  price="5000"
-                  title="Home Repair Service"
-                  rating={4.5}
-                  providerName="Abc Home Services"
-                  providerAvatar="/assets/images/hair_clean.png"
-                />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
-      </div>
+      ))} */}
     </div>
   );
 }
