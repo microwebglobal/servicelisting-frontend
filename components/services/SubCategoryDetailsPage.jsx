@@ -95,7 +95,7 @@ export function SubCategoryDetailsPage({
     if (showBooking) {
       setShowBooking(false);
     } else {
-      router.push(`/services/${cityName}/${categorySlug}`);
+      router.push(`/services/${cityName}/`);
     }
   };
 

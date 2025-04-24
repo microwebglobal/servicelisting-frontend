@@ -3,11 +3,15 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "@hooks/use-outside-click";
+import { useRouter } from "next/navigation";
 
-export function ExpandableCategory({ categories }) {
+export function ExpandableCategory({ categories, cityName }) {
   const [active, setActive] = useState(null);
   const id = useId();
   const ref = useRef(null);
+  const router = useRouter();
+
+  console.log(categories);
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -27,6 +31,10 @@ export function ExpandableCategory({ categories }) {
   }, [active]);
 
   useOutsideClick(ref, () => setActive(null));
+
+  const handleSubCategoryClick = (categorySlug, subCategorySlug) => {
+    router.push(`/services/${cityName}/${categorySlug}/${subCategorySlug}`);
+  };
 
   return (
     <>
@@ -60,9 +68,7 @@ export function ExpandableCategory({ categories }) {
               }}
               className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6"
               onClick={() => setActive(null)}
-            >
-              <CloseIcon />
-            </motion.button>
+            ></motion.button>
             <motion.div
               layoutId={`card-${active.name}-${id}`}
               ref={ref}
@@ -93,6 +99,9 @@ export function ExpandableCategory({ categories }) {
                         <motion.div
                           key={idx}
                           className="flex flex-col items-center gap-2 text-center p-3 bg-neutral-100 dark:bg-neutral-800 rounded-lg"
+                          onClick={() =>
+                            handleSubCategoryClick(active.slug, sub.slug)
+                          }
                         >
                           <img
                             src={
@@ -150,36 +159,3 @@ export function ExpandableCategory({ categories }) {
     </>
   );
 }
-
-export const CloseIcon = () => {
-  return (
-    <motion.svg
-      initial={{
-        opacity: 0,
-      }}
-      animate={{
-        opacity: 1,
-      }}
-      exit={{
-        opacity: 0,
-        transition: {
-          duration: 0.05,
-        },
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4 text-black"
-    >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M18 6l-12 12" />
-      <path d="M6 6l12 12" />
-    </motion.svg>
-  );
-};
