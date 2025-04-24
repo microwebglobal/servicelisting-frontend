@@ -16,6 +16,8 @@ import {
   CarouselPrevious,
 } from "../ui/carousel";
 
+import CategoryGrid from "../CategoryGrid";
+
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -144,34 +146,9 @@ export function CityServiceCategories({ cityName = "" }) {
               No services available in this city
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* {categories.map((category) => (
-                <Card
-                  key={category.category_id}
-                  className="cursor-pointer hover:shadow-md transition-shadow duration-300"
-                  onClick={() => handleCategoryClick(category.slug)}
-                >
-                  <CardImage
-                    src={
-                      process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url
-                    }
-                    crossOrigin="anonymous"
-                    style={{
-                      height: "150px",
-                      objectFit: "cover",
-                      width: "100%",
-                    }}
-                    alt="card_image"
-                  />
-
-                  <CardHeader>
-                    <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
-                      {category.name}
-                    </CardTitle>
-                  </CardHeader>
-                </Card>
-              ))} */}
-            </div>
+            <>
+              <CategoryGrid categories={categories} />
+            </>
           )}
         </div>
 

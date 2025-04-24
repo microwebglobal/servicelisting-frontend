@@ -11,6 +11,8 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@heroui/accordion": "^2.2.14",
+    "@heroui/react": "^2.7.6",
     "@hookform/resolvers": "^3.9.1",
     "@mui/icons-material": "^6.1.10",
     "@mui/material": "^6.3.0",
