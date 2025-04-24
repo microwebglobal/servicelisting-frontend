@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import FeaturedCard from "@/components/ui/featuredCard";
 import { LocationSwitcher } from "./LocationSwitcher";
+<<<<<<< HEAD
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import {
@@ -17,6 +18,9 @@ import {
 } from "../ui/carousel";
 
 import CategoryGrid from "../CategoryGrid";
+=======
+import { ExpandableCategory } from "../CategoryGrid";
+>>>>>>> c450516 (update category page with sub cat popup)
 
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
@@ -147,7 +151,7 @@ export function CityServiceCategories({ cityName = "" }) {
             </div>
           ) : (
             <>
-              <CategoryGrid categories={categories} />
+              <ExpandableCategory categories={categories} />
             </>
           )}
         </div>
