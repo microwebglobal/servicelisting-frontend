@@ -147,7 +147,7 @@ export function CityServiceCategories({ cityName = "" }) {
             </div>
           ) : (
             <>
-              <ExpandableCategory categories={categories} />
+              <ExpandableCategory categories={categories} cityName={cityName} />
             </>
           )}
         </div>
