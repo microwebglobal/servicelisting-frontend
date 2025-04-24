@@ -138,7 +138,7 @@ export function CityServiceCategories({ cityName = "" }) {
             </div>
           ) : (
             <div className="pt-8">
-              <Label className="font-semibold text-muted-foreground">
+              <Label className=" text-muted-foreground">
                 Explore our services,
               </Label>
 
