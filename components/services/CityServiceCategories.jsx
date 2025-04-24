@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardHeader, CardImage, CardTitle } from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -15,6 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
+import { Bookmark } from "lucide-react";
 
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
@@ -187,9 +187,22 @@ export function CityServiceCategories({ cityName = "" }) {
         </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-10">
         <div className="flex justify-between items-center">
-          <Label className="text-2xl font-semibold">Featured Services</Label>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <Bookmark className="size-8" />
+              <Label className="text-2xl font-semibold">
+                Featured Services
+              </Label>
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              A trusted choice offering exceptional value, backed by positive
+              reviews and real-world results.
+            </p>
+          </div>
+
           <Button
             variant="secondary"
             className="bg-[#5f60b9]/10 text-[#5f60b9] font-semibold"
