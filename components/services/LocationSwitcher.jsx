@@ -71,7 +71,7 @@ export function LocationSwitcher() {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="min-w-[480px] p-0">
+      <PopoverContent className="p-0">
         <Command>
           <CommandInput placeholder="Search city..." />
           <CommandEmpty>No city found.</CommandEmpty>

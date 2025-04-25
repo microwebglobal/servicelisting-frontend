@@ -7,6 +7,16 @@ import { LocationSwitcher } from "./LocationSwitcher";
 import { ExpandableCategory } from "../CategoryGrid";
 import FeaturedSection from "./FeaturedSection";
 import { Label } from "../ui/label";
+import SubCategoryCard from "./SubCategoryCard";
+import { Button } from "../ui/button";
+import Link from "next/link";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "../ui/carousel";
 
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
@@ -145,52 +155,109 @@ export function CityServiceCategories({ cityName = "" }) {
           )}
         </div>
 
-        <div className="w-full lg:w-3/5 hidden md:block">
-          <Image
-            src="/assets/images/home_repair.webp"
-            alt="service_banner"
-            width={1280}
-            height={768}
-            className="rounded-md min-h-[420px] object-cover"
-            priority
-            style={{
-              WebkitMaskImage:
-                "linear-gradient(to right, transparent 0%, black 40%)",
-              maskImage: "linear-gradient(to right, transparent 0%, black 70%)",
-              WebkitMaskSize: "100% 100%",
-              maskSize: "100% 100%",
-              WebkitMaskRepeat: "no-repeat",
-              maskRepeat: "no-repeat",
-            }}
-          />
+        <div className="w-full lg:w-3/5 hidden md:grid grid-cols-2 grid-rows-2 gap-3 h-[420px]">
+          <div className="relative col-span-1 row-span-2">
+            <Image
+              src="/assets/images/home_repair.webp"
+              alt="service_banner_1"
+              fill
+              className="rounded-md object-cover w-full h-full"
+              priority
+              style={{
+                WebkitMaskImage:
+                  "linear-gradient(to right, transparent 0%, black 40%)",
+                maskImage:
+                  "linear-gradient(to right, transparent 0%, black 70%)",
+                WebkitMaskSize: "100% 100%",
+                maskSize: "100% 100%",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+              }}
+            />
+          </div>
+
+          <div className="relative col-span-1 row-span-1">
+            <Image
+              src="/assets/images/herobg-5.jpg"
+              alt="service_banner_2"
+              fill
+              className="rounded-md object-cover w-full h-full"
+              priority
+            />
+          </div>
+
+          <div className="relative col-span-1 row-span-1">
+            <Image
+              src="/assets/images/herobg-2.jpg"
+              alt="service_banner_3"
+              fill
+              className="rounded-md object-cover w-full h-full"
+              priority
+            />
+          </div>
         </div>
       </div>
 
       <FeaturedSection />
 
-      {categories.map((category) => (
-        <div key={category.category_id} className="space-y-10">
-          <Label className="text-xl font-semibold">{category.name}</Label>
+      {categories.map(
+        (category) =>
+          category.SubCategories.length > 0 && (
+            <div key={category.category_id} className="space-y-10">
+              <div className="flex justify-between items-center">
+                <Label className="text-lg md:text-2xl font-semibold">
+                  {category.name}
+                </Label>
 
-          <div>
-            {category.SubCategories.length &&
-              category.SubCategories.map((sub) => (
-                <div
-                  key={sub.sub_category_id}
-                  className="w-56 h-56 relative rounded-md overflow-hidden"
+                <Button
+                  asChild
+                  variant="secondary"
+                  className="bg-[#5f60b9]/10 text-[#5f60b9] font-semibold h-9 px-3 md:px-4 md:h-10"
                 >
-                  <Image
-                    src={process.env.NEXT_PUBLIC_API_ENDPOINT + sub.icon_url}
-                    alt={sub.name}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-              ))}
-          </div>
-        </div>
-      ))}
+                  <Link href={`/services/${cityName}/${category.slug}`}>
+                    See All
+                  </Link>
+                </Button>
+              </div>
+
+              <Carousel
+                opts={{
+                  align: "start",
+                  slidesToScroll: 1,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="flex gap-5 scroll-snap-x scroll-snap-mandatory">
+                  {category.SubCategories.map((sub) => (
+                    <CarouselItem
+                      key={`${category.category_id}-${sub.sub_category_id}`}
+                      className="!w-56 basis-56 shrink-0 scroll-snap-start"
+                    >
+                      <div className="p-1">
+                        <SubCategoryCard
+                          key={`${category.category_id}-${sub.sub_category_id}`}
+                          name={sub.name}
+                          icon_url={sub.icon_url}
+                          url={`/services/${cityName}/${category.slug}/${sub.slug}`}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+
+                  {/* Spacer to prevent early disabling of the Next button */}
+                  <div className="shrink-0 w-[16px]" />
+                </CarouselContent>
+
+                {category.SubCategories.length > 4 && (
+                  <>
+                    <CarouselPrevious className="hidden md:flex" />
+                    <CarouselNext className="hidden md:flex" />
+                  </>
+                )}
+              </Carousel>
+            </div>
+          )
+      )}
     </div>
   );
 }
