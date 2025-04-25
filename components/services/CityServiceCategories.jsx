@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -14,7 +13,6 @@ export function CityServiceCategories({ cityName = "" }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [city, setCity] = useState(null);
-  const router = useRouter();
   const { toast } = useToast();
   const [isNotInServiceArea, setIsNotInServiceArea] = useState(false);
 
@@ -32,8 +30,8 @@ export function CityServiceCategories({ cityName = "" }) {
 
         // First get city
         const citiesResponse = await serviceAPI.getCities();
-        const matchedCity = citiesResponse.data.find(
-          (city) => city.name.toLowerCase() === cityName.toLowerCase()
+        const matchedCity = citiesResponse.data.find((city) =>
+          cityName.toLowerCase().includes(city.name.toLowerCase())
         );
 
         if (!matchedCity) {
@@ -68,16 +66,28 @@ export function CityServiceCategories({ cityName = "" }) {
     fetchData();
   }, [cityName, toast]);
 
-  const handleCategoryClick = (categorySlug) => {
-    router.push(`/services/${cityName}/${categorySlug}`);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-10">
         <div className="text-center py-8">
           <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto"></div>
           <p className="mt-4">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!city || cityName === "Unknown") {
+    return (
+      <div className="min-h-screen bg-gray-50 p-10">
+        <div className="text-center py-8 space-y-8">
+          <h2 className="text-2xl font-semibold">
+            Please select your location to view services.
+          </h2>
+
+          <div className="max-w-md mx-auto">
+            <LocationSwitcher />
+          </div>
         </div>
       </div>
     );
@@ -110,23 +120,11 @@ export function CityServiceCategories({ cityName = "" }) {
     );
   }
 
-  if (!city) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-10">
-        <div className="text-center py-8">
-          <h2 className="text-xl text-gray-600">
-            Please select a valid city to view available services
-          </h2>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-7xl mx-auto space-y-20">
-      <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20 mt-14">
+    <div className="max-w-7xl mx-auto space-y-12 md:space-y-16 xl:space-y-20 px-5 xl:px-0">
+      <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20 mt-5 lg:mt-14">
         <div className="w-full lg:w-2/5">
-          <h1 className="text-4xl font-bold mb-5 capitalize">
+          <h1 className="text-2xl md:text-3xl font-bold mb-5 capitalize">
             Services in {cityName}, India
           </h1>
 
@@ -147,7 +145,7 @@ export function CityServiceCategories({ cityName = "" }) {
           )}
         </div>
 
-        <div className="w-full lg:w-3/5">
+        <div className="w-full lg:w-3/5 hidden md:block">
           <Image
             src="/assets/images/home_repair.webp"
             alt="service_banner"
@@ -157,7 +155,7 @@ export function CityServiceCategories({ cityName = "" }) {
             priority
             style={{
               WebkitMaskImage:
-                "linear-gradient(to right, transparent 0%, black 70%)",
+                "linear-gradient(to right, transparent 0%, black 40%)",
               maskImage: "linear-gradient(to right, transparent 0%, black 70%)",
               WebkitMaskSize: "100% 100%",
               maskSize: "100% 100%",
@@ -170,7 +168,7 @@ export function CityServiceCategories({ cityName = "" }) {
 
       <FeaturedSection />
 
-      {/* {categories.map((category) => (
+      {categories.map((category) => (
         <div key={category.category_id} className="space-y-10">
           <Label className="text-xl font-semibold">{category.name}</Label>
 
@@ -192,7 +190,7 @@ export function CityServiceCategories({ cityName = "" }) {
               ))}
           </div>
         </div>
-      ))} */}
+      ))}
     </div>
   );
 }

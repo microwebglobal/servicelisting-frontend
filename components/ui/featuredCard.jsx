@@ -23,7 +23,7 @@ const FeaturedCard = ({
       role="button"
       tabIndex={0}
       className={cn(
-        "relative bg-white group border rounded-lg overflow-hidden cursor-pointer transition-shadow duration-300 w-[260px] h-[300px] hover:shadow-xl",
+        "relative group border rounded-lg overflow-hidden cursor-pointer transition-shadow duration-300 w-[260px] h-[300px] hover:border-purple-800/20 hover:shadow-md",
         className
       )}
     >
