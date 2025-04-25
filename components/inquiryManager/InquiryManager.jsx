@@ -15,6 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { providerAPI } from "@api/provider";
 import InquiryPopup from "@components/popups/InquiryPopup";
 import { toast } from "@hooks/use-toast";
+import TableActionsMenu from "../menus/TableActionsMenu";
+import CopyToClipboard from "../CopyToClipboard";
 
 const InquiryManager = () => {
   const [inquirys, setInqirys] = useState([]);
@@ -30,6 +32,7 @@ const InquiryManager = () => {
   const [isRejecting, setIsRejecting] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [registrationLink, setRegistrationLink] = useState();
 
   const handleOpenModal = (inquiry) => {
     setIsOpen(true);
@@ -77,14 +80,17 @@ const InquiryManager = () => {
   const handleApprove = async () => {
     try {
       setIsApproving(true);
-      await providerAPI.approveEnquiry(selectedInquiry.enquiry_id);
+      await providerAPI
+        .approveEnquiry(selectedInquiry.enquiry_id)
+        .then((res) => setRegistrationLink(res.data.registration_link));
+
       const updatedInquiries = inquirys.map((item) =>
         item.enquiry_id === selectedInquiry.enquiry_id
           ? { ...item, status: "approved" }
           : item
       );
+
       setInqirys(updatedInquiries);
-      setConfirmModalOpen(false);
       toast({
         title: "Success!",
         description: "Service Provider Inquiry Approved Sucessfully!",
@@ -184,6 +190,31 @@ const InquiryManager = () => {
     }
   };
 
+  const handleDeleteInquiry = async (inquiry) => {
+    try {
+      await providerAPI.deleteEnquiry(inquiry.enquiry_id);
+
+      const updatedInquiries = inquirys.filter(
+        (item) => item.enquiry_id !== inquiry.enquiry_id
+      );
+
+      setInqirys(updatedInquiries);
+
+      toast({
+        title: "Success!",
+        description: "Inquiry deleted successfully!",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error deleting inquiry", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete inquiry!",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between mb-4 mt-4">
@@ -260,7 +291,7 @@ const InquiryManager = () => {
                       {inquiry.status}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right w-56">
                     <div className="flex justify-end gap-2">
                       <>
                         {inquiry.status === "pending" && (
@@ -298,6 +329,13 @@ const InquiryManager = () => {
                       </>
                     </div>
                   </TableCell>
+
+                  <TableCell>
+                    <TableActionsMenu
+                      moduleName="inquiry"
+                      onConfirm={() => handleDeleteInquiry(inquiry)}
+                    />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -312,27 +350,45 @@ const InquiryManager = () => {
           className="m-10 bg-white p-8 rounded-lg shadow-xl w-96 max-w-lg"
           overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
         >
-          <div className="space-y-4">
-            <p>Are you sure you want to approve this inquiry?</p>
-            <div className="flex space-x-4">
-              <Button
-                className="flex-1"
-                onClick={handleApprove}
-                disabled={isApproving}
-              >
-                {isApproving ? "Approving..." : "Confirm"}
-              </Button>
+          {registrationLink ? (
+            <div className="space-y-4">
+              <p className="font-semibold">Registration link:</p>
+              <CopyToClipboard value={registrationLink} />
+
               <Button
                 type="button"
-                variant="outline"
-                className="flex-1"
+                className="w-full"
                 onClick={closeConfirmModal}
                 disabled={isApproving}
               >
-                Cancel
+                Dismiss
               </Button>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              <p>Are you sure you want to approve this inquiry?</p>
+
+              <div className="flex space-x-4">
+                <Button
+                  className="flex-1"
+                  onClick={handleApprove}
+                  disabled={isApproving}
+                >
+                  {isApproving ? "Approving..." : "Confirm"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={closeConfirmModal}
+                  disabled={isApproving}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
         </Modal>
 
         {/* Modal */}

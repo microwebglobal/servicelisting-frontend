@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -12,18 +19,22 @@ import {
 import { profileAPI } from "@/api/profile";
 import { toast } from "@/hooks/use-toast";
 import { MapPin, Plus, Edit2, Trash2, Star } from "lucide-react";
+import SetLocationWithMap from "@/components/SetLocationWithMap";
 
 const AddressManager = () => {
   const [addresses, setAddresses] = useState([]);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [addressForm, setAddressForm] = useState({
-    type: 'home',
-    line1: '',
-    line2: '',
-    city: '',
-    state: '',
-    postal_code: '',
+    type: "home",
+    line1: "",
+    line2: "",
+    city: "",
+    state: "",
+    postal_code: "",
+    location: null,
   });
 
   useEffect(() => {
@@ -43,9 +54,34 @@ const AddressManager = () => {
     }
   };
 
+  const handleLocationSelect = (locationData) => {
+    setAddressForm((prev) => ({
+      ...prev,
+      line1: locationData.details.street,
+      city: locationData.details.city,
+      state: locationData.details.state,
+      postal_code: locationData.details.postalCode,
+      location: {
+        type: "Point",
+        coordinates: locationData.coordinates,
+      },
+    }));
+  };
+
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
+
+    if (!addressForm.location) {
+      toast({
+        title: "Error",
+        description: "Please select a location",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      setIsLoading(true);
       if (selectedAddress) {
         await profileAPI.updateAddress(selectedAddress.id, addressForm);
       } else {
@@ -55,8 +91,8 @@ const AddressManager = () => {
       fetchAddresses();
       toast({
         title: "Success",
-        description: selectedAddress 
-          ? "Address updated successfully" 
+        description: selectedAddress
+          ? "Address updated successfully"
           : "Address added successfully",
       });
     } catch (error) {
@@ -65,7 +101,36 @@ const AddressManager = () => {
         description: "Failed to save address. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const openAddressModal = (address = null) => {
+    if (address) {
+      setSelectedAddress(address);
+      setAddressForm({
+        type: address.type,
+        line1: address.line1,
+        line2: address.line2 || "",
+        city: address.city,
+        state: address.state,
+        postal_code: address.postal_code,
+        location: address.location,
+      });
+    } else {
+      setSelectedAddress(null);
+      setAddressForm({
+        type: "home",
+        line1: "",
+        line2: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        location: null,
+      });
+    }
+    setIsAddressModalOpen(true);
   };
 
   const handleDelete = async (addressId) => {
@@ -102,24 +167,6 @@ const AddressManager = () => {
     }
   };
 
-  const openAddressModal = (address = null) => {
-    if (address) {
-      setSelectedAddress(address);
-      setAddressForm(address);
-    } else {
-      setSelectedAddress(null);
-      setAddressForm({
-        type: 'home',
-        line1: '',
-        line2: '',
-        city: '',
-        state: '',
-        postal_code: '',
-      });
-    }
-    setIsAddressModalOpen(true);
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -142,7 +189,9 @@ const AddressManager = () => {
                 <MapPin className="h-5 w-5 text-gray-500 mt-1" />
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium capitalize">{address.type}</span>
+                    <span className="font-medium capitalize">
+                      {address.type}
+                    </span>
                     {address.is_primary && (
                       <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                     )}
@@ -194,10 +243,10 @@ const AddressManager = () => {
       </div>
 
       <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
-              {selectedAddress ? 'Edit Address' : 'Add New Address'}
+              {selectedAddress ? "Edit Address" : "Add New Address"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddressSubmit} className="space-y-4">
@@ -221,6 +270,14 @@ const AddressManager = () => {
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-medium">Location</label>
+              <SetLocationWithMap
+                initialLocation={selectedAddress?.map_location}
+                onLocationSelect={handleLocationSelect}
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-medium">Street Address</label>
               <Input
                 value={addressForm.line1}
@@ -233,7 +290,9 @@ const AddressManager = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Apartment, suite, etc.</label>
+              <label className="text-sm font-medium">
+                Apartment, suite, etc.
+              </label>
               <Input
                 value={addressForm.line2}
                 onChange={(e) =>
@@ -274,14 +333,17 @@ const AddressManager = () => {
               <Input
                 value={addressForm.postal_code}
                 onChange={(e) =>
-                  setAddressForm({ ...addressForm, postal_code: e.target.value })
+                  setAddressForm({
+                    ...addressForm,
+                    postal_code: e.target.value,
+                  })
                 }
                 placeholder="Postal code"
                 required
               />
             </div>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 pt-4">
               <Button
                 type="button"
                 variant="outline"
@@ -289,8 +351,9 @@ const AddressManager = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit">
-                {selectedAddress ? 'Update' : 'Save'} Address
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Saving..." : selectedAddress ? "Update" : "Save"}{" "}
+                Address
               </Button>
             </div>
           </form>
@@ -298,6 +361,6 @@ const AddressManager = () => {
       </Dialog>
     </div>
   );
-}
+};
 
 export default AddressManager;

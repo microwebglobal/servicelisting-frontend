@@ -6,6 +6,17 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import FeaturedCard from "@/components/ui/featuredCard";
 import { LocationSwitcher } from "./LocationSwitcher";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "../ui/carousel";
+
+import { ExpandableCategory } from "../CategoryGrid";
 
 export function CityServiceCategories({ cityName = "" }) {
   const [categories, setCategories] = useState([]);
@@ -86,7 +97,7 @@ export function CityServiceCategories({ cityName = "" }) {
       <div className="min-h-screen bg-gray-50 p-10">
         <div className="text-center py-8 space-y-8">
           <h2 className="text-2xl font-semibold">
-            Sorry, We do not provide services in {cityName}.
+            Sorry, We do not provide services in {cityName.replace("%20", " ")}.
           </h2>
 
           <div className="space-y-4 max-w-md mx-auto">
@@ -121,7 +132,7 @@ export function CityServiceCategories({ cityName = "" }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto space-y-10">
       <div className="mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-20 mt-14">
         <div className="w-full lg:w-2/5">
           <h1 className="text-4xl font-bold mb-5 capitalize">
@@ -130,41 +141,14 @@ export function CityServiceCategories({ cityName = "" }) {
 
           <LocationSwitcher />
 
-          <hr className="mb-10 mt-5" />
-
           {categories.length === 0 ? (
             <div className="text-center py-8">
               No services available in this city
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {categories.map((category) => (
-                <Card
-                  key={category.category_id}
-                  className="cursor-pointer hover:shadow-md transition-shadow duration-300"
-                  onClick={() => handleCategoryClick(category.slug)}
-                >
-                  <CardImage
-                    src={
-                      process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url
-                    }
-                    crossOrigin="anonymous"
-                    style={{
-                      height: "150px",
-                      objectFit: "cover",
-                      width: "100%",
-                    }}
-                    alt="card_image"
-                  />
-
-                  <CardHeader>
-                    <CardTitle className="text-2xl hover:text-indigo-600 transition-colors">
-                      {category.name}
-                    </CardTitle>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
+            <>
+              <ExpandableCategory categories={categories} cityName={cityName} />
+            </>
           )}
         </div>
 
@@ -172,26 +156,48 @@ export function CityServiceCategories({ cityName = "" }) {
           <Image
             src="/assets/images/hair_clean.png"
             alt="Professional Services"
-            width={800}
-            height={700}
-            className="rounded-xl mb-10"
+            width={1280}
+            height={768}
+            className="rounded-xl mb-10 min-h-[420px] object-cover"
             priority
           />
-          <hr />
-          <h2 className="text-2xl mt-5 mb-10">Featured Services</h2>
-          <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
-            {[1, 2, 3, 4].map((index) => (
-              <FeaturedCard
-                key={index}
-                imageSrc="/assets/images/hair_clean.png"
-                badgeText="123"
-                price="5000"
-                title="Home Repair Service"
-                rating={4.5}
-              />
-            ))}
-          </div>
         </div>
+      </div>
+
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <Label className="text-2xl font-semibold">Featured Services</Label>
+          <Button
+            variant="secondary"
+            className="bg-[#5f60b9]/10 text-[#5f60b9] font-semibold"
+          >
+            Show All
+          </Button>
+        </div>
+
+        <Carousel>
+          <CarouselContent className="pl-8">
+            {[1, 2, 3, 4].map((index) => (
+              <CarouselItem
+                key={index}
+                className="md:basis-1/3 lg:basis-1/4 -ml-8"
+              >
+                <FeaturedCard
+                  imageSrc="/assets/images/hair_clean.png"
+                  badgeText="123"
+                  price="5000"
+                  title="Home Repair Service"
+                  rating={4.5}
+                  providerName="Abc Home Services"
+                  providerAvatar="/assets/images/hair_clean.png"
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
       </div>
     </div>
   );

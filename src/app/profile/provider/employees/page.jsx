@@ -195,21 +195,6 @@ const EmployeeFormModal = ({ employee, onSubmit, onClose }) => {
               {...register("years_experience", { required: "Required" })}
             />
           </div>
-
-          <div>
-            <label className="block font-semibold">
-              Cities/Regions of Service
-            </label>
-            <Select
-              id="cities"
-              options={citiesOptions}
-              isMulti
-              value={selectedCities}
-              onChange={setSelectedCities}
-              required
-            />
-            {errors.cities && <p className="text-red-500">{errors.cities}</p>}
-          </div>
         </div>
 
         {/* Buttons */}

@@ -8,6 +8,7 @@ export const providerAPI = {
   approveEnquiry: (inquiryId) => api.put(`/enquiry/${inquiryId}/approve`),
   rejectEnquiry: (inquiryId, data) =>
     api.put(`/enquiry/${inquiryId}/reject`, data),
+  deleteEnquiry: (inquiryId) => api.delete(`/enquiry/${inquiryId}`),
 
   // Service Provider Registration
   registerProvider: (data) =>

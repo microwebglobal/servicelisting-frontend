@@ -245,7 +245,11 @@ const IndividualRegistrationForm = ({
 
   // Set default part-time availability hours
   useEffect(() => {
-    if (formData.availability_type === "part_time") {
+    if (
+      formData.availability_type === "part_time" &&
+      !formData.availability_hours.start &&
+      !formData.availability_hours.end
+    ) {
       setFormData((prev) => ({
         ...prev,
         availability_hours: {

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { providerAPI } from "@/api/provider";
 import { AlertCircle, CheckCircle, PenBoxIcon, XCircle } from "lucide-react";
 import {
@@ -24,6 +24,8 @@ import ProviderDocuments from "./ProviderDocuments";
 import Modal from "react-modal";
 import { toast } from "@hooks/use-toast";
 import Select from "react-select";
+import TableActionsMenu from "../menus/TableActionsMenu";
+import CopyToClipboard from "../CopyToClipboard";
 
 // Rejectable fields
 const individualRejectableFields = [
@@ -122,6 +124,8 @@ const ProviderManager = () => {
   });
   // Rejected fields
   const [rejectedFields, setRejectedFields] = useState([]);
+  const [registrationLink, setRegistrationLink] = useState(null);
+  const [accountUpdateLinks, setAccountUpdateLinks] = useState([]);
 
   console.log(rejectingProvider);
 
@@ -153,8 +157,6 @@ const ProviderManager = () => {
         rejectionReason,
         rejectedFields
       );
-
-      closeRejectModal();
     } catch (error) {
       console.error("Error rejecting provider:", error);
     }
@@ -221,6 +223,7 @@ const ProviderManager = () => {
           setIsRejectDialogOpen(true);
           return;
         }
+
         updateData.rejection_reason = rejectionReason;
 
         // Add rejected fields
@@ -229,7 +232,15 @@ const ProviderManager = () => {
         }
       }
 
-      await providerAPI.updateProvider(providerId, updateData);
+      await providerAPI.updateProvider(providerId, updateData).then((res) => {
+        if (res.data.registration_link) {
+          setRegistrationLink(res.data.registration_link);
+        }
+
+        if (res.data.password_links) {
+          setAccountUpdateLinks(res.data.password_links);
+        }
+      });
 
       const updatedProviders = providers.map((provider) =>
         provider.provider_id === providerId
@@ -248,7 +259,6 @@ const ProviderManager = () => {
 
       if (newStatus === "rejected") {
         setRejectionReason("");
-        setIsRejectDialogOpen(false);
         setRejectingProvider(null);
       }
 
@@ -266,7 +276,6 @@ const ProviderManager = () => {
       });
     } finally {
       setIsApproving(false);
-      closeConfirmModal();
     }
   };
 
@@ -314,6 +323,34 @@ const ProviderManager = () => {
       )
     );
     console.log(filteredProviders);
+  };
+
+  const handleDeleteProvider = async (provider) => {
+    try {
+      await providerAPI.deleteProvider(provider.provider_id);
+
+      setFilteredProviders((prevProviders) =>
+        prevProviders.filter(
+          (provider) => provider.provider_id !== provider.provider_id
+        )
+      );
+
+      toast({
+        title: "Success!",
+        description: "Provider deleted successfully!",
+        variant: "default",
+      });
+
+      console.log("Deleted", provider);
+    } catch (error) {
+      console.error("Error deleting provider:", error);
+
+      toast({
+        title: "Error",
+        description: "Failed to delete provider!",
+        variant: "destructive",
+      });
+    }
   };
 
   useEffect(() => {
@@ -408,7 +445,8 @@ const ProviderManager = () => {
                       {provider.status}
                     </span>
                   </TableCell>
-                  <TableCell>
+
+                  <TableCell className="w-56">
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -419,6 +457,7 @@ const ProviderManager = () => {
                       >
                         Docs
                       </Button>
+
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -428,6 +467,7 @@ const ProviderManager = () => {
                       >
                         View Details
                       </Button>
+
                       {provider.status === "pending_approval" && (
                         <>
                           <Button
@@ -455,6 +495,13 @@ const ProviderManager = () => {
                         </>
                       )}
                     </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <TableActionsMenu
+                      moduleName="provider"
+                      onConfirm={() => handleDeleteProvider(provider)}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
@@ -525,51 +572,69 @@ const ProviderManager = () => {
         className="m-10 bg-white p-8 rounded-lg shadow-xl w-96 max-w-lg"
         overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
       >
-        <div className="space-y-4 z-50">
-          <p className="text-lg font-semibold">Reject Provider Registration</p>
+        {registrationLink ? (
+          <div className="space-y-4">
+            <p className="font-semibold">Registration link:</p>
+            <CopyToClipboard value={registrationLink} />
 
-          <Select
-            isMulti
-            placeholder="Select rejected fields"
-            value={rejectedFields}
-            onChange={setRejectedFields}
-            options={
-              rejectingProvider?.provider_type === "individual"
-                ? individualRejectableFields
-                : businessRejectableFields
-            }
-          />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Rejection Reason
-            </label>
-            <textarea
-              className="mt-1 block w-full rounded-md border p-2 shadow-sm"
-              rows={4}
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-              placeholder="Please provide a reason for rejection..."
-            />
-          </div>
-
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={closeRejectModal}>
-              Cancel
-            </Button>
             <Button
-              variant="destructive"
-              onClick={handleReject}
-              disabled={
-                !rejectionReason.trim() ||
-                rejectedFields.length === 0 ||
-                isApproving
-              }
+              type="button"
+              className="w-full"
+              onClick={closeRejectModal}
+              disabled={isApproving}
             >
-              {isApproving ? "Rejecting..." : "Reject Registration "}
+              Dismiss
             </Button>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-4 z-50">
+            <p className="text-lg font-semibold">
+              Reject Provider Registration
+            </p>
+
+            <Select
+              isMulti
+              placeholder="Select rejected fields"
+              value={rejectedFields}
+              onChange={setRejectedFields}
+              options={
+                rejectingProvider?.provider_type === "individual"
+                  ? individualRejectableFields
+                  : businessRejectableFields
+              }
+            />
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Rejection Reason
+              </label>
+              <textarea
+                className="mt-1 block w-full rounded-md border p-2 shadow-sm"
+                rows={4}
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Please provide a reason for rejection..."
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={closeRejectModal}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleReject}
+                disabled={
+                  !rejectionReason.trim() ||
+                  rejectedFields.length === 0 ||
+                  isApproving
+                }
+              >
+                {isApproving ? "Rejecting..." : "Reject Registration "}
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
 
       {/* Confirm Modal */}
@@ -580,32 +645,63 @@ const ProviderManager = () => {
         className="m-10 bg-white p-8 rounded-lg shadow-xl w-96 max-w-lg"
         overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
       >
-        <div className="space-y-4">
-          <p>Are you sure you want to approve this provider?</p>
-          <div className="flex space-x-4">
-            <Button
-              className="flex-1"
-              onClick={() =>
-                handleStatusUpdate(
-                  approveProvider.providerId,
-                  approveProvider.status
-                )
-              }
-              disabled={isApproving}
-            >
-              {isApproving ? "Approving..." : "Confirm"}
-            </Button>
+        {accountUpdateLinks && accountUpdateLinks.length ? (
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <p className="font-semibold text-xl">
+                Continue with Account Setup
+              </p>
+              <p className="text-sm">
+                Use following links to continue with user account setup.
+              </p>
+            </div>
+
+            {accountUpdateLinks.map((item, index) => (
+              <div key={index} className="space-y-2">
+                <p className="text-sm capitalize">
+                  {item.type}: {item.name}
+                </p>
+                <CopyToClipboard value={item.link} />
+              </div>
+            ))}
+
             <Button
               type="button"
-              variant="outline"
-              className="flex-1"
+              className="w-full"
               onClick={closeConfirmModal}
               disabled={isApproving}
             >
-              Cancel
+              Dismiss
             </Button>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-4">
+            <p>Are you sure you want to approve this provider?</p>
+            <div className="flex space-x-4">
+              <Button
+                className="flex-1"
+                onClick={() =>
+                  handleStatusUpdate(
+                    approveProvider.providerId,
+                    approveProvider.status
+                  )
+                }
+                disabled={isApproving}
+              >
+                {isApproving ? "Approving..." : "Confirm"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={closeConfirmModal}
+                disabled={isApproving}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

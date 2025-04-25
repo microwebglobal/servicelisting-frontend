@@ -13,6 +13,7 @@ import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
 import { Label } from "../ui/label";
+import { io } from "socket.io-client";
 
 const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
   const [category, setCategory] = useState(null);
@@ -24,6 +25,7 @@ const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
   const [customItemName, setCustomItemName] = useState("");
   const [customItemPrice, setCustomItemPrice] = useState("");
   const [customItems, setCustomItems] = useState([]);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -64,6 +66,25 @@ const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
     });
   };
 
+  useEffect(() => {
+    // Initialize Socket.IO connection when component mounts
+    const newSocket = io(
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
+      {
+        path: "/socket.io/",
+        withCredentials: true,
+        transports: ["websocket", "polling"],
+      }
+    );
+
+    setSocket(newSocket);
+
+    // Clean up on unmount
+    return () => {
+      if (newSocket) newSocket.disconnect();
+    };
+  }, []);
+
   const handleAddCustomItem = () => {
     if (customItemName && customItemPrice) {
       const newItem = {
@@ -86,6 +107,7 @@ const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
       await providerAPI.sendBookingEditOtp({
         mobile: booking?.customer?.mobile,
         bookingId: booking?.booking_id,
+        userId: booking?.user_id,
         addOns: Array.from(selectedItems).map((item) => ({
           item_id: item.item_id,
           name: item.name,
@@ -94,6 +116,11 @@ const ProviderBookingEditModel = ({ booking, onConfirm, onClose }) => {
         })),
       });
       setStep("otp");
+
+      // Join the booking room
+      if (socket) {
+        socket.emit("join-booking", booking.user_id);
+      }
     } catch (error) {
       console.error("Error sending OTP", error);
     }
