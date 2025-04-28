@@ -159,18 +159,11 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
   };
 
   const DefaultView = () => (
-    <div className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start">
-        <div>
+    <div className="bg-muted p-4 rounded-lg transition-shadow">
+      <div className="space-y-3 sm:space-y-0">
+        <div className="flex flex-col gap-2 sm:gap-0 sm:flex-row justify-between items-start">
           <h6 className="font-medium">{pkg.name}</h6>
-          <p className="text-sm text-gray-600 mt-1">{pkg.description}</p>
-          {(pkg.duration_hours > 0 || pkg.duration_minutes > 0) && (
-            <p className="text-sm text-gray-600 mt-1">
-              Service Duration: {pkg.duration_hours}h {pkg.duration_minutes}m
-            </p>
-          )}
-        </div>
-        <div className="text-right">
+
           <div className="flex items-center gap-2 justify-end">
             <span className="text-lg font-bold">₹{basePrice}</span>
             {selectedItems.price &&
@@ -180,6 +173,19 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
                 </span>
               )}
           </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end">
+          <div className="space-y-1 mt-1">
+            <p className="text-sm text-muted-foreground">{pkg.description}</p>
+
+            {(pkg.duration_hours > 0 || pkg.duration_minutes > 0) && (
+              <p className="text-sm text-muted-foreground">
+                Service Duration: {pkg.duration_hours}h {pkg.duration_minutes}m
+              </p>
+            )}
+          </div>
+
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -203,7 +209,7 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
   );
 
   const CustomizationView = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-muted rounded-lg p-4">
       {sections.map((section) => (
         <div key={section.section_id} className="border-b pb-4">
           <h3 className="font-medium mb-2">{section.name}</h3>
@@ -221,17 +227,22 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
                   key={item.item_id}
                   className="flex items-center justify-between p-2 hover:bg-gray-50 rounded"
                 >
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-start space-x-3">
                     <RadioGroupItem value={item.item_id} id={item.item_id} />
-                    <Label htmlFor={item.item_id} className="cursor-pointer">
-                      <div>
+
+                    <Label
+                      htmlFor={item.item_id}
+                      className="block cursor-pointer"
+                    >
+                      <div className="space-y-2">
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {item.description}
                         </p>
                       </div>
                     </Label>
                   </div>
+
                   <div className="text-right">
                     <span className="font-bold">₹{item.price}</span>
                     {item.originalPrice &&
@@ -248,11 +259,12 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
         </div>
       ))}
 
-      <div className="sticky bottom-0 bg-white p-4 border-t mt-4">
+      <div className="sticky bottom-0 bg-white p-4 rounded-lg mt-4">
         <div className="flex justify-between items-center mb-4">
           <span className="text-lg font-medium">Total</span>
           <span className="text-xl font-bold">₹{packageTotal}</span>
         </div>
+
         <Button className="w-full" onClick={handleAddToCart}>
           Add to Cart
         </Button>

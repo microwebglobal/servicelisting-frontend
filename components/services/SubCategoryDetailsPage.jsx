@@ -3,13 +3,14 @@ import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceList } from "./ServiceList";
 import { PackageList } from "./PackageList";
 import { BookingPage } from "./BookingPage";
 import DOMPurify from "dompurify";
 import Modal from "react-modal";
+import { Label } from "../ui/label";
 
 export function SubCategoryDetailsPage({
   cityName,
@@ -269,12 +270,19 @@ export function SubCategoryDetailsPage({
   }
 
   return (
-    <div>
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-6xl mx-auto">
-          <Button variant="ghost" className="mb-4" onClick={handleBack}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back to {subCategory?.category_name}
+    <>
+      <div className="px-6 md:px-8 sm:pt-6 min-h-screen">
+        <div className="max-w-7xl mx-auto">
+          <Button
+            variant="ghost"
+            className="mb-2 p-0 hover:bg-transparent hover:text-muted-foreground"
+            onClick={handleBack}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back{" "}
+            {subCategory?.category_name
+              ? `to ${subCategory.category_name}`
+              : ""}
           </Button>
 
           <h1 className="text-4xl font-bold mb-8">{subCategory?.name}</h1>
@@ -282,43 +290,48 @@ export function SubCategoryDetailsPage({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-8">
               {serviceTypes.map((type) => (
-                <Card key={type.type_id}>
-                  <div className="flex justify-between">
-                    <CardHeader>
-                      <CardTitle>{type.name}</CardTitle>
-                    </CardHeader>
+                <div key={type.type_id} className="space-y-5">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-xl font-semibold">{type.name}</Label>
+
                     <Button
+                      variant="secondary"
                       onClick={() => openModal(type.description)}
-                      className="mt-5 mr-5"
+                      className="bg-[#5f60b9]/10 text-[#5f60b9] font-semibold"
                     >
                       View Details
                     </Button>
                   </div>
 
-                  <CardContent>
+                  <div className="p-5 space-y-10 border rounded-lg">
                     <ServiceList
                       typeId={type.type_id}
                       cityId={cityId}
                       addToCart={addToCart}
                     />
+
                     <PackageList
                       typeId={type.type_id}
                       cityId={cityId}
                       addToCart={addToCart}
                     />
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
 
             <div className="md:col-span-1">
-              <Card className="sticky top-8">
+              <Card className="sticky top-28">
                 <CardHeader>
-                  <CardTitle>Selected Items</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingCart />
+                    Cart
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+
+                <CardContent className="pl-7">
                   {selectedItems.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">
+                    <p className="text-gray-500 text-center pt-4 pb-8">
                       No items selected
                     </p>
                   ) : (
@@ -328,27 +341,47 @@ export function SubCategoryDetailsPage({
                           key={`${item.id}-${item.type}`}
                           className="flex justify-between items-center"
                         >
-                          <div>
-                            <p className="font-medium">{item.name}</p>
+                          <div className="w-full">
+                            <div className="flex justify-between">
+                              <p className="font-medium text-base">
+                                {item.name}
+                              </p>
+
+                              <span>₹{item.price}</span>
+                            </div>
+
                             <p className="text-sm text-gray-500">
                               Quantity: {item.quantity || 1}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span>₹{item.price}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                removeFromSelection(item.id, item.type)
-                              }
-                            >
-                              ✕
-                            </Button>
-                          </div>
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="-mt-6"
+                            onClick={() =>
+                              removeFromSelection(item.id, item.type)
+                            }
+                          >
+                            ✕
+                          </Button>
                         </div>
                       ))}
-                      <div className="border-t pt-4">
+
+                      <div className="border-t pt-4 space-y-4">
+                        <div className="flex justify-between items-center">
+                          <Label className="font-semibold text-lg text-[#5f60b9]">
+                            Total Price
+                          </Label>
+
+                          <span className="font-semibold text-lg">
+                            ₹
+                            {selectedItems
+                              .map((item) => item.price * (item.quantity || 1))
+                              .reduce((a, b) => a + b, 0)}
+                          </span>
+                        </div>
+
                         <Button
                           className="w-full"
                           onClick={handleProceedToBooking}
@@ -370,15 +403,17 @@ export function SubCategoryDetailsPage({
         onRequestClose={closeModal}
         ariaHideApp={false}
         contentLabel="Service Description"
-        className="m-10 bg-white p-8 rounded-md shadow-xl transform transition-all duration-300 ease-in-out w-2/4 overflow-y-auto max-h-[80vh]"
+        className="max-w-md space-y-4 bg-white p-6 rounded-md shadow-xl transform transition-all duration-300 ease-in-out w-2/4 overflow-y-auto max-h-[80vh]"
         overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
       >
+        <Label className="text-lg font-semibold">Description</Label>
+
         <div
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(modalDescription),
           }}
         />
       </Modal>
-    </div>
+    </>
   );
 }

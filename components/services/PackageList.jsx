@@ -53,11 +53,12 @@ export function PackageList({ typeId, cityId, addToCart }) {
 
   if (loading) {
     return (
-      <div className="mt-8 space-y-4">
+      <div className="space-y-4">
         <div className="flex items-center gap-2 mb-4">
           <Package size={20} />
           <h3 className="text-lg font-medium">Available Packages</h3>
         </div>
+
         <div className="space-y-4">
           {[1, 2].map((index) => (
             <Skeleton key={index} className="h-32 w-full rounded-lg" />
@@ -69,7 +70,7 @@ export function PackageList({ typeId, cityId, addToCart }) {
 
   if (error) {
     return (
-      <div className="mt-8 p-4 text-center text-red-500 bg-red-50 rounded-lg">
+      <div className="p-4 text-center text-red-500 bg-red-50 rounded-lg">
         <p>Failed to load packages. Please try again later.</p>
       </div>
     );
@@ -80,11 +81,12 @@ export function PackageList({ typeId, cityId, addToCart }) {
   }
 
   return (
-    <div className="mt-8">
+    <div>
       <div className="flex items-center gap-2 mb-4">
         <Package size={20} />
-        <h3 className="text-lg font-medium">Available Packages</h3>
+        <h3 className="font-medium">Available Packages</h3>
       </div>
+
       <div className="grid gap-4">
         {packages.map((pkg) => (
           <PackageDetails
