@@ -145,17 +145,16 @@ export function CityServiceCategories({ cityName = "" }) {
               No services available in this city
             </div>
           ) : (
-            <div className="pt-8">
-              <Label className=" text-muted-foreground">
+            <div className="pt-3 md:pt-8 space-y-2">
+              <Label className="hidden md:block font-medium">
                 Explore our services,
               </Label>
-
               <ExpandableCategory categories={categories} cityName={cityName} />
             </div>
           )}
         </div>
 
-        <div className="w-full lg:w-3/5 hidden md:grid grid-cols-2 grid-rows-2 gap-3 h-[420px]">
+        <div className="w-full lg:w-3/5 hidden md:grid grid-cols-2 grid-rows-2 gap-3">
           <div className="relative col-span-1 row-span-2">
             <Image
               src="/assets/images/home_repair.webp"

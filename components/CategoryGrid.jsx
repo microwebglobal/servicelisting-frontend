@@ -140,25 +140,25 @@ export function ExpandableCategory({ categories, cityName }) {
         ) : null}
       </AnimatePresence>
 
-      <ul className="max-w-2xl mx-auto w-full flex flex-wrap gap-3 py-4">
-        {categories.map((card) => (
+      <ul className="max-w-2xl w-full grid grid-cols-3 gap-y-5 gap-x-3 py-4">
+        {categories.map((card, index) => (
           <li key={card.name} className="list-none">
             <motion.div
               layoutId={`card-${card.name}-${id}`}
               onClick={() => setActive(card)}
             >
-              <Badge
-                variant="secondary"
-                className="cursor-pointer h-10 gap-2 pr-4"
-              >
-                <img
-                  crossOrigin="anonymous"
-                  src={`${process.env.NEXT_PUBLIC_API_ENDPOINT}${card.icon_url}`}
-                  alt={card.title}
-                  className="object-cover object-center aspect-square w-7 h-7 rounded-full"
-                />
+              <div className="w-full cursor-pointer text-xs flex flex-col items-center gap-3 text-center">
+                <div className="bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 rounded-lg p-3 w-full flex justify-center">
+                  <img
+                    crossOrigin="anonymous"
+                    src={`${process.env.NEXT_PUBLIC_API_ENDPOINT}${card.icon_url}`}
+                    alt={card.title}
+                    className="object-cover object-center aspect-square w-[54px] h-[54px] rounded-md"
+                  />
+                </div>
+
                 {card.name}
-              </Badge>
+              </div>
             </motion.div>
           </li>
         ))}
