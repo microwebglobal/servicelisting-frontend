@@ -64,8 +64,6 @@ export function BookingPage({
         customerNotes: bookingDetails.customerNotes || "",
       };
 
-      console.log("Submitting cart data:", cartData);
-
       await cartService.addToCart(cartData);
       router.push("/cart");
     } catch (error) {
@@ -89,67 +87,73 @@ export function BookingPage({
   }, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <Button variant="ghost" className="mb-4" onClick={onBack}>
-          <ChevronLeft className="mr-2 h-4 w-4" />
+    <div className="min-h-screen p-5 sm:p-8">
+      <div className="max-w-lg w-full mx-auto">
+        <Button
+          variant="ghost"
+          className="mb-4 p-0 hover:bg-transparent hover:text-[#5f60b9]"
+          onClick={onBack}
+        >
+          <ChevronLeft className="h-4 w-4" />
           Back to Services
         </Button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Selected Services</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {selectedItems.map((item) => (
-                    <div
-                      key={`${item.id}-${item.type}`}
-                      className="flex justify-between items-center"
-                    >
-                      <div>
-                        <span className="font-medium">{item.name}</span>
-                        {item.quantity > 1 && (
-                          <span className="text-sm text-gray-500 ml-2">
-                            x{item.quantity}
-                          </span>
-                        )}
-                      </div>
-                      <span className="font-semibold">
-                        ₹{formatPrice(item.price)}
-                      </span>
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> */}
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Selected Services</CardTitle>
+            </CardHeader>
+
+            <CardContent className="px-6">
+              <div className="space-y-4">
+                {selectedItems.map((item) => (
+                  <div
+                    key={`${item.id}-${item.type}`}
+                    className="flex justify-between items-center"
+                  >
+                    <div>
+                      <span className="font-medium">{item.name}</span>
+                      {item.quantity > 1 && (
+                        <span className="text-sm text-gray-500 ml-2">
+                          x{item.quantity}
+                        </span>
+                      )}
                     </div>
-                  ))}
-                  <div className="border-t pt-4 mt-4">
-                    <div className="flex justify-between items-center font-bold">
-                      <span>Total Amount</span>
-                      <span>₹{formatPrice(totalAmount)}</span>
-                    </div>
+                    <span className="font-semibold">
+                      ₹{formatPrice(item.price)}
+                    </span>
+                  </div>
+                ))}
+
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex justify-between items-center text-lg font-bold">
+                    <span className="text-[#5f60b9]">Total Amount</span>
+                    <span>₹{formatPrice(totalAmount)}</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            <div className="mt-8">
-              <BookingForm
-                onBookingSubmit={handleBookingSubmit}
-                city={cityName}
-                loading={loading}
-              />
-            </div>
+          <div className="mt-8">
+            <BookingForm
+              onBookingSubmit={handleBookingSubmit}
+              city={cityName}
+              loading={loading}
+            />
           </div>
+        </div>
 
-          <div>
+        {/* <div>
             <CartPreview
               items={selectedItems}
               loading={loading}
               totalAmount={totalAmount}
             />
-          </div>
-        </div>
+          </div> */}
       </div>
+      {/* </div> */}
     </div>
   );
 }
