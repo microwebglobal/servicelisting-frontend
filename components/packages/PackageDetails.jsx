@@ -26,8 +26,6 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
     }
   }, [pkg]);
 
-  console.log(pkg);
-
   const fetchPackageSections = async () => {
     try {
       const response = await serviceAPI.getSectionsByPackage(pkg.package_id);
@@ -40,8 +38,6 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
         console.warn("Response data is not an array:", response.data);
         return;
       }
-
-      console.log(sectionsData);
 
       // Initialize variables for tracking default selections and total
       let defaultItemsTotal = 0;
@@ -196,6 +192,7 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
                 Customize Package
               </Button>
             </DialogTrigger>
+
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Customize {pkg.name}</DialogTitle>
@@ -259,7 +256,7 @@ const PackageDetails = ({ pkg, addToCart, cityId }) => {
         </div>
       ))}
 
-      <div className="sticky bottom-0 bg-white p-4 rounded-lg mt-4">
+      <div className="sticky bottom-3 bg-white p-4 rounded-lg mt-4">
         <div className="flex justify-between items-center mb-4">
           <span className="text-lg font-medium">Total</span>
           <span className="text-xl font-bold">₹{packageTotal}</span>

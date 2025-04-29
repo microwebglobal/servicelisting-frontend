@@ -4,9 +4,9 @@ import React, { useEffect, useId, useRef, useState } from "react";
 import { useOutsideClick } from "@hooks/use-outside-click";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { Badge } from "./ui/badge";
 import { X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export function ExpandableCategory({ categories, cityName }) {
   const [active, setActive] = useState(null);
@@ -32,10 +32,6 @@ export function ExpandableCategory({ categories, cityName }) {
   }, [active]);
 
   useOutsideClick(ref, () => setActive(null));
-
-  const handleSubCategoryClick = (categorySlug, subCategorySlug) => {
-    router.push(`/services/${cityName}/${categorySlug}/${subCategorySlug}`);
-  };
 
   return (
     <>
@@ -104,29 +100,28 @@ export function ExpandableCategory({ categories, cityName }) {
                 {active.SubCategories?.length ? (
                   <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
                     {active.SubCategories?.map((sub, idx) => (
-                      <motion.div
+                      <Link
                         key={idx}
-                        className="flex flex-col items-center cursor-pointer gap-2 text-center p-3 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 rounded-lg"
-                        onClick={() =>
-                          handleSubCategoryClick(active.slug, sub.slug)
-                        }
+                        href={`/services/${cityName}/${active.slug}/${sub.slug}`}
                       >
-                        <div className="rounded-md w-12 h-12 sm:w-16 sm:h-16 overflow-hidden">
-                          <img
-                            src={
-                              process.env.NEXT_PUBLIC_API_ENDPOINT +
-                              sub.icon_url
-                            }
-                            alt={sub.name}
-                            className=" object-cover object-center w-full h-full"
-                            crossOrigin="anonymous"
-                          />
-                        </div>
+                        <motion.div className="flex flex-col items-center cursor-pointer gap-2 text-center p-3 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 rounded-lg">
+                          <div className="rounded-md w-12 h-12 sm:w-16 sm:h-16 overflow-hidden">
+                            <img
+                              src={
+                                process.env.NEXT_PUBLIC_API_ENDPOINT +
+                                sub.icon_url
+                              }
+                              alt={sub.name}
+                              className=" object-cover object-center w-full h-full"
+                              crossOrigin="anonymous"
+                            />
+                          </div>
 
-                        <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-                          {sub.name}
-                        </span>
-                      </motion.div>
+                          <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+                            {sub.name}
+                          </span>
+                        </motion.div>
+                      </Link>
                     ))}
                   </motion.div>
                 ) : (

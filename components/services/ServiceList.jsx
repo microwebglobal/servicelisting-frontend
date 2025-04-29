@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import DOMPurify from "dompurify";
 import Modal from "react-modal";
 import { Label } from "../ui/label";
+import Image from "next/image";
 
 export function ServiceList({ typeId, cityId, addToCart }) {
   const [services, setServices] = useState([]);
@@ -51,7 +52,6 @@ export function ServiceList({ typeId, cityId, addToCart }) {
 
     try {
       const response = await serviceAPI.getServiceItems(serviceId, cityId);
-      console.log(response.data);
       const items = response.data;
 
       setServiceItems((prev) => ({
@@ -90,7 +90,21 @@ export function ServiceList({ typeId, cityId, addToCart }) {
               className="flex items-center justify-between cursor-pointer hover:text-indigo-600"
               onClick={() => fetchServiceItems(service.service_id)}
             >
-              <p className="font-medium text-sm">{service.name}</p>
+              <div className="flex items-center gap-4">
+                <Image
+                  src={process.env.NEXT_PUBLIC_API_ENDPOINT + service.icon_url}
+                  alt={service.name}
+                  width={60}
+                  height={60}
+                  className="rounded-md object-center"
+                />
+
+                <div className="space-y-0.5">
+                  <p className="font-medium text-sm">{service.name}</p>
+                  <p className="text-sm text-gray-500">{service.description}</p>
+                </div>
+              </div>
+
               <ChevronDown />
             </div>
 
@@ -141,14 +155,14 @@ export function ServiceList({ typeId, cityId, addToCart }) {
                     </div>
 
                     {item.is_home_visit && (
-                      <p className="text-sm text-[#5f60b9] flex items-center mt-6">
+                      <p className="text-sm text-[#5f60b9] flex items-start mt-6">
                         <AlertCircleIcon className="mr-2 w-4" />
                         You need to visit service provider to get this service
                       </p>
                     )}
 
                     {item.advance_percentage > 0 && (
-                      <p className="text-[#5f60b9] flex items-center text-sm mt-6">
+                      <p className="text-[#5f60b9] flex items-start text-sm mt-6">
                         <AlertCircleIcon className="mr-2 w-4" />
                         {item.advance_percentage}% Advanced Payment Required
                       </p>

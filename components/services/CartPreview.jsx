@@ -74,6 +74,7 @@ export function CartPreview({ cart = [], removeFromCart, onCheckout }) {
           <span className="font-bold">Total:</span>
           <span className="text-xl font-bold">₹{cartTotal.toFixed(2)}</span>
         </div>
+
         <Button
           className="w-full"
           onClick={onCheckout}

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, ShoppingCart } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceList } from "./ServiceList";
 import { PackageList } from "./PackageList";
@@ -11,6 +10,8 @@ import { BookingPage } from "./BookingPage";
 import DOMPurify from "dompurify";
 import Modal from "react-modal";
 import { Label } from "../ui/label";
+import Image from "next/image";
+import Cart from "./Cart";
 
 export function SubCategoryDetailsPage({
   cityName,
@@ -101,7 +102,6 @@ export function SubCategoryDetailsPage({
   };
 
   const addToCart = (item, type) => {
-    console.log("item", selectedItems);
     // Check if any selected item is a home visit or non-home visit
     const hasHomeVisitItem = selectedItems.some(
       (i) => i.is_home_visit === true
@@ -159,8 +159,8 @@ export function SubCategoryDetailsPage({
       }
 
       toast({
-        title: "Added to selection",
-        description: `${item.name} has been added to your selection.`,
+        title: "Added to cart",
+        description: `${item.name} has been added to your cart.`,
       });
     }
 
@@ -196,15 +196,11 @@ export function SubCategoryDetailsPage({
       });
 
       toast({
-        title: "Added to selection",
-        description: `${item.name} and its package items have been added to your selection.`,
+        title: "Added to cart",
+        description: `${item.name} and its package items have been added to your cart.`,
       });
     }
   };
-
-  useEffect(() => {
-    console.log(selectedItems);
-  }, [selectedItems]);
 
   const removeFromSelection = (itemId, type) => {
     setSelectedItems(
@@ -213,14 +209,13 @@ export function SubCategoryDetailsPage({
       )
     );
     toast({
-      title: "Removed from selection",
-      description: "Item has been removed from your selection.",
+      title: "Removed from cart",
+      description: "Item has been removed from your cart.",
     });
   };
 
   const getUserInfo = () => {
     const userInfo = JSON.parse(localStorage.getItem("user"));
-    console.log(userInfo);
     return userInfo ? userInfo : null;
   };
 
@@ -289,6 +284,18 @@ export function SubCategoryDetailsPage({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-8">
+              <div className="relative w-full h-[200px] sm:h-[300px] overflow-hidden rounded-md mb-10">
+                <Image
+                  src={
+                    process.env.NEXT_PUBLIC_API_ENDPOINT + subCategory?.icon_url
+                  }
+                  alt={subCategory?.name}
+                  fill
+                  priority
+                  className="object-cover object-top rounded-md"
+                />
+              </div>
+
               {serviceTypes.map((type) => (
                 <div key={type.type_id} className="space-y-5">
                   <div className="flex justify-between items-center">
@@ -321,78 +328,11 @@ export function SubCategoryDetailsPage({
             </div>
 
             <div className="md:col-span-1">
-              <Card className="sticky top-28">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ShoppingCart />
-                    Cart
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="pl-7">
-                  {selectedItems.length === 0 ? (
-                    <p className="text-gray-500 text-center pt-4 pb-8">
-                      No items selected
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {selectedItems.map((item) => (
-                        <div
-                          key={`${item.id}-${item.type}`}
-                          className="flex justify-between items-center"
-                        >
-                          <div className="w-full">
-                            <div className="flex justify-between">
-                              <p className="font-medium text-base">
-                                {item.name}
-                              </p>
-
-                              <span>₹{item.price}</span>
-                            </div>
-
-                            <p className="text-sm text-gray-500">
-                              Quantity: {item.quantity || 1}
-                            </p>
-                          </div>
-
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="-mt-6"
-                            onClick={() =>
-                              removeFromSelection(item.id, item.type)
-                            }
-                          >
-                            ✕
-                          </Button>
-                        </div>
-                      ))}
-
-                      <div className="border-t pt-4 space-y-4">
-                        <div className="flex justify-between items-center">
-                          <Label className="font-semibold text-lg text-[#5f60b9]">
-                            Total Price
-                          </Label>
-
-                          <span className="font-semibold text-lg">
-                            ₹
-                            {selectedItems
-                              .map((item) => item.price * (item.quantity || 1))
-                              .reduce((a, b) => a + b, 0)}
-                          </span>
-                        </div>
-
-                        <Button
-                          className="w-full"
-                          onClick={handleProceedToBooking}
-                        >
-                          Proceed to Booking
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <Cart
+                selectedItems={selectedItems}
+                onRemove={(item) => removeFromSelection(item.id, item.type)}
+                onCheckout={handleProceedToBooking}
+              />
             </div>
           </div>
         </div>
@@ -409,6 +349,7 @@ export function SubCategoryDetailsPage({
         <Label className="text-lg font-semibold">Description</Label>
 
         <div
+          className="text-gray-600 text-sm"
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(modalDescription),
           }}
