@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { format } from "date-fns";
 import CreatableSelect from "react-select/creatable";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -147,15 +146,15 @@ const BookingForm = ({ onBookingSubmit, city }) => {
             Schedule Your Service
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+
+        <CardContent className="space-y-6 px-6 pb-6">
           <div className="space-y-4">
-            <div>
+            <div className="rounded-md bg-muted/50 border flex justify-center p-2">
               <Calendar
                 mode="single"
                 selected={bookingDetails.bookingDate}
                 onSelect={(date) => handleInputChange("bookingDate", date)}
                 disabled={(date) => date < new Date()}
-                className="rounded-md border"
               />
             </div>
 
@@ -198,6 +197,7 @@ const BookingForm = ({ onBookingSubmit, city }) => {
                 <MessageSquare className="h-4 w-4" />
                 Special Instructions
               </label>
+
               <Textarea
                 placeholder="Any special instructions for the service provider..."
                 value={bookingDetails.customerNotes}
@@ -215,7 +215,11 @@ const BookingForm = ({ onBookingSubmit, city }) => {
             </Alert>
           )}
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full font-semibold"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Processing..." : "Confirm Booking"}
           </Button>
         </CardContent>

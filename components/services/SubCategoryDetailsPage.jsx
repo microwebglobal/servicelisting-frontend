@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
@@ -10,6 +9,9 @@ import { PackageList } from "./PackageList";
 import { BookingPage } from "./BookingPage";
 import DOMPurify from "dompurify";
 import Modal from "react-modal";
+import { Label } from "../ui/label";
+import Image from "next/image";
+import Cart from "./Cart";
 
 export function SubCategoryDetailsPage({
   cityName,
@@ -100,7 +102,6 @@ export function SubCategoryDetailsPage({
   };
 
   const addToCart = (item, type) => {
-    console.log("item", selectedItems);
     // Check if any selected item is a home visit or non-home visit
     const hasHomeVisitItem = selectedItems.some(
       (i) => i.is_home_visit === true
@@ -158,8 +159,8 @@ export function SubCategoryDetailsPage({
       }
 
       toast({
-        title: "Added to selection",
-        description: `${item.name} has been added to your selection.`,
+        title: "Added to cart",
+        description: `${item.name} has been added to your cart.`,
       });
     }
 
@@ -195,15 +196,11 @@ export function SubCategoryDetailsPage({
       });
 
       toast({
-        title: "Added to selection",
-        description: `${item.name} and its package items have been added to your selection.`,
+        title: "Added to cart",
+        description: `${item.name} and its package items have been added to your cart.`,
       });
     }
   };
-
-  useEffect(() => {
-    console.log(selectedItems);
-  }, [selectedItems]);
 
   const removeFromSelection = (itemId, type) => {
     setSelectedItems(
@@ -212,14 +209,13 @@ export function SubCategoryDetailsPage({
       )
     );
     toast({
-      title: "Removed from selection",
-      description: "Item has been removed from your selection.",
+      title: "Removed from cart",
+      description: "Item has been removed from your cart.",
     });
   };
 
   const getUserInfo = () => {
     const userInfo = JSON.parse(localStorage.getItem("user"));
-    console.log(userInfo);
     return userInfo ? userInfo : null;
   };
 
@@ -269,97 +265,82 @@ export function SubCategoryDetailsPage({
   }
 
   return (
-    <div>
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-6xl mx-auto">
-          <Button variant="ghost" className="mb-4" onClick={handleBack}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back to {subCategory?.category_name}
+    <>
+      <div className="px-6 md:px-8 sm:pt-6 min-h-screen">
+        <div className="max-w-7xl mx-auto">
+          <Button
+            variant="ghost"
+            className="mb-2 p-0 hover:bg-transparent hover:text-muted-foreground"
+            onClick={handleBack}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back{" "}
+            {subCategory?.category_name
+              ? `to ${subCategory.category_name}`
+              : ""}
           </Button>
 
           <h1 className="text-4xl font-bold mb-8">{subCategory?.name}</h1>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-8">
+              <div className="relative w-full h-[200px] sm:h-[280px] overflow-hidden rounded-md mb-10">
+                <Image
+                  src={
+                    process.env.NEXT_PUBLIC_API_ENDPOINT + subCategory?.icon_url
+                  }
+                  alt={subCategory?.name}
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+
+                {/* Dark overlay */}
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent" />
+
+                {/* <div className="absolute bottom-4 left-5 text-white font-semibold text-lg z-10">
+                  {subCategory.ServiceTypes?.length || 0} Service Types
+                </div> */}
+              </div>
+
               {serviceTypes.map((type) => (
-                <Card key={type.type_id}>
-                  <div className="flex justify-between">
-                    <CardHeader>
-                      <CardTitle>{type.name}</CardTitle>
-                    </CardHeader>
+                <div key={type.type_id} className="space-y-5">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-xl font-semibold">{type.name}</Label>
+
                     <Button
+                      variant="secondary"
                       onClick={() => openModal(type.description)}
-                      className="mt-5 mr-5"
+                      className="bg-[#5f60b9]/10 text-[#5f60b9] font-semibold"
                     >
                       View Details
                     </Button>
                   </div>
 
-                  <CardContent>
+                  <div className="p-5 space-y-10 border rounded-lg">
                     <ServiceList
                       typeId={type.type_id}
                       cityId={cityId}
                       addToCart={addToCart}
                     />
+
                     <PackageList
                       typeId={type.type_id}
                       cityId={cityId}
                       addToCart={addToCart}
                     />
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
 
             <div className="md:col-span-1">
-              <Card className="sticky top-8">
-                <CardHeader>
-                  <CardTitle>Selected Items</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {selectedItems.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">
-                      No items selected
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {selectedItems.map((item) => (
-                        <div
-                          key={`${item.id}-${item.type}`}
-                          className="flex justify-between items-center"
-                        >
-                          <div>
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-sm text-gray-500">
-                              Quantity: {item.quantity || 1}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span>₹{item.price}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                removeFromSelection(item.id, item.type)
-                              }
-                            >
-                              ✕
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                      <div className="border-t pt-4">
-                        <Button
-                          className="w-full"
-                          onClick={handleProceedToBooking}
-                        >
-                          Proceed to Booking
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <Cart
+                selectedItems={selectedItems}
+                onRemove={(item) => removeFromSelection(item.id, item.type)}
+                onCheckout={handleProceedToBooking}
+              />
             </div>
           </div>
         </div>
@@ -370,15 +351,18 @@ export function SubCategoryDetailsPage({
         onRequestClose={closeModal}
         ariaHideApp={false}
         contentLabel="Service Description"
-        className="m-10 bg-white p-8 rounded-md shadow-xl transform transition-all duration-300 ease-in-out w-2/4 overflow-y-auto max-h-[80vh]"
+        className="max-w-md space-y-4 bg-white p-6 rounded-md shadow-xl transform transition-all duration-300 ease-in-out w-2/4 overflow-y-auto max-h-[80vh]"
         overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-xs"
       >
+        <Label className="text-lg font-semibold">Description</Label>
+
         <div
+          className="text-gray-600 text-sm"
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(modalDescription),
           }}
         />
       </Modal>
-    </div>
+    </>
   );
 }
