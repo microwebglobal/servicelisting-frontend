@@ -284,7 +284,7 @@ export function SubCategoryDetailsPage({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-8">
-              <div className="relative w-full h-[200px] sm:h-[300px] overflow-hidden rounded-md mb-10">
+              <div className="relative w-full h-[200px] sm:h-[280px] overflow-hidden rounded-md mb-10">
                 <Image
                   src={
                     process.env.NEXT_PUBLIC_API_ENDPOINT + subCategory?.icon_url
@@ -292,8 +292,16 @@ export function SubCategoryDetailsPage({
                   alt={subCategory?.name}
                   fill
                   priority
-                  className="object-cover object-top rounded-md"
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
+
+                {/* Dark overlay */}
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent" />
+
+                {/* <div className="absolute bottom-4 left-5 text-white font-semibold text-lg z-10">
+                  {subCategory.ServiceTypes?.length || 0} Service Types
+                </div> */}
               </div>
 
               {serviceTypes.map((type) => (

@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 export function ExpandableCategory({ categories, cityName }) {
   const [active, setActive] = useState(null);
@@ -32,6 +31,11 @@ export function ExpandableCategory({ categories, cityName }) {
   }, [active]);
 
   useOutsideClick(ref, () => setActive(null));
+
+  const handleSubCategoryClick = (subCategory) => {
+    setActive(null);
+    router.push(`/services/${cityName}/${active.slug}/${subCategory.slug}`);
+  };
 
   return (
     <>
@@ -100,28 +104,27 @@ export function ExpandableCategory({ categories, cityName }) {
                 {active.SubCategories?.length ? (
                   <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
                     {active.SubCategories?.map((sub, idx) => (
-                      <Link
+                      <motion.div
                         key={idx}
-                        href={`/services/${cityName}/${active.slug}/${sub.slug}`}
+                        onClick={() => handleSubCategoryClick(sub)}
+                        className="flex flex-col items-center cursor-pointer gap-2 text-center p-3 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 rounded-lg"
                       >
-                        <motion.div className="flex flex-col items-center cursor-pointer gap-2 text-center p-3 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 rounded-lg">
-                          <div className="rounded-md w-12 h-12 sm:w-16 sm:h-16 overflow-hidden">
-                            <img
-                              src={
-                                process.env.NEXT_PUBLIC_API_ENDPOINT +
-                                sub.icon_url
-                              }
-                              alt={sub.name}
-                              className=" object-cover object-center w-full h-full"
-                              crossOrigin="anonymous"
-                            />
-                          </div>
+                        <div className="rounded-md w-12 h-12 sm:w-16 sm:h-16 overflow-hidden">
+                          <img
+                            src={
+                              process.env.NEXT_PUBLIC_API_ENDPOINT +
+                              sub.icon_url
+                            }
+                            alt={sub.name}
+                            className=" object-cover object-center w-full h-full"
+                            crossOrigin="anonymous"
+                          />
+                        </div>
 
-                          <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-                            {sub.name}
-                          </span>
-                        </motion.div>
-                      </Link>
+                        <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+                          {sub.name}
+                        </span>
+                      </motion.div>
                     ))}
                   </motion.div>
                 ) : (
@@ -136,7 +139,7 @@ export function ExpandableCategory({ categories, cityName }) {
       </AnimatePresence>
 
       <ul className="max-w-2xl w-full grid grid-cols-3 gap-y-5 gap-x-3 py-4">
-        {categories.map((card, index) => (
+        {categories.map((card) => (
           <li key={card.name} className="list-none">
             <motion.div
               layoutId={`card-${card.name}-${id}`}

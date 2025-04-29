@@ -96,7 +96,7 @@ export function ServiceList({ typeId, cityId, addToCart }) {
                   alt={service.name}
                   width={60}
                   height={60}
-                  className="rounded-md object-center"
+                  className="rounded-md object-center aspect-square"
                 />
 
                 <div className="space-y-0.5">
