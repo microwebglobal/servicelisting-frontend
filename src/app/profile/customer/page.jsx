@@ -15,7 +15,6 @@ const CustomerProfile = () => {
   const [userData, setUserData] = useState(null);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
-  const [isSocketReady, setIsSocketReady] = useState(false);
   const [currentOtp, setCurrentOtp] = useState(null);
   const router = useRouter();
   const { logout, user } = useAuth();
@@ -25,22 +24,26 @@ const CustomerProfile = () => {
     if (!socket || !user?.uId) return;
 
     const onConnect = () => {
-      console.log("🔌 Connected:", socket.id);
+      console.log("🔌 Socket connected:", socket.id);
       socket.emit("join-booking", user.uId);
-      setIsSocketReady(true);
     };
 
     const onDisconnect = () => {
-      console.log("🔌 Disconnected");
-      setIsSocketReady(false);
+      console.log("🔌 Socket disconnected");
     };
 
     const onConnectError = (err) => {
-      console.error("Connection error:", err);
-      setIsSocketReady(false);
+      console.error("Socket connection error:", err);
+      toast({
+        title: "Connection Issue",
+        description:
+          "Unable to connect to real-time service. OTPs may not be received.",
+        variant: "destructive",
+      });
     };
 
     const onOtpReceived = (data) => {
+      console.log("OTP received:", data);
       setCurrentOtp(data.otp);
       toast({
         title: "OTP Received",
@@ -50,16 +53,21 @@ const CustomerProfile = () => {
       });
     };
 
+    // Register socket event listeners
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("connect_error", onConnectError);
     socket.on("otp-generated", onOtpReceived);
 
-    if (!socket.connected) {
-      console.log("Attempting to connect socket...");
+    if (socket.connected) {
+      console.log("Socket already connected, joining booking:", user.uId);
+      socket.emit("join-booking", user.uId);
+    } else {
+      console.log("Socket not connected, attempting to connect...");
       socket.connect();
     }
 
+    // Cleanup listeners on unmount
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
@@ -103,15 +111,11 @@ const CustomerProfile = () => {
     router.push("/login");
   };
 
-  if (isLoading || !isSocketReady) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">
-          {!isSocketReady
-            ? "Connecting to real-time service..."
-            : "Loading profile..."}
-        </span>
+        <span className="ml-2">Loading profile...</span>
       </div>
     );
   }
