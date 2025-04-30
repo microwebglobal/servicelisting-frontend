@@ -202,7 +202,7 @@ export function CityServiceCategories({ cityName = "" }) {
       {categories.map(
         (category) =>
           category.SubCategories.length > 0 && (
-            <div key={category.category_id} className="space-y-10">
+            <div key={category.category_id} className="space-y-8">
               <div className="flex justify-between items-center">
                 <Label className="text-lg md:text-2xl font-semibold">
                   {category.name}

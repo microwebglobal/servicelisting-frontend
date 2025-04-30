@@ -11,6 +11,7 @@ import { Bookmark } from "lucide-react";
 import FeaturedCard from "@/components/ui/featuredCard";
 import { serviceAPI } from "@/api/services";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function FeaturedSection({ city }) {
   const [data, setData] = useState();
@@ -73,18 +74,22 @@ export default function FeaturedSection({ city }) {
               className="!w-[260px] basis-[260px] shrink-0 scroll-snap-start"
             >
               <div className="p-1">
-                <FeaturedCard
-                  imageSrc={
-                    process.env.NEXT_PUBLIC_API_ENDPOINT + item.icon_url
-                  }
-                  badgeText={item.numberOfReviews}
-                  price={item.base_price}
-                  title={item.name}
-                  rating={item.rating}
-                  providerName={item.providerName}
-                  providerAvatar={item.providerAvatar}
-                  description={item.description}
-                />
+                <Link
+                  href={`/services/${city}/${item.full_url}?itemId=${item.item_id}&serviceId=${item.service_id}`}
+                >
+                  <FeaturedCard
+                    imageSrc={
+                      process.env.NEXT_PUBLIC_API_ENDPOINT + item.icon_url
+                    }
+                    badgeText={item.numberOfReviews}
+                    price={item.base_price}
+                    title={item.name}
+                    rating={item.rating}
+                    providerName={item.providerName}
+                    providerAvatar={item.providerAvatar}
+                    description={item.description}
+                  />
+                </Link>
               </div>
             </CarouselItem>
           ))}

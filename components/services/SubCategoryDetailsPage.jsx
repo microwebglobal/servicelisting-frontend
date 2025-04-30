@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
@@ -29,6 +29,8 @@ export function SubCategoryDetailsPage({
   const [isOpen, setIsOpen] = useState(false);
   const [modalDescription, setModelDescription] = useState(null);
 
+  const searchParams = useSearchParams();
+
   const openModal = (description) => {
     setModelDescription(description);
     setIsOpen(true);
@@ -48,6 +50,42 @@ export function SubCategoryDetailsPage({
       fetchSubCategoryDetails();
     }
   }, [subCategorySlug, cityId]);
+
+  // Automatically add items to cart
+  const handleAutoAddToCart = async () => {
+    const itemId = searchParams.get("itemId");
+    const serviceId = searchParams.get("serviceId");
+    if (!itemId || !cityId || !serviceId) return;
+
+    try {
+      setLoading(true);
+      const response = await serviceAPI.getServiceItems(serviceId, cityId);
+      const toAdd = response.data.find((item) => item.item_id === itemId);
+
+      if (toAdd) {
+        addToCart(toAdd, "service_item");
+      } else {
+        toast({
+          title: "Not found",
+          description: `Service ${itemId} currently not available.`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching service items:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load service items. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleAutoAddToCart();
+  }, [searchParams, cityId]);
 
   const fetchCityId = async () => {
     try {
