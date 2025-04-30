@@ -109,9 +109,9 @@ const Home = () => {
                 <Image
                   src="/assets/images/herobg-5.jpg"
                   alt="Home Maintenance 1"
-                  layout="fill"
-                  objectFit="cover"
+                  fill
                   priority
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>
@@ -123,8 +123,8 @@ const Home = () => {
                 <Image
                   src="/assets/images/herobg-6.jpg"
                   alt="Home Maintenance 2"
-                  layout="fill"
-                  objectFit="cover"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>
@@ -136,8 +136,8 @@ const Home = () => {
                 <Image
                   src="/assets/images/herobg-7.jpg"
                   alt="Home Maintenance 3"
-                  layout="fill"
-                  objectFit="cover"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>
@@ -389,6 +389,7 @@ const Home = () => {
             <Image
               src="/assets/images/roof_work.jpg"
               alt="Professional"
+              priority
               width={600}
               height={600}
               className="w-full h-full object-cover rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
