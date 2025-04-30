@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import * as Switch from "@radix-ui/react-switch"; // Added Switch component
 import { serviceAPI } from "../../api/services";
 import TextEditor from "@components/ui/textEditor";
 import { toast } from "@hooks/use-toast";
@@ -52,6 +53,7 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
       })) || [],
     advance_percentage: data?.advance_percentage || 0,
     is_home_visit: data?.is_home_visit || false,
+    is_featured: data?.is_featured || false,
   });
 
   useEffect(() => {
@@ -396,29 +398,48 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="base_price">Is Home Visit</Label>
-        <Select
-          value={formData.is_home_visit}
-          onValueChange={(value) =>
-            setFormData({
-              ...formData,
-              is_home_visit: value,
-            })
-          }
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select Home Visit Or Not" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem key={true} value={true}>
-              True
-            </SelectItem>
-            <SelectItem key={false} value={false}>
-              False
-            </SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex space-x-4">
+        <div className="space-y-2">
+          <Label htmlFor="is_home_visit">Is Home Visit</Label>
+          <Select
+            value={formData.is_home_visit}
+            onValueChange={(value) =>
+              setFormData({
+                ...formData,
+                is_home_visit: value,
+              })
+            }
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select Home Visit Or Not" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key={true} value={true}>
+                True
+              </SelectItem>
+              <SelectItem key={false} value={false}>
+                False
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="is_featured">Is Featured</Label>
+          <div className="flex items-center space-x-2">
+            <Switch.Root
+              id="is_featured"
+              checked={formData.is_featured}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, is_featured: checked })
+              }
+              className="w-10 h-5 bg-gray-300 rounded-full relative data-[state=checked]:bg-blue-600"
+            >
+              <Switch.Thumb className="block w-4 h-4 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform data-[state=checked]:translate-x-5" />
+            </Switch.Root>
+            <span>{formData.is_featured ? "Featured" : "Not Featured"}</span>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-between">
