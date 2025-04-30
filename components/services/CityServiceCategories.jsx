@@ -197,7 +197,7 @@ export function CityServiceCategories({ cityName = "" }) {
         </div>
       </div>
 
-      <FeaturedSection />
+      <FeaturedSection city={cityName} />
 
       {categories.map(
         (category) =>
