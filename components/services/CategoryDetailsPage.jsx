@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardImage,
-  CardContent,
-} from "@/components/ui/card";
 import { serviceAPI } from "@/api/services";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import SubCategoryCard from "./SubCategoryCard";
 
 export function CategoryDetailsPage({ cityName, categorySlug }) {
   const [category, setCategory] = useState(null);
@@ -74,10 +69,6 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
     fetchCategoryDetails();
   }, [cityName, categorySlug, toast]);
 
-  const handleSubCategoryClick = (subCategorySlug) => {
-    router.push(`/services/${cityName}/${categorySlug}/${subCategorySlug}`);
-  };
-
   const handleBack = () => {
     router.push(`/services/${cityName}`);
   };
@@ -106,35 +97,45 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10">
-      <div className="max-w-6xl mx-auto">
-        <Button variant="ghost" className="mb-4" onClick={handleBack}>
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Back to Categories
-        </Button>
+    <div className="min-h-screen p-6 md:p-10">
+      <div className="max-w-7xl mx-auto space-y-10 md:space-y-14">
+        <div>
+          <Button
+            variant="ghost"
+            className="mb-2 -ml-1 p-0 hover:bg-transparent hover:text-[#5f60b9]"
+            onClick={handleBack}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to Categories
+          </Button>
 
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6">
-          {category?.name} in {cityName}
-        </h1>
+          <h1 className="text-2xl font-bold z-20">
+            {category?.name} in {cityName}
+          </h1>
+        </div>
 
-        <div className="flex justify-center">
-          <img
+        <div className="relative w-full h-[300px]">
+          <Image
+            fill
             src={process.env.NEXT_PUBLIC_API_ENDPOINT + category.icon_url}
             crossOrigin="anonymous"
             alt="Category Image"
-            className="w-full md:w-3/4 lg:w-2/3 h-64 object-cover rounded-xl shadow-lg"
+            className="object-cover"
           />
         </div>
 
-        <h2 className="text-2xl md:text-3xl font-semibold mt-8 text-center">
-          What is {category?.name}?
-        </h2>
-        <p className="text-lg text-gray-700 text-center max-w-4xl mx-auto mt-4 leading-relaxed">
-          {category?.name} is an essential part of daily life in {cityName}.
-          Whether you're looking for professional services, products, or local
-          offers, this category encompasses everything you need. Explore each
-          subcategory below to find what suits your needs.
-        </p>
+        <div>
+          <h2 className="text-2xl font-semibold mt-8">
+            What is {category?.name}?
+          </h2>
+
+          <p className="text-sm text-gray-700 mt-4 leading-relaxed">
+            {category?.name} is an essential part of daily life in {cityName}.
+            Whether you're looking for professional services, products, or local
+            offers, this category encompasses everything you need. Explore each
+            subcategory below to find what suits your needs.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
           {subCategories.length === 0 ? (
@@ -143,32 +144,13 @@ export function CategoryDetailsPage({ cityName, categorySlug }) {
             </div>
           ) : (
             subCategories.map((subCategory) => (
-              <Card
-                key={subCategory.sub_category_id}
-                className="cursor-pointer hover:shadow-xl transition-shadow duration-300 rounded-xl"
-                onClick={() => handleSubCategoryClick(subCategory.slug)}
-              >
-                <CardImage
-                  src={
-                    process.env.NEXT_PUBLIC_API_ENDPOINT + subCategory.icon_url
-                  }
-                  crossOrigin="anonymous"
-                  alt="Subcategory Image"
-                  className="w-full h-48 object-cover rounded-t-xl"
+              <div key={subCategory.id}>
+                <SubCategoryCard
+                  name={subCategory.name}
+                  icon_url={subCategory.icon_url}
+                  url={`/services/${cityName}/${categorySlug}/${subCategory.slug}`}
                 />
-                <CardHeader className="p-4">
-                  <CardTitle className="text-lg md:text-xl font-medium text-indigo-700 hover:text-indigo-500 transition-colors">
-                    {subCategory.name}
-                  </CardTitle>
-                  {subCategory.description && (
-                    <CardContent className="pt-2">
-                      <p className="text-gray-600 text-sm">
-                        {subCategory.description}
-                      </p>
-                    </CardContent>
-                  )}
-                </CardHeader>
-              </Card>
+              </div>
             ))
           )}
         </div>
