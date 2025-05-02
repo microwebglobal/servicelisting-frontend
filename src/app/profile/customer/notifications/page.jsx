@@ -1,32 +1,45 @@
 "use client";
 import { profileAPI } from "@/api/profile";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useProfileRefresh } from "@src/context/ProfileRefreshContext";
 
-const Page = () => {
+const Page = ({ currentOtp }) => {
   const [notifications, setNotifications] = useState([]);
   const [typeFilter, setTypeFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { refreshKey, triggerRefresh } = useProfileRefresh();
 
   useEffect(() => {
-    getUserNotifications();
-  }, [typeFilter]);
+    console.log("Received currentOtp in Page:", currentOtp);
+  }, [currentOtp]);
 
-  const getUserNotifications = async () => {
+  const getUserNotifications = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = typeFilter
         ? await profileAPI.filterNotifications({ type: typeFilter })
         : await profileAPI.getUserNotifications();
 
-      setNotifications(response.data.data);
+      console.log("Notifications API response:", response.data.data);
+      setNotifications(response.data.data || []);
     } catch (error) {
-      console.error(error);
-      setError("Failed to load notifications");
+      console.error("Error fetching notifications:", error.message);
+      setError("Failed to load notifications. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [typeFilter]);
+
+  useEffect(() => {
+    console.log("useEffect triggered with:", {
+      typeFilter,
+      refreshKey,
+      currentOtp,
+    });
+    getUserNotifications();
+  }, [typeFilter, refreshKey, currentOtp, getUserNotifications]);
 
   const markAsRead = async (notificationId) => {
     try {
@@ -37,7 +50,8 @@ const Page = () => {
         )
       );
     } catch (error) {
-      console.error("Error marking as read:", error);
+      console.error("Error marking as read:", error.message);
+      setError("Failed to mark notification as read.");
     }
   };
 
@@ -48,7 +62,8 @@ const Page = () => {
         prev.filter((n) => n.notification_id !== notificationId)
       );
     } catch (error) {
-      console.error("Error deleting notification:", error);
+      console.error("Error deleting notification:", error.message);
+      setError("Failed to delete notification.");
     }
   };
 
@@ -57,7 +72,8 @@ const Page = () => {
       await profileAPI.deleteAllNotifications();
       setNotifications([]);
     } catch (error) {
-      console.error("Error deleting all:", error);
+      console.error("Error deleting all notifications:", error.message);
+      setError("Failed to delete all notifications.");
     }
   };
 
@@ -77,10 +93,14 @@ const Page = () => {
           <option value="booking">Booking</option>
           <option value="reminder">Reminder</option>
           <option value="general">General</option>
+          <option value="otp">OTP</option>
         </select>
 
         <button
-          onClick={getUserNotifications}
+          onClick={() => {
+            getUserNotifications();
+            triggerRefresh(); // Trigger global refresh
+          }}
           className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
         >
           Refresh

@@ -8,73 +8,14 @@ import { Loader2 } from "lucide-react";
 import ProfileContent from "@components/profile/ProfileContent";
 import EmailVerificationDialog from "@components/profile/EmailVerificationDialog";
 import withAuth from "@/components/isAuth";
-import { useSocket } from "@src/context/SocketContext.js";
 
 const CustomerProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
-  const [currentOtp, setCurrentOtp] = useState(null);
   const router = useRouter();
   const { logout, user } = useAuth();
-  const socket = useSocket();
-
-  useEffect(() => {
-    if (!socket || !user?.uId) return;
-
-    const onConnect = () => {
-      console.log("🔌 Socket connected:", socket.id);
-      socket.emit("join-booking", user.uId);
-    };
-
-    const onDisconnect = () => {
-      console.log("🔌 Socket disconnected");
-    };
-
-    const onConnectError = (err) => {
-      console.error("Socket connection error:", err);
-      toast({
-        title: "Connection Issue",
-        description:
-          "Unable to connect to real-time service. OTPs may not be received.",
-        variant: "destructive",
-      });
-    };
-
-    const onOtpReceived = (data) => {
-      console.log("OTP received:", data);
-      setCurrentOtp(data.otp);
-      toast({
-        title: "OTP Received",
-        description: data.customerMessage
-          ? `${data.customerMessage}`
-          : `Your booking OTP is ${data.otp}`,
-      });
-    };
-
-    // Register socket event listeners
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("connect_error", onConnectError);
-    socket.on("otp-generated", onOtpReceived);
-
-    if (socket.connected) {
-      console.log("Socket already connected, joining booking:", user.uId);
-      socket.emit("join-booking", user.uId);
-    } else {
-      console.log("Socket not connected, attempting to connect...");
-      socket.connect();
-    }
-
-    // Cleanup listeners on unmount
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("connect_error", onConnectError);
-      socket.off("otp-generated", onOtpReceived);
-    };
-  }, [socket, user?.uId]);
 
   const fetchUserProfile = useCallback(async () => {
     if (!user?.uId) return;
@@ -102,14 +43,6 @@ const CustomerProfile = () => {
   useEffect(() => {
     fetchUserProfile();
   }, [fetchUserProfile]);
-
-  const handleLogout = () => {
-    if (socket) {
-      socket.disconnect();
-    }
-    logout();
-    router.push("/login");
-  };
 
   if (isLoading) {
     return (

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LoginAPI } from "@/api/login";
 import { useAuth } from "@src/context/AuthContext";
+import { InputOtp } from "@heroui/react";
 
 const CustomerLogin = () => {
   const [step, setStep] = useState(1);
@@ -135,22 +136,23 @@ const CustomerLogin = () => {
               </button>
             </>
           ) : (
-            <>
-              <p className="text-center mb-8">
-                Enter the 6-digit code sent to {mobile}
-              </p>
-              <input
-                type="text"
-                className="w-full px-4 py-2 mb-6 text-gray-700 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                maxLength={6}
-              />
-              <p className="text-center text-gray-500 mb-4">
+            <div className="flex flex-col items-center justify-center text-center w-full">
+              <p className="mb-8">Enter the 6-digit code sent to {mobile}</p>
+
+              <div className="flex justify-center mb-4">
+                <InputOtp
+                  length={6}
+                  value={otp}
+                  onValueChange={setOtp}
+                  variant="faded"
+                />
+              </div>
+
+              <p className="text-gray-500 mb-4">
                 OTP expires in {Math.floor(timer / 60)}:
                 {String(timer % 60).padStart(2, "0")}
               </p>
+
               <button
                 className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
                 onClick={handleVerifyOtp}
@@ -158,17 +160,18 @@ const CustomerLogin = () => {
               >
                 {isLoading ? "Verifying..." : "Verify OTP"}
               </button>
+
               <button
                 className="w-full mt-4 text-indigo-500 hover:text-indigo-600"
                 onClick={() => {
                   setStep(1);
-                  setOtp("");
+                  setValue("");
                   setError("");
                 }}
               >
                 Change Mobile Number
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>
