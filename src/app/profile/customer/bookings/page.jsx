@@ -35,9 +35,9 @@ const Page = () => {
   return (
     <div className="min-h-screen ml-20 bg-gray-50">
       {!selectedBooking ? (
-        <div className="flex flex-col md:flex-row">
+        <div className="mt-8">
           {/* Sidebar */}
-          <aside className="w-full md:w-80 bg-white p-6 border-r min-h-screen">
+          <div className="items-center mx-10">
             <button
               className="flex items-center gap-2 text-2xl font-semibold hover:text-indigo-600 transition-colors"
               onClick={() => router.back()}
@@ -47,8 +47,7 @@ const Page = () => {
             </button>
 
             <BookingStatus onStatusChange={setSelectedStatus} />
-          </aside>
-
+          </div>
           {/* Main Content */}
           <main className="flex-1 p-6 md:p-8">
             {filteredBookings.length > 0 ? (
