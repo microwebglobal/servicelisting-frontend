@@ -101,6 +101,17 @@ export const cartService = {
     }
   },
 
+  verifyPhonepePayment: async (data) => {
+    try {
+      const response = await api.post(`/booking/payment/phone-pe/verify`, data);
+      return response;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch booking"
+      );
+    }
+  },
+
   getBooking: async (bookingId) => {
     try {
       const response = await api.get(`/booking/${bookingId}`);
@@ -154,6 +165,17 @@ export const cartService = {
         data
       );
       return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch booking"
+      );
+    }
+  },
+
+  getAvailableTimeSlotes: async (data) => {
+    try {
+      const response = await api.post(`/booking/availability`, data);
+      return response;
     } catch (error) {
       throw new Error(
         error.response?.data?.message || "Failed to fetch booking"
