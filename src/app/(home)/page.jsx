@@ -91,7 +91,7 @@ const Home = () => {
   return (
     <div className="overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative mt-10 py-32 flex flex-col justify-center items-center text-white overflow-hidden">
+      <section className="relative mt-10 pb-28 pt-16 lg:py-32 flex flex-col justify-center items-center text-white overflow-hidden">
         {/* Background Image Slider */}
         <div className="absolute inset-0 -z-10 w-full h-full">
           <Swiper
@@ -150,9 +150,9 @@ const Home = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="z-10 px-4 sm:px-6 md:px-8 lg:px-10 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-28 space-y-8 sm:space-y-10"
+          className="z-10 px-6 sm:px-6 md:px-8 lg:px-10 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-28 space-y-8 sm:space-y-10"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
             Find Trusted Professionals <br className="hidden sm:block" /> In
             Just a Click!
           </h1>
@@ -163,6 +163,7 @@ const Home = () => {
 
             <p className="text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
               Need help finding the right service for you?{" "}
+              <br className="md:hidden" />
               <Link href="" className="underline font-medium">
                 Chat with us
               </Link>
@@ -191,35 +192,43 @@ const Home = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white bg-opacity-90 shadow-md"
+          className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white/90 shadow-md"
         >
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-black text-sm sm:text-base md:text-lg px-4 sm:px-8 max-w-7xl mx-auto">
-            <div className="flex flex-col items-center">
-              <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-blue-600 text-sm sm:text-base md:text-lg px-4 sm:px-8 max-w-7xl mx-auto">
+            <div className="flex flex-col items-center space-y-1">
+              <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
                 <CountUp start={0} end={2400} duration={2.75} suffix=" +" />
               </span>
-              <p className="text-xs sm:text-sm">JOBS COMPLETED</p>
+
+              <p className="text-xs sm:text-sm text-primary">JOBS COMPLETED</p>
             </div>
 
-            <div className="flex flex-col items-center">
-              <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
+            <div className="flex flex-col items-center space-y-1">
+              <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
                 <CountUp start={0} end={52} duration={3.75} suffix=" +" />
               </span>
-              <p className="text-xs sm:text-sm">EXPERTS</p>
+
+              <p className="text-xs sm:text-sm text-primary">EXPERTS</p>
             </div>
 
-            <div className="flex flex-col items-center">
-              <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
+            <div className="flex flex-col items-center space-y-1">
+              <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
                 <CountUp start={0} end={96} duration={2.75} suffix=" %" />
               </span>
-              <p className="text-xs sm:text-sm">RATED THEIR PRO PERFECT</p>
+
+              <p className="text-xs sm:text-sm text-primary">
+                RATED THEIR PRO PERFECT
+              </p>
             </div>
 
-            <div className="flex flex-col items-center">
-              <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-blue-600">
+            <div className="flex flex-col items-center space-y-1">
+              <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
                 <CountUp start={0} end={32} duration={3.75} suffix=" +" />
               </span>
-              <p className="text-xs sm:text-sm">SERVICE CATEGORIES</p>
+
+              <p className="text-xs sm:text-sm text-primary">
+                SERVICE CATEGORIES
+              </p>
             </div>
           </div>
         </motion.div>
@@ -288,6 +297,7 @@ const Home = () => {
         >
           Our Services
         </motion.h2>
+
         <div className="max-w-6xl mx-auto space-y-2">
           {/* First Row: Display 3 cards */}
           <motion.div
@@ -321,7 +331,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-10 sm:mt-0 px-3 py-2 sm:px-5 sm:py-3 md:px-8 md:py-3 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
+              className="mt-10 sm:mt-5 px-3 py-2 sm:px-5 sm:py-3 md:px-8 md:py-3 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
             >
               View all services
             </motion.button>
@@ -337,7 +347,7 @@ const Home = () => {
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center lg:flex-row gap-10 lg:gap-20"
         >
-          <div className="w-full lg:w-1/2 text-center lg:text-left">
+          <div className="w-full lg:w-1/2 text-left">
             <motion.h2
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -355,9 +365,9 @@ const Home = () => {
               seamless and stress-free experience.
             </p>
 
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 items-center -ml-8 lg:items-start textl-lg">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 items-start">
               <div>
-                <ul className="list-inside pl-5 text-gray-600 space-y-4">
+                <ul className="list-inside pl-5 space-y-4">
                   <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
                     Trusted Professionals
                   </li>
@@ -370,7 +380,7 @@ const Home = () => {
                 </ul>
               </div>
               <div>
-                <ul className="list-inside pl-5 text-gray-600 space-y-4">
+                <ul className="list-inside pl-5 space-y-4">
                   <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
                     Experienced Experts
                   </li>

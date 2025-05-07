@@ -1,12 +1,12 @@
-import "@styles/globals.css";
-import { Poppins } from "next/font/google";
 import { ToastProvider } from "@components/ui/toast";
 import { Toaster } from "@components/ui/toaster";
 import { AuthProvider } from "@src/context/AuthContext";
 import "react-datepicker/dist/react-datepicker.css";
 import { SocketProvider } from "@src/context/SocketContext";
+import { Inter } from "next/font/google";
+import "@styles/globals.css";
 
-const poppins = Poppins({ subsets: ["latin"], weight: ["400", "700"] });
+const poppins = Inter({ subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata = {
   title: "",

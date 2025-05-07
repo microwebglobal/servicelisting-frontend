@@ -66,15 +66,12 @@ const Navbar = () => {
 
   return (
     <>
-      <nav
-        className="bg-primary h-16 lg:h-20 py-4 px-6 md:px-10 fixed w-full z-20 flex justify-center"
-        style={{ backgroundColor: "#5f60b9" }}
-      >
+      <nav className="bg-[#5f60b9] text-white h-16 lg:h-20 py-4 px-6 md:px-10 fixed w-full z-20 flex justify-center">
         {/* Container */}
         <div className="flex items-center justify-between w-full max-w-7xl">
           <div className="flex items-center gap-10">
             {/* Logo (Left Side) */}
-            <div className="font-bold text-xl md:text-3xl -mt-1 text-white">
+            <div className="font-bold text-xl md:text-3xl -mt-1">
               <Link href="/">QProz</Link>
             </div>
 
@@ -88,7 +85,7 @@ const Navbar = () => {
                 >
                   <Link
                     href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                    className="text-white font-semibold"
+                    className="font-semibold"
                   >
                     {item}
                   </Link>
