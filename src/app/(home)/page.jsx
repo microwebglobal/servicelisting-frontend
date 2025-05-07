@@ -4,23 +4,23 @@ import Image from "next/image";
 import CitySelector from "@components/home/CitySelector";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion } from "framer-motion";
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import { Calendar, ListChecks, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  Check,
+  CircleCheckBig,
+  ListChecks,
+  ShieldCheck,
+} from "lucide-react";
 import ServiceCard from "@/components/home/ServiceCard";
 import CountUp from "react-countup";
 import { useToast } from "@/hooks/use-toast";
-import { FaAppStore, FaGooglePay, FaGooglePlay } from "react-icons/fa";
+import { FaAppStore, FaGooglePlay } from "react-icons/fa";
 import { serviceAPI } from "@/api/services";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { SparklesIcon } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/carousel";
 import Link from "next/link";
 import PageSection from "@/components/PageSection";
+import AnimatedButton from "@/components/home/AnimatedButton";
+import SectionBadge from "@/components/home/SectionBadge";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -234,167 +236,14 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* Steps Section */}
-      <PageSection className="bg-gradient-to-b from-gray-50 to-white">
-        {/* Left Side - Image */}
-        <div className="lg:w-1/2 h-full">
-          <Image
-            src="/assets/images/how_app_work.jpg"
-            alt="Professional"
-            width={440}
-            height={418}
-            className="w-full h-full object-cover drop-shadow-lg rounded-xl"
-          />
-        </div>
-
-        {/* Right Side - Steps */}
-        <motion.div
-          initial={{ opacity: 0, x: 30, transform: "none" }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2"
-        >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl text-center lg:text-left font-bold mb-10 text-gray-900 p-3">
-            How does <span className="text-indigo-600">QProz</span> work?
-          </h2>
-
-          <ul className="text-lg">
-            {steps.map((step, index) => (
-              <li key={index} className="mb-10 list-item">
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0, x: 0 }}
-                  transition={{ duration: 0.8, delay: index * 0.3 }}
-                  className="flex flex-col lg:flex-row gap-4 lg:gap-8 items-center text-center lg:text-left"
-                >
-                  {/* Icon */}
-                  <div className="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
-                    {step.icon}
-                  </div>
-
-                  {/* Text Content */}
-                  <div>
-                    <span className="font-bold text-xl text-gray-900">
-                      {step.title}
-                    </span>
-                    <p className="text-gray-600 lg:pr-16">{step.description}</p>
-                  </div>
-                </motion.div>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      </PageSection>
-
-      {/* Services Section */}
-      <section className="bg-gray-100 py-20 px-4 items-center justify-center text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center text-3xl md:text-4xl lg:text-5xl font-bold mb-5"
-        >
-          Our Services
-        </motion.h2>
-
-        <div className="max-w-6xl mx-auto space-y-2">
-          {/* First Row: Display 3 cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mx-auto max-w-xs md:max-w-xl lg:max-w-5xl xl:max-w-7xl"
-          >
-            <Carousel>
-              <CarouselContent>
-                {categories.slice(0, 10).map((serv, index) => (
-                  <CarouselItem
-                    key={index}
-                    className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-                  >
-                    <ServiceCard
-                      key={index}
-                      name={serv.name}
-                      icon={serv.icon_url}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          </motion.div>
-
-          <Link href="/services">
-            <motion.button
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-10 sm:mt-5 px-3 py-2 sm:px-5 sm:py-3 md:px-8 md:py-3 bg-indigo-500 text-white font-semibold text-sm sm:text-base md:text-lg rounded-full hover:bg-blue-700 transition shadow-md"
-            >
-              View all services
-            </motion.button>
-          </Link>
-        </div>
-      </section>
-
       {/* Professionals Section */}
-      <PageSection className="bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA]">
+      <PageSection className="bg-gradient-to-b from-gray-50 to-white">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center lg:flex-row gap-10 lg:gap-20"
         >
-          <div className="w-full lg:w-1/2 text-left">
-            <motion.h2
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-10"
-            >
-              Trusted Professionals for Your Home Services
-            </motion.h2>
-
-            <p className="text-gray-600 mb-8 text-lg">
-              Finding reliable professionals for your home services has never
-              been easier. Our team of skilled experts is committed to
-              delivering top-quality solutions tailored to your needs. Whether
-              you require repairs, installations, or maintenance, we ensure a
-              seamless and stress-free experience.
-            </p>
-
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 items-start">
-              <div>
-                <ul className="list-inside pl-5 space-y-4">
-                  <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
-                    Trusted Professionals
-                  </li>
-                  <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
-                    Seamless Booking
-                  </li>
-                  <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
-                    Customizable Solutions
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <ul className="list-inside pl-5 space-y-4">
-                  <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
-                    Experienced Experts
-                  </li>
-                  <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
-                    24/7 Availability
-                  </li>
-                  <li className="flex items-center before:content-['✔'] before:text-violet-500 before:mr-4 before:text-xl hover:text-violet-500 transition-colors duration-300">
-                    Guaranteed Satisfaction
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
           <div className="w-full h-full lg:w-1/2">
             <Image
               src="/assets/images/roof_work.jpg"
@@ -402,14 +251,165 @@ const Home = () => {
               priority
               width={600}
               height={600}
-              className="w-full h-full object-cover rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+              className="w-full h-full object-cover rounded-xl hover:scale-105 transition-all duration-300"
             />
+          </div>
+
+          <div className="w-full h-full lg:w-1/2 text-left">
+            <SectionBadge>About Us</SectionBadge>
+
+            <div className="space-y-7 mt-4">
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Trusted Professionals for Your Home Services
+              </h2>
+
+              <p className="text-gray-600">
+                Finding reliable professionals for your home services has never
+                been easier. Our team of skilled experts is committed to
+                delivering top-quality solutions tailored to your needs.
+              </p>
+
+              <div className="flex flex-col lg:flex-row gap-4 lg:gap-20 lg:pl-2 items-start">
+                <div>
+                  <ul className="list-inside space-y-4">
+                    <li className="flex items-center gap-4 hover:text-[#5f60b9] transition-colors duration-300">
+                      <CircleCheckBig className="text-[#5f60b9] size-4" />
+                      Trusted Professionals
+                    </li>
+                    <li className="flex items-center gap-4 hover:text-[#5f60b9] transition-colors duration-300">
+                      <CircleCheckBig className="text-[#5f60b9] size-4" />
+                      Seamless Booking
+                    </li>
+                    <li className="flex items-center gap-4 hover:text-[#5f60b9] transition-colors duration-300">
+                      <CircleCheckBig className="text-[#5f60b9] size-4" />
+                      Customizable Solutions
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <ul className="list-inside space-y-4">
+                    <li className="flex items-center gap-4 hover:text-[#5f60b9] transition-colors duration-300">
+                      <CircleCheckBig className="text-[#5f60b9] size-4" />
+                      Experienced Experts
+                    </li>
+                    <li className="flex items-center gap-4 hover:text-[#5f60b9] transition-colors duration-300">
+                      <CircleCheckBig className="text-[#5f60b9] size-4" />
+                      24/7 Availability
+                    </li>
+                    <li className="flex items-center gap-4 hover:text-[#5f60b9] transition-colors duration-300">
+                      <CircleCheckBig className="text-[#5f60b9] size-4" />
+                      Guaranteed Satisfaction
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <Link href="/about" className="block mt-10 lg:mt-12">
+              <AnimatedButton icon={ArrowRight} title="About us" />
+            </Link>
+          </div>
+        </motion.div>
+      </PageSection>
+
+      {/* Services Section */}
+      <section className="bg-gray-100 pt-20 pb-14 px-4 items-center justify-center">
+        <div className="max-w-7xl mx-auto px-5 lg:px-0">
+          {/* First Row: Display 3 cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <SectionBadge>What We Do</SectionBadge>
+
+            <div className="flex items-center justify-between mt-4">
+              <h2 className="text-3xl md:text-4xl font-bold">Our Services</h2>
+
+              <Link href="/services">
+                <AnimatedButton title="Explore More" />
+              </Link>
+            </div>
+
+            <p className="text-gray-600 mt-2">
+              We always deliver a wide range of high quality services at
+              affordable prices.
+            </p>
+
+            <div className="mx-auto max-w-xs md:max-w-xl lg:max-w-5xl xl:max-w-7xl mt-8 md:mt-2">
+              <Carousel>
+                <CarouselContent>
+                  {categories.slice(0, 10).map((serv, index) => (
+                    <CarouselItem
+                      key={index}
+                      className="md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
+                    >
+                      <ServiceCard
+                        key={index}
+                        name={serv.name}
+                        icon={serv.icon_url}
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Steps Section */}
+      <PageSection className="bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA] py-12">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="w-full text-center space-y-16"
+        >
+          <div className="space-y-5">
+            <SectionBadge>How It Works</SectionBadge>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+              How does <span className="text-[#5f60b9]">QProz</span> work?
+            </h2>
+          </div>
+
+          <div className="relative w-full px-4">
+            <ul className="relative z-10 flex flex-col items-center lg:flex-row md:justify-center">
+              {steps.map((step, idx) => (
+                <React.Fragment key={idx}>
+                  {/* Step item */}
+                  <li className="flex-none flex flex-col items-center text-center space-y-4">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: idx * 0.2 }}
+                      className="p-4 bg-indigo-100 rounded-full"
+                    >
+                      {step.icon}
+                    </motion.div>
+                    <h3 className="font-bold text-xl text-gray-900">
+                      {step.title}
+                    </h3>
+                    <p className="text-gray-600 max-w-xs">{step.description}</p>
+                  </li>
+
+                  {/* Connector: vertical on mobile, horizontal on md+ */}
+                  {idx < steps.length - 1 && (
+                    <div
+                      className={`flex-none border-dashed border-indigo-600/50 border-l-2 h-12 w-0 my-4 lg:border-l-0 lg:border-t-2 lg:h-0 lg:w-24 lg:mx-4 lg:my-0`}
+                    />
+                  )}
+                </React.Fragment>
+              ))}
+            </ul>
           </div>
         </motion.div>
       </PageSection>
 
       {/* CTA Section */}
-      <motion.section className="text-center flex justify-center  bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-16 md:px-16">
+      <motion.section className="text-center flex justify-center bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-20 md:px-16">
         <div className="flex flex-col lg:flex-row justify-between items-center max-w-7xl">
           <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
             <Image
@@ -427,11 +427,12 @@ const Home = () => {
             transition={{ duration: 0.8 }}
             className="w-full lg:w-1/2 lg:ml-24 -mr-10"
           >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-left text-gray-900 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-left text-gray-900 leading-tight">
               Download the <br />
               mobile app today!
             </h2>
-            <p className="text-lg text-left pr-10 md:text-xl tracking-tight text-gray-600 mb-6 leading-relaxed">
+
+            <p className="text-left pr-10 tracking-tight text-gray-600 mb-6 leading-relaxed">
               Experience seamless services at your fingertips. Get instant
               access, connect with top professionals, and manage everything
               effortlessly—all in one place.

@@ -4,7 +4,7 @@ const ServiceCard = ({ name, icon }) => {
   return (
     <div className="w-full mx-auto bg-transparent group perspective-1000 p-1">
       <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 gap-4 backface-hidden overflow-hidden">
-        <div className="relative h-64 max-w-64 aspect-square overflow-hidden rounded-xl">
+        <div className="relative h-64 max-w-[234px] aspect-square overflow-hidden rounded-lg">
           {icon && (
             <img
               src={process.env.NEXT_PUBLIC_API_ENDPOINT + icon}
