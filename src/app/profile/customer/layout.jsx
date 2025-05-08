@@ -130,11 +130,11 @@ const layout = ({ children }) => {
       />
       <div>
         <div className="flex">
-          <div className="fixed left-0 top-0 h-full w-64">
+          <div className="fixed left-0 top-0 h-full">
             <ProfileSidebar handleUserLogout={handleLogout} />
           </div>
 
-          <div className="flex-1 ml-72 bg-gray-50 py-6 flex flex-col items-center space-y-10">
+          <div className="flex-1 ml-[370px] bg-gray-50 py-6 flex flex-col items-center gap-10">
             <ProfileHeader />
 
             {React.Children.map(children, (child) =>

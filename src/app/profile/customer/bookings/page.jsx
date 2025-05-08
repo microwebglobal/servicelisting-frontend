@@ -33,13 +33,18 @@ const Page = () => {
     : bookingData;
 
   return (
-    <div className="min-h-screen ml-20 bg-gray-50">
+    <div className="min-h-screen w-full max-w-5xl">
+      <BookingStatus
+        selectedStatus={selectedStatus}
+        onStatusChange={setSelectedStatus}
+      />
+
       {!selectedBooking ? (
-        <div className="mt-8">
+        <div>
           {/* Main Content */}
-          <main className="flex-1 p-6 md:p-8">
+          <div className="flex-1 p-6 md:p-8">
             {filteredBookings.length > 0 ? (
-              <div className="max-w-4xl mx-auto space-y-6">
+              <div className="space-y-6">
                 {filteredBookings.map((booking, index) => (
                   <BookingCard
                     key={booking.booking_id || index}
@@ -50,13 +55,13 @@ const Page = () => {
                 ))}
               </div>
             ) : (
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center mt-10">
                 <p className="text-xl font-semibold text-gray-600">
                   No Bookings...
                 </p>
               </div>
             )}
-          </main>
+          </div>
         </div>
       ) : (
         // Booking Details View

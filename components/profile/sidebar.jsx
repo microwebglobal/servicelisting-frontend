@@ -84,7 +84,7 @@ const ProfileSidebar = ({ handleUserLogout }) => {
   }
 
   return (
-    <aside className="w-full md:w-96 bg-white p-6 border-r border-gray-200 overflow-y-auto h-screen">
+    <aside className="w-full max-w-[360px] bg-white p-6 border-r border-gray-200 overflow-y-auto h-screen">
       <div className="space-y-6">
         {/* Profile Photo Section */}
         <div className="flex items-center gap-5">
