@@ -11,7 +11,6 @@ import "swiper/css/navigation";
 import {
   ArrowRight,
   Calendar,
-  Check,
   CircleCheckBig,
   ListChecks,
   ShieldCheck,
@@ -100,7 +99,7 @@ const Home = () => {
         {/* Hero Section */}
         <section className="relative pb-28 pt-24 lg:pb-32 lg:pt-[9.5rem] flex flex-col justify-center items-center text-white overflow-hidden">
           {/* Background Image Slider */}
-          <div className="absolute inset-0 -z-10 w-full h-full">
+          <div className="absolute inset-0 w-full h-full">
             <Swiper
               modules={[Autoplay, Pagination]}
               spaceBetween={0}
@@ -199,7 +198,7 @@ const Home = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white/90 shadow-md"
+            className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white/90 shadow-md z-10"
           >
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-blue-600 text-sm sm:text-base md:text-lg px-4 sm:px-8 max-w-7xl mx-auto">
               <div className="flex flex-col items-center space-y-1">
