@@ -87,8 +87,8 @@ const ProfileSidebar = ({ handleUserLogout }) => {
     <aside className="w-full md:w-96 bg-white p-6 border-r border-gray-200 overflow-y-auto h-screen">
       <div className="space-y-6">
         {/* Profile Photo Section */}
-        <div className="text-center">
-          <div className="relative w-32 h-32 mx-auto">
+        <div className="flex items-center gap-5">
+          <div className="relative w-28 h-28">
             <Image
               src={userData.photo || "/assets/images/def_pro.webp"}
               alt={userData.name}
@@ -105,8 +105,11 @@ const ProfileSidebar = ({ handleUserLogout }) => {
               />
             </label>
           </div>
-          <h2 className="mt-4 text-xl font-semibold">{userData.name}</h2>
-          <p className="text-gray-500">{userData.email}</p>
+
+          <div>
+            <h2 className="text-xl font-semibold">{userData.name}</h2>
+            <p className="text-gray-500">{userData.email}</p>
+          </div>
         </div>
 
         {/* Profile Form */}
@@ -152,11 +155,10 @@ const ProfileSidebar = ({ handleUserLogout }) => {
 
         {/* Logout Button */}
         <Button
-          variant="destructive"
-          className="w-full"
+          className="w-full bg-red-300/20 text-destructive hover:bg-destructive hover:text-white"
           onClick={() => handleLogout()}
         >
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="h-4 w-4" />
           Logout
         </Button>
       </div>

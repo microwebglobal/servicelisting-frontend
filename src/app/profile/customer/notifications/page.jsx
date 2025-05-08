@@ -179,11 +179,7 @@ const Page = ({ currentOtp }) => {
   };
 
   return (
-    <div className="ml-24 p-6">
-      <h1 className="text-3xl font-semibold text-gray-900 mb-4">
-        Notifications
-      </h1>
-
+    <div>
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <select
           value={typeFilter}
@@ -267,6 +263,7 @@ const Page = ({ currentOtp }) => {
           ))
         )}
       </div>
+
       <NotificationSettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

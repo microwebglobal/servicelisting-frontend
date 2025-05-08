@@ -10,6 +10,7 @@ import {
   ProfileRefreshProvider,
   useProfileRefresh,
 } from "@src/context/ProfileRefreshContext";
+import ProfileHeader from "@/components/profile/ProfileHeader";
 
 // Child component to use useProfileRefresh within provider
 const SocketHandler = ({ setCurrentOtp, socket, user, router }) => {
@@ -133,7 +134,9 @@ const layout = ({ children }) => {
             <ProfileSidebar handleUserLogout={handleLogout} />
           </div>
 
-          <div className="flex-1 ml-72">
+          <div className="flex-1 ml-72 bg-gray-50 py-6 flex flex-col items-center space-y-10">
+            <ProfileHeader />
+
             {React.Children.map(children, (child) =>
               cloneElement(child, { currentOtp })
             )}
