@@ -5,6 +5,15 @@ import { useRouter } from "next/navigation";
 import { LoginAPI } from "@/api/login";
 import { useAuth } from "@src/context/AuthContext";
 import { InputOtp } from "@heroui/react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
+import { FaWhatsapp } from "react-icons/fa";
+import { MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const CustomerLogin = () => {
   const [step, setStep] = useState(1);
@@ -13,6 +22,7 @@ const CustomerLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(120);
+  const [selectedMethod, setSelectedMethod] = useState("mobile");
   const { login } = useAuth();
   const router = useRouter();
 
@@ -43,7 +53,10 @@ const CustomerLogin = () => {
       setIsLoading(true);
       setError("");
 
-      const response = await LoginAPI.customerLoginSendOTP(mobile);
+      const response = await LoginAPI.customerLoginSendOTP(
+        mobile,
+        selectedMethod
+      );
       if (response.data.success) {
         setStep(2);
       }
@@ -88,24 +101,7 @@ const CustomerLogin = () => {
           />
         </div>
 
-        {/* Text Section */}
-        {/* <div className="w-full lg:w-1/2 text-center lg:text-left flex flex-col justify-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            We will be available soon...
-          </h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
-            Our team is working hard to bring you an amazing experience. Stay
-            tuned for updates and exciting features coming your way!
-          </p>
-          <p className="mt-5 text-sm text-gray-500">
-            If you have any questions, feel free to contact us at{" "}
-            <span className="font-semibold text-indigo-500">
-              support@qproz.com
-            </span>
-          </p>
-        </div> */}
-
-        <div className="ml-14 w-96">
+        <div className="lg:ml-12 flex flex-col w-full lg:w-2/5">
           <h2 className="text-3xl font-semibold text-center mb-2">
             Welcome Back!
           </h2>
@@ -121,12 +117,53 @@ const CustomerLogin = () => {
               </p>
               <input
                 type="tel"
-                className="w-full px-4 py-2 mb-6 text-gray-700 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 mb-4 text-gray-700 bg-gray-100 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Mobile Number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
                 maxLength={10}
               />
+
+              <div className="mb-6">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 w-full justify-start bg-gray-100 text-gray-600"
+                    >
+                      {selectedMethod === "mobile" ? (
+                        <>
+                          <MessageCircle className="w-4 h-4 text-purple-500" />
+                          Send via SMS
+                        </>
+                      ) : (
+                        <>
+                          <FaWhatsapp className="w-4 h-4 text-green-500" />
+                          Send to WhatsApp
+                        </>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="start" className="w-[200px]">
+                    <DropdownMenuItem
+                      onClick={() => setSelectedMethod("mobile")}
+                      className="flex items-center gap-2"
+                    >
+                      <MessageCircle className="w-4 h-4 text-purple-500" />
+                      SMS
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      onClick={() => setSelectedMethod("whatsapp")}
+                      className="flex items-center gap-2"
+                    >
+                      <FaWhatsapp className="w-4 h-4 text-green-500" />
+                      WhatsApp
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
               <button
                 className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
                 onClick={handleSendOtp}
