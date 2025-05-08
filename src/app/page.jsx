@@ -158,7 +158,7 @@ const Home = () => {
             transition={{ duration: 0.8 }}
             className="z-10 px-6 sm:px-6 md:px-8 lg:px-10 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-28 space-y-8 sm:space-y-10"
           >
-            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
               Find Trusted Professionals <br className="hidden sm:block" /> In
               Just a Click!
             </h1>
