@@ -166,6 +166,7 @@ const BookingDetails = ({ booking }) => {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             Service Provider
           </h3>
+          <p>Booking Otp: {booking.otp}</p>
           <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg">
             <Image
               src={

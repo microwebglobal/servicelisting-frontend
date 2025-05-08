@@ -12,7 +12,7 @@ import AddressManager from "./AddressManager";
 import ProfileForm from "./ProfileForm";
 import { useSocket } from "@src/context/SocketContext";
 
-const ProfileSidebar = () => {
+const ProfileSidebar = ({ handleUserLogout }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
   const router = useRouter();
@@ -45,11 +45,11 @@ const ProfileSidebar = () => {
   };
 
   const handleLogout = () => {
-    logout();
+    handleUserLogout();
     if (socket) {
       socket.disconnect();
     }
-    router.push("/login");
+    router.push("/login/user");
   };
 
   const handlePhotoUpload = async (e) => {

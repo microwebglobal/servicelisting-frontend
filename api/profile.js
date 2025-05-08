@@ -43,4 +43,5 @@ export const profileAPI = {
   deleteNotification: (id) => api.delete(`/notification/${id}`),
   deleteAllNotifications: () => api.delete(`/notification/delete-all`),
   filterNotifications: (params) => api.get("/notification/filter", { params }),
+  getUserNotificationSettings: () => api.get("/notification/settings"),
 };
