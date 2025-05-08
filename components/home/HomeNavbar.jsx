@@ -8,6 +8,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { SiMqtt } from "react-icons/si";
 import Modal from "react-modal";
+import { cn } from "@/lib/utils";
 
 const HomeNavbar = () => {
   const [showLogout, setShowLogout] = useState(false);
@@ -72,9 +73,9 @@ const HomeNavbar = () => {
       <nav
         className={`${
           isScrolled || isMobileMenuOpen
-            ? "bg-[#5f60b9]/95 shadow-md"
+            ? "bg-[#5f60b9] shadow-md"
             : "bg-transparent"
-        } fixed top-0 left-0 w-full z-30 text-white transition-all duration-300 py-6 px-6 md:px-10 flex justify-center`}
+        } fixed top-0 left-0 w-full h-[5rem] z-30 text-white transition-all duration-300 py-6 px-6 md:px-10 flex justify-center`}
       >
         {/* Overlay */}
         {!isScrolled && !isMobileMenuOpen && (
@@ -86,7 +87,9 @@ const HomeNavbar = () => {
           <div className="flex items-center gap-10">
             <div className="font-bold text-xl md:text-3xl -mt-1">
               <Link href="/" className="flex items-center gap-2.5">
-                <SiMqtt className="size-6" />
+                <SiMqtt
+                  className={cn("size-6", { "text-[#5f60b9]": !isScrolled })}
+                />
                 QProz
               </Link>
             </div>
