@@ -121,7 +121,7 @@ const CustomerLogin = () => {
                 placeholder="Mobile Number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
-                maxLength={10}
+                maxLength={12}
               />
 
               <div className="mb-6">
@@ -167,7 +167,9 @@ const CustomerLogin = () => {
               <button
                 className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
                 onClick={handleSendOtp}
-                disabled={isLoading || mobile.length !== 10}
+                disabled={
+                  isLoading || !(mobile.length === 10 || mobile.length === 12)
+                }
               >
                 {isLoading ? "Sending..." : "Send OTP"}
               </button>
