@@ -97,7 +97,7 @@ const Page = ({ params }) => {
 
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-md mx-4">
           <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-center p-6">
@@ -128,7 +128,7 @@ const Page = ({ params }) => {
           )}
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
