@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { SiMqtt } from "react-icons/si";
 import { cn } from "@/lib/utils";
 import UserProfileMenu from "../layout/UserProfile";
+import Image from "next/image";
 
 const HomeNavbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -81,6 +82,13 @@ const HomeNavbar = () => {
                 className={cn("size-6", { "text-[#5f60b9]": !isScrolled })}
               />
               QProz
+              {/* <div className="relative w-28 h-28 -mr-10">
+                <Image
+                  src="/assets/images/brand-logo.png"
+                  alt="QProz Logo"
+                  fill
+                />
+              </div> */}
             </Link>
           </div>
 
