@@ -82,9 +82,9 @@ const HomeNavbar = () => {
                 className={cn("size-6", { "text-[#5f60b9]": !isScrolled })}
               />
               QProz
-              {/* <div className="relative w-28 h-28 -mr-10">
+              {/* <div className="relative w-14 h-14">
                 <Image
-                  src="/assets/images/brand-logo.png"
+                  src="/assets/images/brand-logo.jpg"
                   alt="QProz Logo"
                   fill
                 />
