@@ -7,9 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import Modal from "react-modal";
+import UserProfileMenu from "./UserProfile";
 
 const Navbar = () => {
-  const [showLogout, setShowLogout] = useState(false);
   const { logout } = useAuth();
   const [isLoggedInState, setIsLoggedInState] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -36,16 +36,6 @@ const Navbar = () => {
   const getUserInfo = () => {
     const userInfo = JSON.parse(localStorage.getItem("user"));
     return userInfo ? userInfo : null;
-  };
-
-  const handleNavigate = () => {
-    const userInfo = getUserInfo();
-    if (userInfo?.role === "customer") {
-      router.push("/profile/customer");
-    } else if (userInfo?.role === "admin") {
-      router.push("/admin");
-    }
-    setIsMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -112,27 +102,7 @@ const Navbar = () => {
                 </button>
               </Link>
             ) : (
-              <div
-                className="relative p-2"
-                onMouseEnter={() => setShowLogout(true)}
-                onMouseLeave={() => setShowLogout(false)}
-              >
-                <div
-                  className="rounded-full w-10 h-10 bg-gray-200 flex items-center justify-center cursor-pointer"
-                  onClick={handleNavigate}
-                ></div>
-                {showLogout && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="absolute top-12 right-0 bg-gray-800 text-white p-2 rounded-md cursor-pointer"
-                    onClick={() => setConfirmLogout(true)}
-                  >
-                    Logout
-                  </motion.div>
-                )}
-              </div>
+              <UserProfileMenu user={getUserInfo()} onLogout={handleLogout} />
             )}
           </div>
 
@@ -187,27 +157,7 @@ const Navbar = () => {
                   </button>
                 </Link>
               ) : (
-                <div
-                  className="relative p-2"
-                  onMouseEnter={() => setShowLogout(true)}
-                  onMouseLeave={() => setShowLogout(false)}
-                >
-                  <div
-                    className="rounded-full w-10 h-10 bg-gray-200 flex items-center justify-center cursor-pointer"
-                    onClick={handleNavigate}
-                  ></div>
-                  {showLogout && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute top-12 right-0 bg-gray-800 text-white p-2 rounded-md cursor-pointer"
-                      onClick={() => setConfirmLogout(true)}
-                    >
-                      Logout
-                    </motion.div>
-                  )}
-                </div>
+                <UserProfileMenu user={getUserInfo()} onLogout={handleLogout} />
               )}
             </motion.div>
           )}

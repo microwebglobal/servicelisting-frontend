@@ -31,8 +31,8 @@ import Link from "next/link";
 import PageSection from "@/components/PageSection";
 import AnimatedButton from "@/components/home/AnimatedButton";
 import SectionBadge from "@/components/home/SectionBadge";
-import Footer from "@/components/Footer";
-import HomeNavbar from "@/components/home/HomeNavbar";
+import Footer from "@/components/layout/Footer";
+import HomeNavbar from "@/components/layout/HomeNavbar";
 
 const Home = () => {
   const [categories, setCategories] = useState([]);

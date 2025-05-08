@@ -1,6 +1,6 @@
 import LocationInitializer from "@/components/LocationInitializer";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
 import { cookies } from "next/headers";
 
 export default async function HomeLayout({ children }) {

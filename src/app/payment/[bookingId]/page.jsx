@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CreditCard, Wallet, Loader2, AlertCircleIcon } from "lucide-react";
 import PaymentSuccess from "@components/PaymentSuccess";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/layout/Navbar";
 
 const formatCurrency = (value) => {
   const num = typeof value === "string" ? parseFloat(value) : value;

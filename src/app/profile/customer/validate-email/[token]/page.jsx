@@ -5,8 +5,8 @@ import { profileAPI } from "@api/profile";
 import { Button } from "@components/ui/button";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
-import Footer from "@components/Footer";
-import Navbar from "@components/Navbar";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
 
 const Page = ({ params }) => {
   const [token, setToken] = useState(null);

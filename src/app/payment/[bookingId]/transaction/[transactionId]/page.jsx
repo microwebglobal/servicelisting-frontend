@@ -3,7 +3,7 @@ import { cartService } from "@/api/cartService";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/layout/Navbar";
 
 const TransactionPage = ({ params }) => {
   const { bookingId, transactionId } = params;
