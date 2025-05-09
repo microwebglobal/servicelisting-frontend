@@ -1,7 +1,6 @@
 "use client";
 import { profileAPI } from "@/api/profile";
 import React, { useEffect, useState } from "react";
-import { useNotification } from "@/src/context/ProfileRefreshContext";
 
 const Page = () => {
   const [notifications, setNotifications] = useState([]);
