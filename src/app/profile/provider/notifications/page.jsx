@@ -1,16 +1,18 @@
 "use client";
 import { profileAPI } from "@/api/profile";
 import React, { useEffect, useState } from "react";
+import { useNotification } from "@/src/context/ProfileRefreshContext";
 
 const Page = () => {
   const [notifications, setNotifications] = useState([]);
   const [typeFilter, setTypeFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { isRefresh } = useNotification();
 
   useEffect(() => {
     getUserNotifications();
-  }, [typeFilter]);
+  }, [typeFilter, isRefresh]);
 
   const getUserNotifications = async () => {
     try {

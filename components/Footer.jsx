@@ -6,7 +6,7 @@ import { FaFacebook, FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="text-white py-10 lg:py-16 px-6 bg-[#5f60b9] mt-auto">
+    <footer className="text-white pt-10 pb-6 lg:pt-16 lg:pb-12 px-6 bg-[#5f60b9] mt-auto">
       <div className="container grid grid-cols-1 lg:grid-cols-3 gap-14 lg:gap-20 items-start max-w-7xl mx-auto">
         {/* Left Section */}
         <motion.div
@@ -15,12 +15,14 @@ const Footer = () => {
           transition={{ duration: 1 }}
           className="md:col-span-1"
         >
-          <h2 className="text-xl font-bold">QProz</h2>
+          <h1 className="text-3xl font-bold">QProz</h1>
+
           <p className="text-gray-300 mt-4">
             Your trusted partner for seamless and efficient solutions. We
             specialize in delivering high-quality services tailored to your
             needs.
           </p>
+
           <div className="mt-4 flex gap-4 text-2xl">
             {[FaFacebook, FaLinkedin, FaInstagram, FaTwitter, BiWorld].map(
               (Icon, index) => (
@@ -75,7 +77,7 @@ const Footer = () => {
               transition={{ duration: 1, delay: 0.3 * (index + 1) }}
             >
               <h2 className="text-xl font-bold">{section.title}</h2>
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-4 space-y-2 text-gray-300">
                 {section.items.map((item, i) => (
                   <li
                     key={i}
@@ -94,7 +96,7 @@ const Footer = () => {
 
       {/* Footer Bottom */}
       <motion.div
-        className="mt-10 text-gray-400 text-sm text-center"
+        className="mt-14 text-gray-300 text-sm text-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.2 }}

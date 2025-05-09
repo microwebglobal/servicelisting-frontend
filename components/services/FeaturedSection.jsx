@@ -9,56 +9,32 @@ import {
 } from "../ui/carousel";
 import { Bookmark } from "lucide-react";
 import FeaturedCard from "@/components/ui/featuredCard";
+import { serviceAPI } from "@/api/services";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-const data = [
-  {
-    imageSrc: "/assets/images/hair_clean.png",
-    numberOfReviews: "123",
-    price: "5000",
-    title: "Hair Treatments",
-    rating: 4.5,
-    providerName: "Wiz Salon",
-    providerAvatar: "/assets/images/hair_clean.png",
-  },
-  {
-    imageSrc: "/assets/images/herobg-2.jpg",
-    numberOfReviews: "1392",
-    price: "2000",
-    title: "Home Repair Service",
-    rating: 4,
-    providerName: "Abc Home Services",
-    providerAvatar: "/assets/images/hair_clean.png",
-  },
-  {
-    imageSrc: "/assets/images/herobg-3.jpg",
-    numberOfReviews: "453",
-    price: "3000",
-    title: "Plumbing Services",
-    rating: 3.5,
-    providerName: "XYZ Plumbing",
-    providerAvatar: "/assets/images/hair_clean.png",
-  },
-  {
-    imageSrc: "/assets/images/herobg-4.jpg",
-    numberOfReviews: "673",
-    price: "8000",
-    title: "Home Cleaning",
-    rating: 4.5,
-    providerName: "Cleaners Company",
-    providerAvatar: "/assets/images/hair_clean.png",
-  },
-  {
-    imageSrc: "/assets/images/herobg-5.jpg",
-    numberOfReviews: "123",
-    price: "300",
-    title: "Salon Services",
-    rating: 4.5,
-    providerName: "Wiz Salon",
-    providerAvatar: "/assets/images/hair_clean.png",
-  },
-];
+export default function FeaturedSection({ city }) {
+  const [data, setData] = useState();
 
-export default function FeaturedSection() {
+  useEffect(() => {
+    if (city !== "" && city !== "unknown") {
+      fetchFeaturedServices(city);
+    }
+  }, [city]);
+
+  const fetchFeaturedServices = async (city) => {
+    try {
+      const response = await serviceAPI.getFeaturedServices(city);
+      setData(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  if (!data || data.length === 0) {
+    return null;
+  }
+
   return (
     <div className="space-y-8 md:space-y-10">
       <div className="flex justify-between items-center">
@@ -92,21 +68,28 @@ export default function FeaturedSection() {
         className="w-full"
       >
         <CarouselContent className="flex gap-5 scroll-snap-x scroll-snap-mandatory">
-          {data.map((item, index) => (
+          {data?.map((item, index) => (
             <CarouselItem
               key={index}
               className="!w-[260px] basis-[260px] shrink-0 scroll-snap-start"
             >
               <div className="p-1">
-                <FeaturedCard
-                  imageSrc={item.imageSrc}
-                  badgeText={item.numberOfReviews}
-                  price={item.price}
-                  title={item.title}
-                  rating={item.rating}
-                  providerName={item.providerName}
-                  providerAvatar={item.providerAvatar}
-                />
+                <Link
+                  href={`/services/${city}/${item.full_url}?itemId=${item.item_id}&serviceId=${item.service_id}`}
+                >
+                  <FeaturedCard
+                    imageSrc={
+                      process.env.NEXT_PUBLIC_API_ENDPOINT + item.icon_url
+                    }
+                    badgeText={item.numberOfReviews}
+                    price={item.base_price}
+                    title={item.name}
+                    rating={item.rating}
+                    providerName={item.providerName}
+                    providerAvatar={item.providerAvatar}
+                    description={item.description}
+                  />
+                </Link>
               </div>
             </CarouselItem>
           ))}

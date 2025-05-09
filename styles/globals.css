@@ -38,6 +38,10 @@ nextjs-portal {
   padding: 10px;
 }
 
+body {
+  overflow-y: auto !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

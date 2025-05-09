@@ -6,16 +6,51 @@ import { useAuth } from "@src/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { SiMqtt } from "react-icons/si";
 import Modal from "react-modal";
 
-const Navbar = () => {
+const HomeNavbar = () => {
   const [showLogout, setShowLogout] = useState(false);
-  const { logout } = useAuth();
-  const [isLoggedInState, setIsLoggedInState] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedInState, setIsLoggedInState] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const router = useRouter();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const { logout } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll);
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const getUserInfo = () => {
+    try {
+      return JSON.parse(localStorage.getItem("user") ?? "null");
+    } catch {
+      return null;
+    }
+  };
+
+  const handleNavigate = () => {
+    const user = getUserInfo();
+    if (user?.role === "customer") router.push("/profile/customer");
+    else if (user?.role === "admin") router.push("/admin");
+    setIsMobileMenuOpen(false);
+  };
+
+  useEffect(() => {
+    setIsLoggedInState(!!getUserInfo());
+  }, []);
+
+  useEffect(() => {
+    const closeMenuOnRoute = () => setIsMobileMenuOpen(false);
+    router.events?.on("routeChangeComplete", closeMenuOnRoute);
+    return () => router.events?.off("routeChangeComplete", closeMenuOnRoute);
+  }, [router]);
 
   const handleLogout = () => {
     logout();
@@ -26,63 +61,39 @@ const Navbar = () => {
       variant: "destructive",
     });
     setConfirmLogout(false);
-
     setTimeout(() => {
       router.push("/");
-      window.location.reload(); // Refresh the page after logout
+      window.location.reload();
     }, 2000);
   };
 
-  const getUserInfo = () => {
-    const userInfo = JSON.parse(localStorage.getItem("user"));
-    return userInfo ? userInfo : null;
-  };
-
-  const handleNavigate = () => {
-    const userInfo = getUserInfo();
-    if (userInfo?.role === "customer") {
-      router.push("/profile/customer");
-    } else if (userInfo?.role === "admin") {
-      router.push("/admin");
-    }
-    setIsMobileMenuOpen(false);
-  };
-
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const userInfo = getUserInfo();
-      setIsLoggedInState(!!userInfo);
-    };
-    checkLoginStatus();
-  }, []);
-
-  useEffect(() => {
-    const handleRouteChange = () => setIsMobileMenuOpen(false);
-    router.events?.on("routeChangeComplete", handleRouteChange);
-    return () => {
-      router.events?.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router]);
-
   return (
     <>
-      <nav className="bg-[#5f60b9] text-white h-16 lg:h-20 py-4 px-6 md:px-10 fixed w-full z-20 flex justify-center">
-        {/* Container */}
-        <div className="flex items-center justify-between w-full max-w-7xl">
+      <nav
+        className={`${
+          isScrolled || isMobileMenuOpen
+            ? "bg-[#5f60b9]/95 shadow-md"
+            : "bg-transparent"
+        } fixed top-0 left-0 w-full z-30 text-white transition-all duration-300 py-6 px-6 md:px-10 flex justify-center`}
+      >
+        {/* Overlay */}
+        {!isScrolled && !isMobileMenuOpen && (
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent pointer-events-none z-0" />
+        )}
+
+        <div className="flex items-center justify-between w-full max-w-7xl z-10">
+          {/* Left - Logo + Nav Links */}
           <div className="flex items-center gap-10">
-            {/* Logo (Left Side) */}
             <div className="font-bold text-xl md:text-3xl -mt-1">
-              <Link href="/">QProz</Link>
+              <Link href="/" className="flex items-center gap-2.5">
+                <SiMqtt className="size-6" />
+                QProz
+              </Link>
             </div>
 
-            {/* Navigation Links (Centered) */}
             <div className="hidden md:flex items-center gap-6">
-              {["Home", "About", "Services", "Contact"].map((item, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+              {["Home", "About", "Services", "Contact"].map((item) => (
+                <motion.div key={item} whileHover={{ scale: 1.1 }}>
                   <Link
                     href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
                     className="font-semibold"
@@ -94,12 +105,11 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Authentication / Registration Buttons (Right Side) */}
           <div className="hidden md:flex items-center gap-4">
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <motion.div whileHover={{ scale: 1.1 }}>
               <Link
                 href="/registration/provider"
-                className="text-white border-2 border-white px-4 py-1 rounded-lg font-semibold"
+                className="border-2 border-white px-4 py-1 rounded-lg font-semibold"
               >
                 Register as Professional
               </Link>
@@ -125,7 +135,7 @@ const Navbar = () => {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.2 }}
                     className="absolute top-12 right-0 bg-gray-800 text-white p-2 rounded-md cursor-pointer"
                     onClick={() => setConfirmLogout(true)}
                   >
@@ -136,42 +146,35 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Toggle */}
           <button
             className="md:hidden text-white text-2xl"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
           >
             {isMobileMenuOpen ? <FiX /> : <FiMenu />}
           </button>
 
-          {/* Mobile Dropdown Menu */}
+          {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden bg-[#5f60b9] text-white absolute top-14 left-0 w-full shadow-lg p-5 flex flex-col gap-4"
+              className="absolute top-14 left-0 w-full p-5 flex flex-col gap-4 md:hidden bg-[#5f60b9] text-white shadow-lg"
             >
-              {["Home", "About", "Services", "Contact"].map((item, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+              {["Home", "About", "Services", "Contact"].map((item) => (
+                <motion.div key={item} whileHover={{ scale: 1.1 }}>
                   <Link
                     href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                    className="block py-2"
+                    className="block py-2 font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item}
                   </Link>
                 </motion.div>
               ))}
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <motion.div whileHover={{ scale: 1.1 }}>
                 <Link
                   href="/registration/provider"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -200,7 +203,6 @@ const Navbar = () => {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
                       className="absolute top-12 right-0 bg-gray-800 text-white p-2 rounded-md cursor-pointer"
                       onClick={() => setConfirmLogout(true)}
                     >
@@ -220,7 +222,7 @@ const Navbar = () => {
         onRequestClose={() => setConfirmLogout(false)}
         ariaHideApp={false}
         className="m-10 bg-white p-6 rounded-lg shadow-xl w-96 max-w-lg"
-        overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-sm z-50"
+        overlayClassName="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50"
       >
         <div className="space-y-4">
           <p className="text-lg font-semibold">
@@ -246,4 +248,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default HomeNavbar;

@@ -2,19 +2,27 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import Image from "next/image";
 
 const ContactPage = () => {
   return (
     <div className="bg-gray-50 text-gray-900">
       {/* Hero Section with Background Image */}
       <section
-        className="relative bg-cover bg-center text-white text-center py-28 px-6"
+        className="relative bg-cover bg-center text-white text-center py-36 px-6"
         style={{
           backgroundImage: "url('/assets/images/contact-us.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
+        <Image
+          src="/assets/images/contact-us.jpg"
+          alt="Contact Us"
+          fill
+          className="object-cover"
+        />
+
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         <motion.h1
           initial={{ opacity: 0, y: -50 }}

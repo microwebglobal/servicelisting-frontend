@@ -140,6 +140,7 @@ export function BookingPage({
             <BookingForm
               onBookingSubmit={handleBookingSubmit}
               city={cityName}
+              selectedItems={selectedItems}
               loading={loading}
             />
           </div>

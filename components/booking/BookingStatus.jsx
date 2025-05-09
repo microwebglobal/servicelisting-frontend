@@ -13,15 +13,14 @@ const statuses = [
 
 const BookingStatus = ({ onStatusChange }) => {
   return (
-    <div className="rounded-lg border px-5 pb-8 mt-8">
+    <div className=" gap-3 mt-8 flex">
       {statuses.map((status) => (
         <button
           key={status.value}
           onClick={() => onStatusChange(status.value)}
-          className="w-full bg-indigo-500 hover:bg-indigo-600 transition-colors text-white py-3 mt-4 rounded-lg flex items-center justify-between px-4"
+          className="w-full bg-indigo-500 hover:bg-indigo-600 transition-colors text-white py-1 mt-4 rounded-lg flex items-center justify-between px-2"
         >
           <span className="font-medium">{status.name}</span>
-          <ArrowForwardIosSharp className="w-4 h-4" />
         </button>
       ))}
     </div>

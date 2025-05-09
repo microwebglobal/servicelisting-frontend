@@ -1,4 +1,3 @@
-import { get } from "react-hook-form";
 import { api } from "../utils/api";
 
 export const serviceAPI = {
@@ -65,6 +64,7 @@ export const serviceAPI = {
     }),
   updateService: (id, data) => api.put(`/services/${id}`, data),
   deleteService: (id) => api.delete(`/services/${id}`),
+  getFeaturedServices: (city) => api.get(`/city/${city}/featured-items`),
 
   // Service Items
   createServiceItem: (data) => api.post("/items", data),

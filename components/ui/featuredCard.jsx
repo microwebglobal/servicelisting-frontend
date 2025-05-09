@@ -50,7 +50,9 @@ const FeaturedCard = ({
       {/* Content Section */}
       <div className="p-4 h-full bg-muted/50">
         <h3 className="text-sm font-semibold text-gray-800 mb-2">{title}</h3>
-        <p className="text-lg text-gray-600 mb-1 line-clamp-2">{description}</p>
+        <p className="text-sm text-muted-foreground mb-1 line-clamp-2">
+          {description}
+        </p>
 
         {rating && (
           <div className="flex items-center gap-3 mb-6 -ml-1">
