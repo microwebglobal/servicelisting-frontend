@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import UserProfileMenu from "./UserProfile";
+import { SiMqtt } from "react-icons/si";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const { logout } = useAuth();
@@ -52,13 +54,23 @@ const Navbar = () => {
   }, [router]);
 
   return (
-    <nav className="bg-[#5f60b9] text-white h-16 lg:h-20 py-4 px-6 md:px-10 fixed w-full z-20 flex justify-center">
+    <nav className="bg-gradient-to-b from-[#5f60b9] to-[#6f71c9] text-white h-16 lg:h-20 py-4 px-6 md:px-10 fixed w-full z-20 flex justify-center">
       {/* Container */}
       <div className="flex items-center justify-between w-full max-w-7xl">
         <div className="flex items-center gap-10">
           {/* Logo (Left Side) */}
           <div className="font-bold text-xl md:text-3xl -mt-1">
-            <Link href="/">QProz</Link>
+            <Link href="/" className="flex items-center gap-2.5">
+              <SiMqtt />
+              QProz
+              {/* <div className="relative w-14 h-14">
+                <Image
+                  src="/assets/images/brand-logo.jpg"
+                  alt="QProz Logo"
+                  fill
+                />
+              </div> */}
+            </Link>
           </div>
 
           {/* Navigation Links (Centered) */}

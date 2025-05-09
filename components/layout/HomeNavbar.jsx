@@ -63,7 +63,7 @@ const HomeNavbar = () => {
     <nav
       className={`${
         isScrolled || isMobileMenuOpen
-          ? "bg-[#5f60b9] shadow-md"
+          ? "bg-gradient-to-b from-[#5f60b9] to-[#6f71c9] shadow-md"
           : "bg-transparent"
       } fixed top-0 left-0 w-full h-[5rem] z-30 text-white transition-all duration-300 py-6 px-6 md:px-10 flex justify-center`}
     >
