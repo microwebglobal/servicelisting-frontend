@@ -134,7 +134,7 @@ const layout = ({ children }) => {
             <ProfileSidebar handleUserLogout={handleLogout} />
           </div>
 
-          <div className="flex-1 ml-[370px] bg-gray-50 py-6 flex flex-col items-center gap-10">
+          <div className="flex-1 ml-[360px] bg-gray-50 py-6 px-5 flex flex-col items-center gap-10">
             <ProfileHeader />
 
             {React.Children.map(children, (child) =>

@@ -12,8 +12,12 @@ import {
   ArrowRight,
   Calendar,
   CircleCheckBig,
+  Hammer,
+  Layers,
   ListChecks,
   ShieldCheck,
+  Star,
+  Users,
 } from "lucide-react";
 import ServiceCard from "@/components/home/ServiceCard";
 import CountUp from "react-countup";
@@ -69,23 +73,46 @@ const Home = () => {
 
   const steps = [
     {
-      title: "Book Your Service",
+      title: "1. Book Your Service",
       description:
         "Choose from our wide range of services available in your city.",
       icon: <Calendar size={40} className="text-indigo-600" />,
       img: "/assets/images/step1.png",
     },
     {
-      title: "Confirm & Schedule",
+      title: "2. Confirm & Schedule",
       description: "Pick a date and time that works best for you.",
       icon: <ListChecks size={40} className="text-indigo-600" />,
       img: "/assets/images/step2.png",
     },
     {
-      title: "Enjoy & Relax",
+      title: "3. Enjoy & Relax",
       description: "Our professionals will take care of everything for you.",
       icon: <ShieldCheck size={40} className="text-indigo-600" />,
       img: "/assets/images/step3.png",
+    },
+  ];
+
+  const stats = [
+    {
+      icon: <Hammer className="w-6 h-6" />,
+      count: <CountUp start={0} end={2400} duration={2.75} suffix=" +" />,
+      label: "JOBS COMPLETED",
+    },
+    {
+      icon: <Users className="w-6 h-6" />,
+      count: <CountUp start={0} end={52} duration={3.75} suffix=" +" />,
+      label: "EXPERTS",
+    },
+    {
+      icon: <Star className="w-6 h-6" />,
+      count: <CountUp start={0} end={96} duration={2.75} suffix=" %" />,
+      label: "RATED THEIR PRO PERFECT",
+    },
+    {
+      icon: <Layers className="w-6 h-6" />,
+      count: <CountUp start={0} end={32} duration={3.75} suffix=" +" />,
+      label: "SERVICE CATEGORIES",
     },
   ];
 
@@ -193,44 +220,25 @@ const Home = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="absolute bottom-0 w-full py-6 sm:py-8 md:py-10 bg-white/90 shadow-md z-10"
+          className="absolute bottom-0 w-full py-8 bg-white/90 shadow-md z-10"
         >
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-blue-600 text-sm sm:text-base md:text-lg px-4 sm:px-8 max-w-7xl mx-auto">
-            <div className="flex flex-col items-center space-y-1">
-              <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
-                <CountUp start={0} end={2400} duration={2.75} suffix=" +" />
-              </span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 px-4 sm:px-8 max-w-7xl mx-auto text-[#5f60b9]">
+            {stats.map((stat, index) => (
+              <div key={index} className="flex items-center gap-6">
+                <div className="size-12 sm:size-16 aspect-square flex items-center justify-center bg-[#5f60b9]/10 rounded-full">
+                  {stat.icon}
+                </div>
 
-              <p className="text-xs sm:text-sm text-primary">JOBS COMPLETED</p>
-            </div>
-
-            <div className="flex flex-col items-center space-y-1">
-              <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
-                <CountUp start={0} end={52} duration={3.75} suffix=" +" />
-              </span>
-
-              <p className="text-xs sm:text-sm text-primary">EXPERTS</p>
-            </div>
-
-            <div className="flex flex-col items-center space-y-1">
-              <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
-                <CountUp start={0} end={96} duration={2.75} suffix=" %" />
-              </span>
-
-              <p className="text-xs sm:text-sm text-primary">
-                RATED THEIR PRO PERFECT
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center space-y-1">
-              <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
-                <CountUp start={0} end={32} duration={3.75} suffix=" +" />
-              </span>
-
-              <p className="text-xs sm:text-sm text-primary">
-                SERVICE CATEGORIES
-              </p>
-            </div>
+                <div className="flex flex-col space-y-1">
+                  <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
+                    {stat.count}
+                  </span>
+                  <p className="text-xs sm:text-sm text-primary">
+                    {stat.label}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
       </section>
@@ -312,7 +320,7 @@ const Home = () => {
       </PageSection>
 
       {/* Services Section */}
-      <section className="bg-gray-100 pt-20 pb-14 px-4 items-center justify-center">
+      <section className="bg-gray-100 pt-20 pb-12 px-4 items-center justify-center">
         <div className="max-w-7xl mx-auto px-5 lg:px-0">
           {/* First Row: Display 3 cards */}
           <motion.div
@@ -320,40 +328,45 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <SectionBadge>What We Do</SectionBadge>
+            <div className="flex flex-col sm:flex-row gap-6 sm:gap-24 justify-between">
+              <div className="sm:w-1/2">
+                <SectionBadge>What We Do</SectionBadge>
 
-            <div className="flex items-center justify-between mt-4">
-              <h2 className="text-3xl md:text-4xl font-bold">Our Services</h2>
+                <h2 className="text-3xl md:text-4xl font-bold mt-4">
+                  Our Services
+                </h2>
 
-              <Link href="/services">
-                <AnimatedButton title="Explore More" />
-              </Link>
-            </div>
+                <p className="text-gray-600 mt-4">
+                  We provide a wide range of reliable and affordable services to
+                  make your life easier. Whether it’s a one-time service or
+                  regular support, we’ve got you covered.
+                </p>
 
-            <p className="text-gray-600 mt-2">
-              We always deliver a wide range of high quality services at
-              affordable prices.
-            </p>
+                <Link href="/services" className="block mt-8 sm:mt-10">
+                  <AnimatedButton title="Explore more" icon={ArrowRight} />
+                </Link>
+              </div>
 
-            <div className="mx-auto max-w-xs md:max-w-xl lg:max-w-5xl xl:max-w-7xl mt-8 md:mt-2">
-              <Carousel>
-                <CarouselContent>
-                  {categories.slice(0, 10).map((serv, index) => (
-                    <CarouselItem
-                      key={index}
-                      className="md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
-                    >
-                      <ServiceCard
+              <div className="sm:w-1/2">
+                <Carousel>
+                  <CarouselContent className="sm:pl-6 sm:-mt-10">
+                    {categories.slice(0, 10).map((serv, index) => (
+                      <CarouselItem
                         key={index}
-                        name={serv.name}
-                        icon={serv.icon_url}
-                      />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
+                        className="xl:basis-1/2 sm:-ml-14"
+                      >
+                        <ServiceCard
+                          key={index}
+                          name={serv.name}
+                          icon={serv.icon_url}
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="ml-10 sm:ml-0" />
+                  <CarouselNext className="mr-10 sm:mr-0" />
+                </Carousel>
+              </div>
             </div>
           </motion.div>
         </div>
