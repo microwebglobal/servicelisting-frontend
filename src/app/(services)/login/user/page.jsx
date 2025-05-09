@@ -78,7 +78,9 @@ const CustomerLogin = () => {
           role: "customer",
           uId: response.data.user.id,
         });
-        router.push("/services");
+        router.push("/services").then(() => {
+          window.location.reload();
+        });
       }
     } catch (error) {
       setError(error.response?.data?.message || "Invalid OTP");
