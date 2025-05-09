@@ -97,7 +97,7 @@ export default function Cart() {
   const payment = cart.BookingPayment || {};
 
   return (
-    <div className="max-w-4xl w-full p-6">
+    <div className="max-w-4xl w-full min-h-screen p-6">
       <Card>
         <CardHeader>
           <CardTitle>Shopping Cart</CardTitle>
@@ -175,7 +175,7 @@ export default function Cart() {
                 </div>
               )}
               <div className="flex justify-between font-bold text-lg pt-2">
-                <span>Total</span>
+                <span className="text-[#5f60b9]">Total</span>
                 <span>
                   ₹
                   {formatCurrency(
@@ -185,7 +185,7 @@ export default function Cart() {
                 </span>
               </div>
               <div className="flex justify-between font-bold text-lg pt-2">
-                <span>Advance Amount</span>
+                <span className="text-[#5f60b9]">Advance Amount</span>
                 <span>₹{formatCurrency(payment.advance_payment)}</span>
               </div>
             </div>
