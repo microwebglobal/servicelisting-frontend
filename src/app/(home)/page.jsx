@@ -95,31 +95,31 @@ const Home = () => {
 
   const stats = [
     {
-      icon: <Hammer className="w-6 h-6" />,
+      icon: <Hammer className="size-6 md:size-7" />,
       count: <CountUp start={0} end={2400} duration={2.75} suffix=" +" />,
-      label: "JOBS COMPLETED",
+      label: "Projects Completed",
     },
     {
-      icon: <Users className="w-6 h-6" />,
+      icon: <Users className="size-6 md:size-7" />,
       count: <CountUp start={0} end={52} duration={3.75} suffix=" +" />,
-      label: "EXPERTS",
+      label: "Certified Professionals",
     },
     {
-      icon: <Star className="w-6 h-6" />,
+      icon: <Star className="size-6 md:size-7" />,
       count: <CountUp start={0} end={96} duration={2.75} suffix=" %" />,
-      label: "RATED THEIR PRO PERFECT",
+      label: "Satisfaction Rate",
     },
     {
-      icon: <Layers className="w-6 h-6" />,
+      icon: <Layers className="size-6 md:size-7" />,
       count: <CountUp start={0} end={32} duration={3.75} suffix=" +" />,
-      label: "SERVICE CATEGORIES",
+      label: "Service Offerings",
     },
   ];
 
   return (
     <div className="overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative pb-28 pt-24 lg:pb-32 lg:pt-[9.5rem] flex flex-col justify-center items-center text-white overflow-hidden">
+      <section className="relative h-[55svh] pt-10 md:h-[40rem] flex flex-col justify-center items-center text-white overflow-hidden">
         {/* Background Image Slider */}
         <div className="absolute inset-0 w-full h-full">
           <Swiper
@@ -127,7 +127,6 @@ const Home = () => {
             spaceBetween={0}
             slidesPerView={1}
             autoplay={{ delay: 3000, disableOnInteraction: false }}
-            pagination={{ clickable: true }}
             loop
             className="w-full h-full"
           >
@@ -178,7 +177,7 @@ const Home = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="z-10 px-6 sm:px-6 md:px-8 lg:px-10 text-center flex flex-col items-center justify-center w-full max-w-6xl pb-28 space-y-8 sm:space-y-10"
+          className="z-10 px-6 sm:px-6 md:px-8 lg:px-10 text-center flex flex-col items-center justify-center w-full max-w-6xl space-y-8 sm:space-y-10"
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
             Find Trusted Professionals <br className="hidden sm:block" /> In
@@ -214,22 +213,31 @@ const Home = () => {
             </motion.button>
           </Link>
         </motion.div>
+      </section>
 
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="absolute bottom-0 w-full py-8 bg-white/90 shadow-md z-10"
-        >
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 px-4 sm:px-8 max-w-7xl mx-auto text-[#5f60b9]">
-            {stats.map((stat, index) => (
-              <div key={index} className="flex items-center gap-6">
+      {/* Stats Section */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+        className="w-full py-8 bg-gray-200/75 z-10"
+      >
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 px-4 sm:px-8 max-w-7xl mx-auto text-[#5f60b9]">
+          {stats.map((stat, index) => {
+            const isFirstCol = index % 4 === 0;
+
+            return (
+              <div
+                key={index}
+                className={`flex items-center gap-5 mx-auto sm:pl-6 ${
+                  !isFirstCol ? "sm:border-l sm:border-gray-300/90" : ""
+                }`}
+              >
                 <div className="size-12 sm:size-16 aspect-square flex items-center justify-center bg-[#5f60b9]/10 rounded-full">
                   {stat.icon}
                 </div>
 
-                <div className="flex flex-col space-y-1">
+                <div className="flex flex-col gap-0.5">
                   <span className="font-bold text-2xl sm:text-3xl md:text-4xl">
                     {stat.count}
                   </span>
@@ -238,10 +246,10 @@ const Home = () => {
                   </p>
                 </div>
               </div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
+            );
+          })}
+        </div>
+      </motion.div>
 
       {/* Professionals Section */}
       <PageSection className="bg-gradient-to-b from-gray-50 to-white">

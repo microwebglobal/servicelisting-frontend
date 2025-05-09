@@ -26,7 +26,7 @@ const UserProfileMenu = ({ user, onLogout }) => {
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer">
             <AvatarImage
-              src={user.imageUrl}
+              src={user?.imageUrl || ""}
               alt="User Avatar"
               className="size-10"
             />

@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import { SiMqtt } from "react-icons/si";
 import { cn } from "@/lib/utils";
 import UserProfileMenu from "../layout/UserProfile";
-import Image from "next/image";
 
 const HomeNavbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -53,11 +52,11 @@ const HomeNavbar = () => {
       description: "Please log in again to continue.",
       variant: "destructive",
     });
-    setConfirmLogout(false);
+
     setTimeout(() => {
       router.push("/");
       window.location.reload();
-    }, 2000);
+    }, 500);
   };
 
   return (

@@ -6,14 +6,12 @@ import { useAuth } from "@src/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
-import Modal from "react-modal";
 import UserProfileMenu from "./UserProfile";
 
 const Navbar = () => {
   const { logout } = useAuth();
   const [isLoggedInState, setIsLoggedInState] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [confirmLogout, setConfirmLogout] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -25,7 +23,6 @@ const Navbar = () => {
       description: "Please log in again to continue.",
       variant: "destructive",
     });
-    setConfirmLogout(false);
 
     setTimeout(() => {
       router.push("/");
@@ -55,144 +52,110 @@ const Navbar = () => {
   }, [router]);
 
   return (
-    <>
-      <nav className="bg-[#5f60b9] text-white h-16 lg:h-20 py-4 px-6 md:px-10 fixed w-full z-20 flex justify-center">
-        {/* Container */}
-        <div className="flex items-center justify-between w-full max-w-7xl">
-          <div className="flex items-center gap-10">
-            {/* Logo (Left Side) */}
-            <div className="font-bold text-xl md:text-3xl -mt-1">
-              <Link href="/">QProz</Link>
-            </div>
-
-            {/* Navigation Links (Centered) */}
-            <div className="hidden md:flex items-center gap-6">
-              {["Home", "About", "Services", "Contact"].map((item, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Link
-                    href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                    className="font-semibold"
-                  >
-                    {item}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
+    <nav className="bg-[#5f60b9] text-white h-16 lg:h-20 py-4 px-6 md:px-10 fixed w-full z-20 flex justify-center">
+      {/* Container */}
+      <div className="flex items-center justify-between w-full max-w-7xl">
+        <div className="flex items-center gap-10">
+          {/* Logo (Left Side) */}
+          <div className="font-bold text-xl md:text-3xl -mt-1">
+            <Link href="/">QProz</Link>
           </div>
 
-          {/* Authentication / Registration Buttons (Right Side) */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Navigation Links (Centered) */}
+          <div className="hidden md:flex items-center gap-6">
+            {["Home", "About", "Services", "Contact"].map((item, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                  className="font-semibold"
+                >
+                  {item}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Authentication / Registration Buttons (Right Side) */}
+        <div className="hidden md:flex items-center gap-4">
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Link
+              href="/registration/provider"
+              className="text-white border-2 border-white px-4 py-1 rounded-lg font-semibold"
+            >
+              Register as Professional
+            </Link>
+          </motion.div>
+
+          {!isLoggedInState ? (
+            <Link href="/login/user">
+              <button className="bg-white text-indigo-500 px-3 py-1 rounded-lg font-semibold">
+                Login
+              </button>
+            </Link>
+          ) : (
+            <UserProfileMenu user={getUserInfo()} onLogout={handleLogout} />
+          )}
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-white text-2xl"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <FiX /> : <FiMenu />}
+        </button>
+
+        {/* Mobile Dropdown Menu */}
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-[#5f60b9] text-white absolute top-14 left-0 w-full shadow-lg p-5 flex flex-col gap-4"
+          >
+            {["Home", "About", "Services", "Contact"].map((item, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                  className="block py-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item}
+                </Link>
+              </motion.div>
+            ))}
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/registration/provider"
-                className="text-white border-2 border-white px-4 py-1 rounded-lg font-semibold"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white border-2 border-white px-4 py-1 my-2 rounded-lg font-semibold"
               >
                 Register as Professional
               </Link>
             </motion.div>
-
             {!isLoggedInState ? (
               <Link href="/login/user">
-                <button className="bg-white text-indigo-500 px-3 py-1 rounded-lg font-semibold">
+                <button className="bg-white text-indigo-500 px-3 py-1 my-2 rounded-lg font-semibold">
                   Login
                 </button>
               </Link>
             ) : (
               <UserProfileMenu user={getUserInfo()} onLogout={handleLogout} />
             )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-white text-2xl"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <FiX /> : <FiMenu />}
-          </button>
-
-          {/* Mobile Dropdown Menu */}
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="md:hidden bg-[#5f60b9] text-white absolute top-14 left-0 w-full shadow-lg p-5 flex flex-col gap-4"
-            >
-              {["Home", "About", "Services", "Contact"].map((item, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Link
-                    href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                    className="block py-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item}
-                  </Link>
-                </motion.div>
-              ))}
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link
-                  href="/registration/provider"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-white border-2 border-white px-4 py-1 my-2 rounded-lg font-semibold"
-                >
-                  Register as Professional
-                </Link>
-              </motion.div>
-              {!isLoggedInState ? (
-                <Link href="/login/user">
-                  <button className="bg-white text-indigo-500 px-3 py-1 my-2 rounded-lg font-semibold">
-                    Login
-                  </button>
-                </Link>
-              ) : (
-                <UserProfileMenu user={getUserInfo()} onLogout={handleLogout} />
-              )}
-            </motion.div>
-          )}
-        </div>
-      </nav>
-
-      {/* Logout Confirmation Modal */}
-      <Modal
-        isOpen={confirmLogout}
-        onRequestClose={() => setConfirmLogout(false)}
-        ariaHideApp={false}
-        className="m-10 bg-white p-6 rounded-lg shadow-xl w-96 max-w-lg"
-        overlayClassName="fixed inset-0 flex justify-center items-center bg-opacity-50 bg-black backdrop-blur-sm z-50"
-      >
-        <div className="space-y-4">
-          <p className="text-lg font-semibold">
-            Are you sure you want to log out?
-          </p>
-          <div className="flex space-x-4">
-            <button
-              className="bg-red-500 text-white px-4 py-2 rounded-lg w-full"
-              onClick={handleLogout}
-            >
-              Yes, Logout
-            </button>
-            <button
-              className="bg-gray-300 px-4 py-2 rounded-lg w-full"
-              onClick={() => setConfirmLogout(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </Modal>
-    </>
+          </motion.div>
+        )}
+      </div>
+    </nav>
   );
 };
 
