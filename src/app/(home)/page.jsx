@@ -119,7 +119,7 @@ const Home = () => {
   return (
     <div className="overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative h-[55svh] pt-10 md:h-[40rem] flex flex-col justify-center items-center text-white overflow-hidden">
+      <section className="relative min-h-[30rem] h-[55svh] pt-10 md:h-[40rem] flex flex-col justify-center items-center text-white overflow-hidden">
         {/* Background Image Slider */}
         <div className="absolute inset-0 w-full h-full">
           <Swiper
@@ -222,14 +222,14 @@ const Home = () => {
         transition={{ duration: 0.8, delay: 0.6 }}
         className="w-full py-8 bg-gray-200/75 z-10"
       >
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 px-4 sm:px-8 max-w-7xl mx-auto text-[#5f60b9]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 px-4 lg:px-0 max-w-7xl mx-auto text-[#5f60b9]">
           {stats.map((stat, index) => {
             const isFirstCol = index % 4 === 0;
 
             return (
               <div
                 key={index}
-                className={`flex items-center gap-5 mx-auto sm:pl-6 ${
+                className={`flex items-center gap-5 sm:pl-12 ${
                   !isFirstCol ? "sm:border-l sm:border-gray-300/90" : ""
                 }`}
               >
@@ -336,7 +336,7 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <div className="flex flex-col sm:flex-row gap-6 sm:gap-24 justify-between">
+            <div className="flex flex-col sm:flex-row gap-8 sm:gap-24 justify-between">
               <div className="sm:w-1/2">
                 <SectionBadge>What We Do</SectionBadge>
 
@@ -381,7 +381,7 @@ const Home = () => {
       </section>
 
       {/* Steps Section */}
-      <PageSection className="bg-gradient-to-b from-[#F6F7F9] to-[#F0F0FA] py-12">
+      <PageSection>
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -395,24 +395,30 @@ const Home = () => {
             </h2>
           </div>
 
-          <div className="relative w-full px-4">
+          <div className="relative w-full px-4 md:pb-10">
             <ul className="relative z-10 flex flex-col items-center lg:flex-row md:justify-center">
               {steps.map((step, idx) => (
                 <React.Fragment key={idx}>
                   {/* Step item */}
-                  <li className="flex-none flex flex-col items-center text-center space-y-4">
+                  <li className="flex-none flex flex-col items-center text-center">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: idx * 0.2 }}
-                      className="p-4 bg-indigo-100 rounded-full"
+                      className="space-y-4"
                     >
-                      {step.icon}
+                      <div className="p-4 w-fit mx-auto bg-indigo-100 rounded-full">
+                        {step.icon}
+                      </div>
+
+                      <h3 className="font-bold text-xl text-gray-900">
+                        {step.title}
+                      </h3>
+
+                      <p className="text-gray-600 max-w-xs">
+                        {step.description}
+                      </p>
                     </motion.div>
-                    <h3 className="font-bold text-xl text-gray-900">
-                      {step.title}
-                    </h3>
-                    <p className="text-gray-600 max-w-xs">{step.description}</p>
                   </li>
 
                   {/* Connector: vertical on mobile, horizontal on md+ */}
@@ -429,7 +435,7 @@ const Home = () => {
       </PageSection>
 
       {/* CTA Section */}
-      <motion.section className="text-center flex justify-center bg-gradient-to-b from-[#F0F0FA] to-[#e5e5fc] px-8 py-20 md:px-16">
+      <motion.section className="text-center flex justify-center bg-gradient-to-b from-gray-100 to-[#e5e5fc] px-8 py-20 md:px-16">
         <div className="flex flex-col lg:flex-row justify-between items-center max-w-7xl">
           <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
             <Image
@@ -437,7 +443,7 @@ const Home = () => {
               alt="Professional"
               width={666}
               height={455}
-              className="w-full rounded-3xl shadow-xl transition-transform transform hover:scale-105 duration-500"
+              className="w-full rounded-3xl transition-transform transform hover:scale-105 duration-500"
             />
           </div>
 
