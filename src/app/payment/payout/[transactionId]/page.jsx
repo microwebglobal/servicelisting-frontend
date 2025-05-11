@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
 import { useSearchParams } from "next/navigation";
-import Navbar from "@/components/Navbar";
 import { providerAPI } from "@/api/provider";
+import Footer from "@/components/layout/Footer";
 
 const TransactionPage = ({ params }) => {
   const { transactionId } = params;
@@ -70,7 +70,6 @@ const TransactionPage = ({ params }) => {
 
   return (
     <>
-      <Navbar />
       <div className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
         <h1 className="text-3xl font-bold text-center mb-6 text-indigo-700">
           Payment Status
@@ -120,6 +119,7 @@ const TransactionPage = ({ params }) => {
           </>
         )}
       </div>
+      <Footer />
     </>
   );
 };
