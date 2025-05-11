@@ -1,23 +1,12 @@
-import LocationInitializer from "@/components/LocationInitializer";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import { cookies } from "next/headers";
+import Footer from "@/components/layout/Footer";
+import HomeNavbar from "@/components/layout/HomeNavbar";
 
-export default async function HomeLayout({ children }) {
-  const cookieStore = await cookies();
-  const city = cookieStore.get("current-location")?.value;
-
+export default function HomeLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col">
-      {!city ? (
-        <LocationInitializer />
-      ) : (
-        <>
-          <Navbar />
-          {children}
-          <Footer />
-        </>
-      )}
+      <HomeNavbar />
+      {children}
+      <Footer />
     </div>
   );
 }

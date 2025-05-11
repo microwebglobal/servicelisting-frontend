@@ -1,10 +1,16 @@
-import React from 'react';
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { profileAPI } from "@/api/profile";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, AlertCircle, UserPen } from "lucide-react";
 
 const ProfileForm = ({ userData, isEditing, setIsEditing, onUpdate }) => {
   const [formData, setFormData] = React.useState(userData);
@@ -50,13 +56,20 @@ const ProfileForm = ({ userData, isEditing, setIsEditing, onUpdate }) => {
         </div>
         <div className="space-y-1">
           <p className="text-sm font-medium">Gender</p>
-          <p className="text-sm text-gray-500">{userData.gender || "Not set"}</p>
+          <p className="text-sm text-gray-500">
+            {userData.gender || "Not set"}
+          </p>
         </div>
         <div className="space-y-1">
           <p className="text-sm font-medium">Date of Birth</p>
           <p className="text-sm text-gray-500">{userData.dob || "Not set"}</p>
         </div>
-        <Button onClick={() => setIsEditing(true)} className="w-full">
+        <Button
+          onClick={() => setIsEditing(true)}
+          variant="secondary"
+          className="w-full"
+        >
+          <UserPen />
           Edit Profile
         </Button>
       </div>
@@ -73,7 +86,7 @@ const ProfileForm = ({ userData, isEditing, setIsEditing, onUpdate }) => {
           placeholder="Your name"
         />
       </div>
-      
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Email</label>
         <Input
@@ -111,10 +124,12 @@ const ProfileForm = ({ userData, isEditing, setIsEditing, onUpdate }) => {
       </div>
 
       <div className="flex gap-2">
-        <Button type="submit" className="flex-1">Save</Button>
-        <Button 
-          type="button" 
-          variant="outline" 
+        <Button type="submit" className="flex-1">
+          Save
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
           onClick={() => setIsEditing(false)}
           className="flex-1"
         >

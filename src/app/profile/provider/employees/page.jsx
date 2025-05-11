@@ -3,25 +3,16 @@ import React, { useEffect, useState } from "react";
 import { toast } from "@hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { Input } from "@components/ui/input";
-import Select from "react-select";
 import { DeleteForeverOutlined } from "@/node_modules/@mui/icons-material";
 import { providerAPI } from "@api/provider";
 import { serviceAPI } from "@/api/services";
-import { Delete, DotIcon, Edit, Eye, PlusCircle, Recycle } from "lucide-react";
+import { Edit, Eye, PlusCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@components/ui/button";
 
 const EmployeeDetailsModal = ({ employee }) => {
@@ -280,7 +271,7 @@ const Page = () => {
     setEditFormOpen(false);
   };
   return (
-    <div className="mt-8">
+    <div className="mt-8 max-w-5xl mx-auto">
       <div className="flex justify-between mb-2">
         <h1 className="text-3xl ml-10 font-bold text-gray-800">
           Business Employees
@@ -289,18 +280,18 @@ const Page = () => {
         <button
           type="button"
           onClick={() => setEditFormOpen(true)}
-          className="bg-black mr-10 flex space-x-2 text-white px-2 py-1 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300"
+          className="bg-[#5f60b9] mr-10 flex items-center space-x-2 text-white px-3 py-1 rounded-lg hover:bg-[#5f60b9]/80 hover:shadow-lg transition-all duration-300"
         >
-          <PlusCircle />
+          <PlusCircle size={20} />
           <span>Add Employee</span>
         </button>
       </div>
 
-      <div className="p-6 mt-10 ml-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="p-6 mt-10 ml-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {employeeData.map((employee) => (
           <div
             key={employee.employee_id}
-            className="bg-gray-100 shadow-lg rounded-lg p-4 flex flex-col items-center text-center"
+            className="bg-gray-100 border rounded-lg p-4 flex flex-col items-center text-center"
           >
             {/* Profile Image */}
             <img
@@ -313,29 +304,39 @@ const Page = () => {
             <h3 className="mt-3 font-semibold text-lg">
               {employee.User?.name}
             </h3>
-            <p className="text-gray-600">{employee.role}</p>
-            <p className="text-gray-500">{employee.User?.email}</p>
-            <p className="text-gray-500">{employee.User?.mobile}</p>
+
+            <div className="my-2 text-sm">
+              <p className="text-gray-600">{employee.role}</p>
+              <p className="text-gray-500">{employee.User?.email}</p>
+              <p className="text-gray-500">{employee.User?.mobile}</p>
+            </div>
 
             <div className="flex gap-4 mt-3">
               <Button
+                variant="outline"
                 onClick={() => {
                   setSelectedEmployee(employee);
                   setEditFormOpen(true);
                 }}
               >
-                <Edit className="text-white" />
+                <Edit />
               </Button>
+
               <Button
+                variant="outline"
                 onClick={() => {
                   setSelectedEmployee(employee);
                   setDialogOpen(true);
                 }}
               >
-                <Eye className="text-white" />
+                <Eye />
               </Button>
-              <Button variant="destructive">
-                <DeleteForeverOutlined className="text-white" />
+
+              <Button
+                variant="secondary"
+                className="bg-red-500/10 text-destructive"
+              >
+                <DeleteForeverOutlined />
               </Button>
             </div>
           </div>
