@@ -33,18 +33,25 @@ const Page = () => {
     : bookingData;
 
   return (
-    <div className="min-h-screen w-full max-w-5xl">
-      <BookingStatus
-        selectedStatus={selectedStatus}
-        onStatusChange={setSelectedStatus}
-      />
-
+    <div className="min-h-screen ml-20 bg-gray-50">
       {!selectedBooking ? (
-        <div>
+        <div className="mt-8">
+          {/* Sidebar */}
+          <div className="items-center mx-10">
+            <button
+              className="flex items-center gap-2 text-2xl font-semibold hover:text-indigo-600 transition-colors"
+              onClick={() => router.back()}
+            >
+              <ArrowBackIosNewSharp className="w-6 h-6" />
+              <span>Bookings</span>
+            </button>
+
+            <BookingStatus onStatusChange={setSelectedStatus} />
+          </div>
           {/* Main Content */}
-          <div className="flex-1 p-6 md:p-8">
+          <main className="flex-1 p-6 md:p-8">
             {filteredBookings.length > 0 ? (
-              <div className="space-y-6">
+              <div className="max-w-4xl mx-auto space-y-6">
                 {filteredBookings.map((booking, index) => (
                   <BookingCard
                     key={booking.booking_id || index}
@@ -55,13 +62,15 @@ const Page = () => {
                 ))}
               </div>
             ) : (
-              <div className="flex items-center justify-center mt-10">
-                <p className="text-xl font-semibold text-gray-600">
-                  No Bookings...
-                </p>
+              <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+                <div className="text-center">
+                  <p className="text-xl font-semibold text-gray-600">
+                    No Bookings...
+                  </p>
+                </div>
               </div>
             )}
-          </div>
+          </main>
         </div>
       ) : (
         // Booking Details View

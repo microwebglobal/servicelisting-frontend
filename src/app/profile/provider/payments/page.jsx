@@ -159,86 +159,80 @@ const Page = () => {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <div className="bg-white p-4 rounded-md border">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">
-          Ongoing Booking Billing Details
-        </h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">
+        Ongoing Booking Billing Details
+      </h2>
 
-        {ongoingBooking ? (
-          <div className="border border-gray-300 bg-white p-4 rounded-md shadow-md">
-            <p>
-              <strong>Booking ID:</strong> {ongoingBooking.booking_id}
-            </p>
-          </div>
-        ) : (
-          <p className="text-gray-500 text-center p-4">
-            No ongoing bookings found.
+      {ongoingBooking ? (
+        <div className="border border-gray-300 bg-white p-4 rounded-md shadow-md">
+          <p>
+            <strong>Booking ID:</strong> {ongoingBooking.booking_id}
           </p>
-        )}
-      </div>
+        </div>
+      ) : (
+        <p className="text-gray-500 text-center">No ongoing bookings found.</p>
+      )}
 
-      <div className="mt-6 bg-white p-4 rounded-md border">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">
-          Payment Details
-        </h2>
+      <h2 className="text-2xl font-bold mt-6 mb-4 text-gray-800">
+        Payment Details
+      </h2>
 
-        {ongoingPayments.length > 0 ? (
-          <div className="border border-gray-300 bg-white p-4 rounded-md shadow-md">
-            {ongoingPayments.map((payment) => (
-              <div
-                key={payment.payment_id}
-                className="border-b last:border-none pb-4 mb-4"
-              >
-                <p>
-                  <strong>Sub Total:</strong> ${payment?.subtotal}
-                </p>
-                <p>
-                  <strong>Tip Amount:</strong> ${payment.tip_amount}
-                </p>
-                <p>
-                  <strong>Tax:</strong> ${payment.tax_amount}
-                </p>
-                <p>
-                  <strong>Discount:</strong> -${payment.discount_amount}
-                </p>
-                <p className="text-lg font-bold">
-                  <strong>Total Amount:</strong> ${payment.total_amount}
-                </p>
+      {ongoingPayments.length > 0 ? (
+        <div className="border border-gray-300 bg-white p-4 rounded-md shadow-md">
+          {ongoingPayments.map((payment) => (
+            <div
+              key={payment.payment_id}
+              className="border-b last:border-none pb-4 mb-4"
+            >
+              <p>
+                <strong>Sub Total:</strong> ${payment?.subtotal}
+              </p>
+              <p>
+                <strong>Tip Amount:</strong> ${payment.tip_amount}
+              </p>
+              <p>
+                <strong>Tax:</strong> ${payment.tax_amount}
+              </p>
+              <p>
+                <strong>Discount:</strong> -${payment.discount_amount}
+              </p>
+              <p className="text-lg font-bold">
+                <strong>Total Amount:</strong> ${payment.total_amount}
+              </p>
 
-                <p>
-                  <strong>Payment Status:</strong>
-                  <span
-                    className={`ml-2 px-2 py-1 rounded ${
-                      payment.payment_status === "completed"
-                        ? "bg-green-200 text-green-800"
-                        : "bg-yellow-200 text-yellow-800"
-                    }`}
-                  >
-                    {payment.payment_status}
-                  </span>
-                </p>
-              </div>
-            ))}
-
-            <div className="text-xl font-semibold mt-4 text-right">
-              <strong>Total Payable Amount: </strong>
-              <span className="text-blue-600">${totalPayable}</span>
+              <p>
+                <strong>Payment Status:</strong>
+                <span
+                  className={`ml-2 px-2 py-1 rounded ${
+                    payment.payment_status === "completed"
+                      ? "bg-green-200 text-green-800"
+                      : "bg-yellow-200 text-yellow-800"
+                  }`}
+                >
+                  {payment.payment_status}
+                </span>
+              </p>
             </div>
-          </div>
-        ) : (
-          <p className="text-gray-500 text-center p-4">No payments found.</p>
-        )}
+          ))}
 
-        {totalPayable !== 0 && (
-          <Button
-            onClick={() => setIsConfirmOpen(true)}
-            disabled={isProcessing}
-            className="mt-6 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold"
-          >
-            {isProcessing ? "Processing..." : "Confirm Collected"}
-          </Button>
-        )}
-      </div>
+          <div className="text-xl font-semibold mt-4 text-right">
+            <strong>Total Payable Amount: </strong>
+            <span className="text-blue-600">${totalPayable}</span>
+          </div>
+        </div>
+      ) : (
+        <p className="text-gray-500 text-center">No payments found.</p>
+      )}
+
+      {totalPayable !== 0 && (
+        <Button
+          onClick={() => setIsConfirmOpen(true)}
+          disabled={isProcessing}
+          className="mt-6 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold"
+        >
+          {isProcessing ? "Processing..." : "Confirm Collected"}
+        </Button>
+      )}
 
       {/* Confirmation Dialog */}
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
@@ -263,85 +257,81 @@ const Page = () => {
       </Dialog>
 
       {/* Payment History Section */}
-      <div className="bg-white p-4 rounded-md border mt-6">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">
-          Payment History
-        </h2>
+      <h2 className="text-2xl font-bold mt-6 mb-4 text-gray-800">
+        Payment History
+      </h2>
 
-        {Object.keys(providerPaymentHistory).length > 0 ? (
-          Object.entries(providerPaymentHistory).map(([bookingId, data]) => (
+      {Object.keys(providerPaymentHistory).length > 0 ? (
+        Object.entries(providerPaymentHistory).map(([bookingId, data]) => (
+          <div
+            key={bookingId}
+            className="border border-gray-300 bg-white p-4 rounded-md shadow-md mb-6"
+          >
             <div
-              key={bookingId}
-              className="border border-gray-300 bg-white p-4 rounded-md shadow-md mb-6"
+              className="flex justify-between items-center cursor-pointer"
+              onClick={() => toggleBooking(bookingId)}
             >
-              <div
-                className="flex justify-between items-center cursor-pointer"
-                onClick={() => toggleBooking(bookingId)}
-              >
-                <h3 className="text-xl font-bold text-gray-800">
-                  Booking ID: {bookingId}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-semibold">
-                    Total: ${data.total.toFixed(2)}
-                  </span>
-                  {expandedBookings[bookingId] ? (
-                    <ChevronUp className="w-5 h-5" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5" />
-                  )}
-                </div>
+              <h3 className="text-xl font-bold text-gray-800">
+                Booking ID: {bookingId}
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-semibold">
+                  Total: ${data.total.toFixed(2)}
+                </span>
+                {expandedBookings[bookingId] ? (
+                  <ChevronUp className="w-5 h-5" />
+                ) : (
+                  <ChevronDown className="w-5 h-5" />
+                )}
               </div>
-
-              {expandedBookings[bookingId] && (
-                <div className="mt-4">
-                  {data.payments.map((payment) => (
-                    <div
-                      key={payment.payment_id}
-                      className="border-b last:border-none pb-4 mb-4"
-                    >
-                      <p>
-                        <strong>Payment ID:</strong> {payment.payment_id}
-                      </p>
-                      <p>
-                        <strong>Sub Total:</strong> ${payment.subtotal}
-                      </p>
-                      <p>
-                        <strong>Tip Amount:</strong> ${payment.tip_amount}
-                      </p>
-                      <p>
-                        <strong>Tax:</strong> ${payment.tax_amount}
-                      </p>
-                      <p>
-                        <strong>Discount:</strong> -${payment.discount_amount}
-                      </p>
-                      <p className="text-lg font-bold">
-                        <strong>Total Amount:</strong> ${payment.total_amount}
-                      </p>
-                      <p>
-                        <strong>Payment Status:</strong>
-                        <span
-                          className={`ml-2 px-2 py-1 rounded ${
-                            payment.payment_status === "completed"
-                              ? "bg-green-200 text-green-800"
-                              : "bg-yellow-200 text-yellow-800"
-                          }`}
-                        >
-                          {payment.payment_status}
-                        </span>
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
-          ))
-        ) : (
-          <p className="text-gray-500 text-center p-4">
-            No payment history found.
-          </p>
-        )}
-      </div>
+
+            {expandedBookings[bookingId] && (
+              <div className="mt-4">
+                {data.payments.map((payment) => (
+                  <div
+                    key={payment.payment_id}
+                    className="border-b last:border-none pb-4 mb-4"
+                  >
+                    <p>
+                      <strong>Payment ID:</strong> {payment.payment_id}
+                    </p>
+                    <p>
+                      <strong>Sub Total:</strong> ${payment.subtotal}
+                    </p>
+                    <p>
+                      <strong>Tip Amount:</strong> ${payment.tip_amount}
+                    </p>
+                    <p>
+                      <strong>Tax:</strong> ${payment.tax_amount}
+                    </p>
+                    <p>
+                      <strong>Discount:</strong> -${payment.discount_amount}
+                    </p>
+                    <p className="text-lg font-bold">
+                      <strong>Total Amount:</strong> ${payment.total_amount}
+                    </p>
+                    <p>
+                      <strong>Payment Status:</strong>
+                      <span
+                        className={`ml-2 px-2 py-1 rounded ${
+                          payment.payment_status === "completed"
+                            ? "bg-green-200 text-green-800"
+                            : "bg-yellow-200 text-yellow-800"
+                        }`}
+                      >
+                        {payment.payment_status}
+                      </span>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-500 text-center">No payment history found.</p>
+      )}
     </div>
   );
 };

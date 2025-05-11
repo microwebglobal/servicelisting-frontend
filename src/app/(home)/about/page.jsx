@@ -11,40 +11,29 @@ const Page = () => {
     <div className="bg-gray-100 text-gray-900 overflow-hidden">
       {/* Hero Section */}
       <section
-        className="relative w-full pb-28 pt-24 lg:pb-32 lg:pt-[9.5rem] flex flex-col justify-center items-center text-center bg-cover"
+        className="relative w-full min-h-screen flex flex-col justify-center items-center text-center bg-cover bg-center"
         style={{ backgroundImage: "url('/assets/images/about-bg.jpg')" }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-        <div className="relative z-10 max-w-5xl space-y-6 px-5">
+        <div className="relative z-10 max-w-5xl px-6">
           <motion.h1
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg text-white"
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight"
           >
             India’s Best{" "}
             <span className="text-blue-400">Home Service Marketplace</span>
           </motion.h1>
-
           <motion.p
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
-            className="text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto"
+            className="text-lg md:text-xl text-white mt-4 max-w-4xl mx-auto"
           >
             Find trusted professionals for home maintenance, beauty, appliance
             repairs, and more! We connect customers with skilled experts across
             major cities in India for hassle-free service.
-          </motion.p>
-
-          <motion.p
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.5 }}
-            className="text-gray-200 text-sm sm:text-base md:text-lg max-w-2xl mx-auto"
-          >
-            Serving major cities: Mumbai, Delhi, Bangalore, Chennai, Hyderabad,
-            Kolkata, Pune, and more!
           </motion.p>
 
           <motion.div
@@ -66,12 +55,22 @@ const Page = () => {
               Become a Service Partner
             </button>
           </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5 }}
+            className="text-white text-lg mt-6"
+          >
+            Serving major cities: Mumbai, Delhi, Bangalore, Chennai, Hyderabad,
+            Kolkata, Pune, and more!
+          </motion.p>
         </div>
       </section>
 
       {/* Our Mission & Vision */}
-      <section className="py-20 px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row items-center gap-16">
+      <section className="py-20 px-6 md:px-16">
+        <div className="flex flex-col lg:flex-row items-center gap-10">
           {/* Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -79,11 +78,8 @@ const Page = () => {
             transition={{ duration: 0.8 }}
             className="md:w-1/2 text-center md:text-left"
           >
-            <h2 className="text-3xl md:text-4xl font-bold">
-              Our Mission & Vision
-            </h2>
-
-            <p className="mt-10 text-gray-600">
+            <h2 className="text-5xl font-bold">Our Mission & Vision</h2>
+            <p className="mt-10 text-lg text-gray-700">
               Our mission is to revolutionize home services by seamlessly
               connecting skilled professionals with customers in need of
               reliable, high-quality assistance. We strive to eliminate the
@@ -126,11 +122,9 @@ const Page = () => {
       </section>
 
       {/* Why Choose Us */}
-      <section className="bg-white py-20 px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-center">
-          Why Choose Us?
-        </h2>
-        <div className="grid md:grid-cols-3 gap-10 mt-10 max-w-7xl mx-auto">
+      <section className="bg-white py-20 px-6 md:px-16">
+        <h2 className="text-5xl font-bold text-center">Why Choose Us?</h2>
+        <div className="grid md:grid-cols-3 gap-10 mt-10">
           {[
             {
               icon: <FaUsers size={40} className="text-blue-500" />,
@@ -157,18 +151,16 @@ const Page = () => {
             >
               <div className="flex justify-center mb-4">{feature.icon}</div>
               <h3 className="text-2xl font-bold">{feature.title}</h3>
-              <p className="mt-2 text-gray-600">{feature.desc}</p>
+              <p className="mt-2 text-gray-700">{feature.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-6 bg-gray-50">
-        <h2 className="text-3xl md:text-4xl font-bold text-center">
-          How It Works
-        </h2>
-        <div className="grid md:grid-cols-4 gap-10 mt-10 max-w-7xl mx-auto">
+      <section className="py-20 px-6 md:px-16 bg-gray-50">
+        <h2 className="text-5xl font-bold text-center">How It Works</h2>
+        <div className="grid md:grid-cols-4 gap-10 mt-10">
           {[
             {
               img: "/assets/images/choose-service.jpg",
@@ -212,10 +204,9 @@ const Page = () => {
           ))}
         </div>
       </section>
-
       {/* Our Story */}
       <section className="py-20 px-6 md:px-16 bg-white">
-        <div className="flex flex-col-reverse md:flex-row items-center gap-10 max-w-7xl mx-auto">
+        <div className="flex flex-col-reverse md:flex-row items-center gap-10">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -237,8 +228,8 @@ const Page = () => {
             transition={{ duration: 1 }}
             className="md:w-1/2 text-center md:text-left"
           >
-            <h2 className="text-3xl md:text-4xl font-bold">Our Story</h2>
-            <p className="mt-6 text-gray-600">
+            <h2 className="text-5xl font-bold">Our Story</h2>
+            <p className="mt-6 text-lg text-gray-700">
               What started as a small initiative to connect skilled workers with
               customers has grown into India’s leading home service marketplace.
               We noticed the gap between professionals looking for work and
@@ -260,22 +251,20 @@ const Page = () => {
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-3xl md:text-4xl font-bold"
+          className="text-5xl font-bold"
         >
           Ready to Experience Hassle-Free Services?
         </motion.h2>
-
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="mt-4 max-w-3xl mx-auto"
+          className="text-lg mt-4 max-w-3xl mx-auto"
         >
           Whether you need a quick repair or a relaxing spa session at home, we
           have you covered. Find your service today or join us as a trusted
           service provider!
         </motion.p>
-
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}

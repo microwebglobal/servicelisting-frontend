@@ -58,7 +58,7 @@ const BookingCard = ({ booking, onClick, onCancell }) => {
     <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-md hover:shadow-lg transition-all cursor-pointer">
       {/* Image & Price Row */}
       <div className="flex items-center gap-4" onClick={onClick}>
-        <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
+        <div className="relative w-24 h-24 rounded-lg overflow-hidden border">
           <CardImage
             src={getImageUrl(booking)}
             crossOrigin="anonymous"

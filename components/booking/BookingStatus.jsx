@@ -1,6 +1,5 @@
 // BookingStatus.js
-import { cn } from "@/lib/utils";
-import { Badge } from "../ui/badge";
+import { ArrowForwardIosSharp } from "@mui/icons-material";
 
 const statuses = [
   { name: "Accepted", value: "accepted" },
@@ -12,20 +11,17 @@ const statuses = [
   { name: "Refunded", value: "refunded" },
 ];
 
-const BookingStatus = ({ selectedStatus, onStatusChange }) => {
+const BookingStatus = ({ onStatusChange }) => {
   return (
-    <div className="gap-3 flex px-8">
+    <div className=" gap-3 mt-8 flex">
       {statuses.map((status) => (
-        <Badge
-          variant={selectedStatus === status.value ? "secondary" : "outline"}
+        <button
           key={status.value}
           onClick={() => onStatusChange(status.value)}
-          className={cn("py-1.5 px-4 cursor-pointer", {
-            "bg-[#5f60b9]/10 text-[#5f60b9]": selectedStatus === status.value,
-          })}
+          className="w-full bg-indigo-500 hover:bg-indigo-600 transition-colors text-white py-1 mt-4 rounded-lg flex items-center justify-between px-2"
         >
           <span className="font-medium">{status.name}</span>
-        </Badge>
+        </button>
       ))}
     </div>
   );

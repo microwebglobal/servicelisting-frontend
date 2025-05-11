@@ -5,8 +5,8 @@ import { profileAPI } from "@api/profile";
 import { Button } from "@components/ui/button";
 import { toast } from "@hooks/use-toast";
 import { useRouter } from "next/navigation";
-import Footer from "@/components/layout/Footer";
-import Navbar from "@/components/layout/Navbar";
+import Footer from "@components/Footer";
+import Navbar from "@components/Navbar";
 
 const Page = ({ params }) => {
   const [token, setToken] = useState(null);
@@ -97,7 +97,7 @@ const Page = ({ params }) => {
 
   return (
     <div>
-      {/* <Navbar /> */}
+      <Navbar />
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-md mx-4">
           <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-center p-6">
@@ -128,7 +128,7 @@ const Page = ({ params }) => {
           )}
         </div>
       </div>
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 };
