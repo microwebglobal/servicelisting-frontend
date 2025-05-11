@@ -695,45 +695,53 @@ const Page = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Your Bookings</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Your Bookings</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-[300px,300px,1fr] gap-6">
         <div className="space-y-4">
           <Card className="p-4">
             <h3 className="font-semibold mb-3">Recent Order Requests</h3>
+
             <div>
-              {bookingRequests.map((booking) => (
-                <div
-                  key={booking.booking_id}
-                  className="p-2 border last:border-b-0"
-                >
-                  <p
-                    onClick={() => {
-                      setSelectedBooking(booking);
-                      setDialogOpen(true);
-                    }}
-                    className="font-medium"
+              {bookingRequests?.length > 0 ? (
+                bookingRequests.map((booking) => (
+                  <div
+                    key={booking.booking_id}
+                    className="p-2 border last:border-b-0"
                   >
-                    Booking #{booking.booking_id}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {booking.customer?.name} - {booking.status}
-                  </p>
-                  <div className="flex gap-3">
-                    <Button onClick={() => handleOrderAcceptence(booking)}>
-                      Accept
-                    </Button>
-                    <Button variant="destructive">Reject</Button>
+                    <p
+                      onClick={() => {
+                        setSelectedBooking(booking);
+                        setDialogOpen(true);
+                      }}
+                      className="font-medium"
+                    >
+                      Booking #{booking.booking_id}
+                    </p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {booking.customer?.name} - {booking.status}
+                    </p>
+                    <div className="flex gap-3">
+                      <Button onClick={() => handleOrderAcceptence(booking)}>
+                        Accept
+                      </Button>
+                      <Button variant="destructive">Reject</Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  No recent order requests
+                </p>
+              )}
             </div>
           </Card>
 
-          <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-4">
-            Ongoing Bookings
-          </h2>
           <Card className="p-4">
+            <h2 className="font-semibold text-gray-800 mb-4">
+              Ongoing Bookings
+            </h2>
+
             <div className="space-y-4">
               {ongoingBookings?.length > 0 ? (
                 ongoingBookings.map((booking) => (
@@ -845,50 +853,62 @@ const Page = () => {
           <Card className="p-4">
             <h3 className="font-semibold mb-3">Accepted Orders</h3>
             <div>
-              {acceptedBookings.map((booking) => (
-                <div
-                  key={booking.booking_id}
-                  className="p-2 border last:border-b-0"
-                >
-                  <p
-                    onClick={() => {
-                      setSelectedBooking(booking);
-                      setDialogOpen(true);
-                    }}
-                    className="font-medium"
+              {acceptedBookings.length > 0 ? (
+                acceptedBookings.map((booking) => (
+                  <div
+                    key={booking.booking_id}
+                    className="p-2 border last:border-b-0"
                   >
-                    Booking #{booking.booking_id}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {booking.customer?.name} - {booking.status}
-                  </p>
-                </div>
-              ))}
+                    <p
+                      onClick={() => {
+                        setSelectedBooking(booking);
+                        setDialogOpen(true);
+                      }}
+                      className="font-medium"
+                    >
+                      Booking #{booking.booking_id}
+                    </p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {booking.customer?.name} - {booking.status}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  No accepted bookings
+                </p>
+              )}
             </div>
           </Card>
 
           <Card className="p-4">
             <h3 className="font-semibold mb-3">Compleated Orders</h3>
             <div>
-              {compleatedBookings.map((booking) => (
-                <div
-                  key={booking.booking_id}
-                  className="p-2 border last:border-b-0"
-                >
-                  <p
-                    onClick={() => {
-                      setSelectedBooking(booking);
-                      setDialogOpen(true);
-                    }}
-                    className="font-medium"
+              {compleatedBookings.length > 0 ? (
+                compleatedBookings.map((booking) => (
+                  <div
+                    key={booking.booking_id}
+                    className="p-2 border last:border-b-0"
                   >
-                    Booking #{booking.booking_id}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {booking.customer?.name} - {booking.status}
-                  </p>
-                </div>
-              ))}
+                    <p
+                      onClick={() => {
+                        setSelectedBooking(booking);
+                        setDialogOpen(true);
+                      }}
+                      className="font-medium"
+                    >
+                      Booking #{booking.booking_id}
+                    </p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {booking.customer?.name} - {booking.status}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  No compleated bookings
+                </p>
+              )}
             </div>
           </Card>
         </div>
@@ -902,6 +922,7 @@ const Page = () => {
           </div>
 
           <Calendar
+            className="bg-white"
             localizer={localizer}
             events={bookingDates}
             startAccessor="start"

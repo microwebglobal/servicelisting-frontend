@@ -1,7 +1,6 @@
 "use client";
 import { profileAPI } from "@/api/profile";
-import React, { useEffect, useState, useCallback } from "react";
-import { useProfileRefresh } from "@src/context/ProfileRefreshContext";
+import React, { useEffect, useState } from "react";
 
 const NotificationSettingsModal = ({ isOpen, onClose, onSave }) => {
   const [preferredMethods, setPreferredMethods] = useState({
