@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { providerAPI } from "@api/provider";
 import { Button } from "@/components/ui/button";
 import { toast } from "@hooks/use-toast";
+import { Edit, Save } from "lucide-react";
 
 const page = () => {
   const [provider, setProvider] = useState();
@@ -103,9 +104,9 @@ const page = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl ml-10 font-bold ">Availability Hours</h1>
+      <h1 className="text-2xl ml-10 font-bold ">Availability Hours</h1>
 
-      <div className=" m-10 bg-gray-100 p-6 rounded-md shadow-md">
+      <div className=" m-10 bg-white p-6 rounded-md border">
         <ul className="space-y-6">
           {Object.entries(availabilityHours).map(
             ([day, { start, end, isOpen }]) => (
@@ -123,19 +124,30 @@ const page = () => {
                       </span>
                     </strong>
                   </div>
-                  <button
+
+                  <Button
+                    size="sm"
+                    variant="secondary"
                     type="button"
-                    className={`px-4 py-2 rounded-md font-semibold text-sm ${
+                    className={`${
                       isOpen
-                        ? "bg-red-500 text-white hover:bg-red-600"
-                        : "bg-green-500 text-white hover:bg-green-600"
+                        ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                        : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
                     }`}
                     onClick={() =>
                       handleEditAvailability(day, "isOpen", !isOpen)
                     }
                   >
-                    {isOpen ? "Mark as Closed" : "Mark as Open"}
-                  </button>
+                    {isOpen ? (
+                      <>
+                        <Edit /> Mark as Closed
+                      </>
+                    ) : (
+                      <>
+                        <Edit /> Mark as Open
+                      </>
+                    )}
+                  </Button>
                 </div>
                 {isOpen && (
                   <div className="flex items-center gap-6">
@@ -169,7 +181,11 @@ const page = () => {
           )}
         </ul>
 
-        <Button className="mt-5" onClick={handleUpdate}>
+        <Button
+          className="bg-[#5f60b9] mt-5 hover:bg-[#5f60b9]/80"
+          onClick={handleUpdate}
+        >
+          <Save />
           Update Avilability
         </Button>
       </div>

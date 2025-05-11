@@ -173,8 +173,9 @@ const AddressManager = () => {
         <h3 className="text-lg font-semibold">Saved Addresses</h3>
         <Button
           size="sm"
+          variant="secondary"
           onClick={() => openAddressModal()}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 text-[#5f60b9] hover:text-[#5f60b9]/80"
         >
           <Plus className="h-4 w-4" />
           Add Address
@@ -196,15 +197,15 @@ const AddressManager = () => {
                       <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                     )}
                   </div>
+
                   <p className="text-sm text-gray-600 mt-1">
                     {address.line1}
-                    {address.line2 && `, ${address.line2}`}
-                  </p>
-                  <p className="text-sm text-gray-600">
+                    {address.line2 && `, ${address.line2}, `}
                     {address.city}, {address.state} {address.postal_code}
                   </p>
                 </div>
               </div>
+
               <div className="flex items-center gap-2">
                 <Button
                   size="icon"

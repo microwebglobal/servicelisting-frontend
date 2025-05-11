@@ -8,7 +8,7 @@ import {
   PlusCircleIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Footer from "@/components/Footer";
+import Footer from "@/components/layout/Footer";
 
 const SuccessPage = () => {
   const router = useRouter();

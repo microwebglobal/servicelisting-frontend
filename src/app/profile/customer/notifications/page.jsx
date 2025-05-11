@@ -2,6 +2,9 @@
 import { profileAPI } from "@/api/profile";
 import React, { useEffect, useState, useCallback } from "react";
 import { useProfileRefresh } from "@src/context/ProfileRefreshContext";
+import { Button } from "@/components/ui/button";
+import { Sync } from "@mui/icons-material";
+import { Settings, Trash } from "lucide-react";
 
 const NotificationSettingsModal = ({ isOpen, onClose, onSave }) => {
   const [preferredMethods, setPreferredMethods] = useState({
@@ -179,11 +182,7 @@ const Page = ({ currentOtp }) => {
   };
 
   return (
-    <div className="ml-24 p-6">
-      <h1 className="text-3xl font-semibold text-gray-900 mb-4">
-        Notifications
-      </h1>
-
+    <div className="w-full max-w-5xl">
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <select
           value={typeFilter}
@@ -197,28 +196,26 @@ const Page = ({ currentOtp }) => {
           <option value="otp">OTP</option>
         </select>
 
-        <button
+        <Button
+          variant="outline"
           onClick={() => {
             getUserNotifications();
             triggerRefresh(); // Trigger global refresh
           }}
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
         >
+          <Sync />
           Refresh
-        </button>
+        </Button>
 
-        <button
-          onClick={deleteAllNotifications}
-          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-        >
-          Delete All
-        </button>
-        <button
-          onClick={() => setIsSettingsOpen(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
+        <Button variant="outline" onClick={() => setIsSettingsOpen(true)}>
+          <Settings />
           Settings
-        </button>
+        </Button>
+
+        <Button variant="destructive" onClick={deleteAllNotifications}>
+          <Trash />
+          Delete All
+        </Button>
       </div>
 
       {loading && <p>Loading notifications...</p>}
@@ -267,6 +264,7 @@ const Page = ({ currentOtp }) => {
           ))
         )}
       </div>
+
       <NotificationSettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
