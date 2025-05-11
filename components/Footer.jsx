@@ -1,14 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { BiWorld } from "react-icons/bi";
 import { FaFacebook, FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";
-import { SiMqtt } from "react-icons/si";
 
 const Footer = () => {
   return (
-    <footer className="text-white pt-10 pb-6 lg:pt-16 px-6 bg-gradient-to-b from-[#5f60b9] to-[#6f71c9] mt-auto">
+    <footer className="text-white pt-10 pb-6 lg:pt-16 lg:pb-12 px-6 bg-[#5f60b9] mt-auto">
       <div className="container grid grid-cols-1 lg:grid-cols-3 gap-14 lg:gap-20 items-start max-w-7xl mx-auto">
         {/* Left Section */}
         <motion.div
@@ -17,27 +15,15 @@ const Footer = () => {
           transition={{ duration: 1 }}
           className="md:col-span-1"
         >
-          <div className="font-bold text-xl md:text-3xl -mt-1">
-            <Link href="/" className="flex items-center gap-2.5">
-              <SiMqtt />
-              QProz
-              {/* <div className="relative w-14 h-14">
-                <Image
-                  src="/assets/images/brand-logo.jpg"
-                  alt="QProz Logo"
-                  fill
-                />
-              </div> */}
-            </Link>
-          </div>
+          <h1 className="text-3xl font-bold">QProz</h1>
 
-          <p className="text-gray-300 text-sm mt-4">
+          <p className="text-gray-300 mt-4">
             Your trusted partner for seamless and efficient solutions. We
             specialize in delivering high-quality services tailored to your
             needs.
           </p>
 
-          <div className="mt-6 flex gap-4 text-2xl">
+          <div className="mt-4 flex gap-4 text-2xl">
             {[FaFacebook, FaLinkedin, FaInstagram, FaTwitter, BiWorld].map(
               (Icon, index) => (
                 <motion.a
@@ -110,12 +96,12 @@ const Footer = () => {
 
       {/* Footer Bottom */}
       <motion.div
-        className="mt-14 text-gray-300 text-sm border-t max-w-7xl mx-auto border-gray-100/10 pt-6"
+        className="mt-14 text-gray-300 text-sm text-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.2 }}
       >
-        &copy; {new Date().getFullYear()} QProz | All rights reserved.
+        &copy; {new Date().getFullYear()} QProz | All rights reserved
       </motion.div>
     </footer>
   );

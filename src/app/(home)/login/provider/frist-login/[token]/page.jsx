@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Footer from "@/components/layout/Footer";
-import Navbar from "@/components/layout/Navbar";
+import Footer from "@components/Footer";
+import Navbar from "@components/Navbar";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
