@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Progress } from "./ui/progress";
 
 // Cookie helper
@@ -11,7 +10,6 @@ export function setCookie(name, value) {
 
 export default function LocationInitializer() {
   const [progress, setProgress] = useState(0);
-  const router = useRouter();
 
   useEffect(() => {
     const detectCity = async () => {
@@ -53,14 +51,18 @@ export default function LocationInitializer() {
             clearInterval(interval);
 
             setCookie("current-location", city);
-            setTimeout(() => router.refresh(), 500);
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
           },
           (error) => {
             console.warn("Geolocation failed, defaulting to 'Unknown'", error);
             setProgress(100);
             clearInterval(interval);
             setCookie("current-location", "Unknown");
-            setTimeout(() => router.refresh(), 500);
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
           },
           {
             enableHighAccuracy: true,
@@ -73,12 +75,14 @@ export default function LocationInitializer() {
         setProgress(100);
         clearInterval(interval);
         setCookie("current-location", "Unknown");
-        setTimeout(() => router.refresh(), 500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       }
     };
 
     detectCity();
-  }, [router]);
+  }, []);
 
   return (
     <div className="w-full h-screen flex items-center justify-center flex-col">
