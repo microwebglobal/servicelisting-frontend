@@ -98,4 +98,7 @@ export const providerAPI = {
     api.post("/provider/payouts/daily/verify", data),
 
   getProviderDuePayouts: () => api.get("/provider/payouts/due"),
+
+  verifyProviderDuePayment: (data) =>
+    api.post("/provider/payouts/due/verify", data),
 };

@@ -131,7 +131,7 @@ const ProviderManager = () => {
 
   useEffect(() => {
     fetchProviders();
-  }, [isDialogOpen, isDocDialogOpen]);
+  }, [isDialogOpen, isDocDialogOpen, isApproving]);
 
   const handleReject = async () => {
     if (!rejectionReason) {
@@ -342,6 +342,8 @@ const ProviderManager = () => {
       });
 
       console.log("Deleted", provider);
+
+      fetchProviders();
     } catch (error) {
       console.error("Error deleting provider:", error);
 
