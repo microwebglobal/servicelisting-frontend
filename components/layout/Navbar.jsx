@@ -8,7 +8,6 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import UserProfileMenu from "./UserProfile";
 import { SiMqtt } from "react-icons/si";
-import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const { logout } = useAuth();
