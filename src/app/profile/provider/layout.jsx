@@ -11,7 +11,8 @@ const layout = ({ children }) => {
           <ServiceProviderSideBar />
         </div>
 
-        <div className="flex-1 ml-72 bg-gray-50 min-h-screen">{children}</div>
+          <div className="flex-1 ml-72 bg-gray-50 min-h-screen">{children}</div>
+        </div>
       </div>
     </div>
   );
