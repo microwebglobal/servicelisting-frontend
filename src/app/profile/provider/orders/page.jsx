@@ -44,6 +44,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import ProviderBookingEditModel from "@/components/business-employee/ProviderBookingEditModel";
 import BookingStopModal from "@/components/business-employee/BookingStopModal";
 import { io } from "socket.io-client";
+import withSuspensionCheck from "@/src/hoc/withSuspensionCheck";
 
 const CountdownTimer = ({ targetDate }) => {
   const [timeLeft, setTimeLeft] = useState({
@@ -962,4 +963,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withSuspensionCheck(Page);
