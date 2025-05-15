@@ -45,12 +45,14 @@ const ContactPage = () => {
 
       {/* Contact Form Section */}
       <section className="py-16 px-6 md:px-16">
-        <div className="max-w-4xl mx-auto bg-white p-10 rounded-3xl shadow-lg">
+        <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center">Get in Touch</h2>
+
           <p className="text-center text-gray-600 mt-2">
             Fill out the form below, and we'll get back to you as soon as
             possible.
           </p>
+
           <form className="mt-8 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <input
@@ -135,7 +137,7 @@ const ContactPage = () => {
       {/* Google Map Section */}
       <section className="py-16 px-6 md:px-16">
         <h2 className="text-3xl font-bold text-center">Our Location</h2>
-        <div className="mt-8 w-full h-72 rounded-lg overflow-hidden shadow-lg">
+        <div className="mt-8 w-full h-72 rounded-lg overflow-hidden shadow-sm">
           <iframe
             title="Company Location"
             className="w-full h-full"

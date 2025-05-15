@@ -110,11 +110,6 @@ const ServiceProviderSideBar = () => {
       icon: DollarSignIcon,
       path: "/profile/provider/payments",
     },
-    {
-      label: "Payouts",
-      icon: DollarSignIcon,
-      path: "/profile/provider/payouts",
-    },
     ...(profileData?.business_type !== "individual"
       ? [
           {

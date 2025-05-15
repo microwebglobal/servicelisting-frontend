@@ -1,6 +1,6 @@
 import React from "react";
 import { jsPDF } from "jspdf";
-import Navbar from "./Navbar";
+import Navbar from "./layout/Navbar";
 
 const PaymentSuccess = ({ paymentData }) => {
   console.log(paymentData);

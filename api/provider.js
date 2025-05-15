@@ -87,15 +87,4 @@ export const providerAPI = {
 
   rejectProviderDocument: (documentId) =>
     api.put(`/provider/doc/reject/${documentId}`),
-
-  //service provider payouts
-  getProviderDailyPayouts: () => api.get("/provider/payouts/daily"),
-
-  processProviderDailyPayment: (data) =>
-    api.post("/provider/payouts/daily/process", data),
-
-  verifyProviderDailyPayment: (data) =>
-    api.post("/provider/payouts/daily/verify", data),
-
-  getProviderDuePayouts: () => api.get("/provider/payouts/due"),
 };

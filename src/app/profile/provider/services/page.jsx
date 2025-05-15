@@ -1,6 +1,7 @@
 "use client";
 import { providerAPI } from "@/api/provider";
 import { serviceAPI } from "@/api/services";
+import { Save } from "lucide-react";
 import React, { useEffect, useState, useCallback } from "react";
 
 const Page = () => {
@@ -396,7 +397,7 @@ const Page = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl ml-10 font-bold text-gray-800">
+      <h1 className="text-2xl font-bold text-gray-800">
         Configure Your Services
       </h1>
 
@@ -404,10 +405,10 @@ const Page = () => {
         {providerCategories.map((category) => (
           <div
             key={category.category_id}
-            className="bg-white p-6 shadow-lg rounded-lg transition-transform transform hover:scale-105"
+            className="bg-white p-6 border rounded-lg transition-transform transform hover:scale-105"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-gray-700">
+              <h2 className="text-lg font-semibold text-gray-700">
                 {category.name}
               </h2>
               <span className="text-sm text-gray-500">
@@ -420,24 +421,24 @@ const Page = () => {
                   key={subCategory.sub_category_id}
                   className="border-b border-gray-200 pb-3"
                 >
-                  <div className="flex items-center justify-between">
-                    <label className="text-lg text-gray-600">
-                      <input
-                        type="checkbox"
-                        checked={selectedSubCategories.includes(
-                          subCategory.sub_category_id
-                        )}
-                        onChange={(e) =>
-                          handleSubCategoryChange(
-                            subCategory.sub_category_id,
-                            e.target.checked
-                          )
-                        }
-                        className="h-5 w-5 text-indigo-600"
-                      />
-                      <span className="ml-2">{subCategory.name}</span>
-                    </label>
-                  </div>
+                  <label className="text-gray-600 flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedSubCategories.includes(
+                        subCategory.sub_category_id
+                      )}
+                      onChange={(e) =>
+                        handleSubCategoryChange(
+                          subCategory.sub_category_id,
+                          e.target.checked
+                        )
+                      }
+                      className="size-4 text-indigo-600"
+                    />
+
+                    <span className="ml-3 text-sm">{subCategory.name}</span>
+                  </label>
+
                   {serviceTypesBySubCategory[subCategory.sub_category_id] && (
                     <div className="mt-3 pl-6">
                       {serviceTypesBySubCategory[
@@ -458,9 +459,9 @@ const Page = () => {
                                 e.target.checked
                               )
                             }
-                            className="h-5 w-5 text-indigo-600"
+                            className="size-4 text-indigo-600"
                           />
-                          <label className="text-md text-gray-500">
+                          <label className="text-sm text-gray-500">
                             {serviceType.name}
                           </label>
                         </div>
@@ -644,10 +645,10 @@ const Page = () => {
         <button
           onClick={handleSubmit}
           disabled={isLoading}
-          className={`px-6 py-3 rounded-full shadow-lg font-bold text-white ${
+          className={`px-6 py-3 rounded-lg shadow-lg font-bold text-base text-white ${
             isLoading
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
+              : "bg-[#5f60b9] hover:bg-[#5f60b9]/90"
           } transition-colors duration-200 flex items-center`}
         >
           {isLoading ? (
@@ -675,7 +676,10 @@ const Page = () => {
               Saving...
             </>
           ) : (
-            "Save Changes"
+            <div className="flex items-center gap-2">
+              <Save className="size-5" />
+              Save Changes
+            </div>
           )}
         </button>
       </div>
