@@ -217,7 +217,7 @@ const BookingForm = ({ onBookingSubmit, city }) => {
 
           <Button
             type="submit"
-            className="w-full font-semibold bg-[#5f60b9] hover:bg-[#5f60b9]/90"
+            className="w-full font-semibold"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Processing..." : "Confirm Booking"}

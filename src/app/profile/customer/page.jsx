@@ -54,7 +54,7 @@ const CustomerProfile = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
+    <div className="flex ml-20 flex-col md:flex-row min-h-screen bg-gray-50">
       <ProfileContent userData={userData} />
 
       <EmailVerificationDialog
