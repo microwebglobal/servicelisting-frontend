@@ -17,6 +17,10 @@ const UserProfileMenu = ({ user, onLogout }) => {
 
   const handleNavigateToProfile = () => {
     if (user?.role === "customer") router.push("/profile/customer");
+    else if (user?.role === "business_service_provider")
+      router.push("/profile/provider");
+    else if (user?.role === "business_employee")
+      router.push("/profile/business-employee");
     else if (user?.role === "admin") router.push("/admin");
   };
 
