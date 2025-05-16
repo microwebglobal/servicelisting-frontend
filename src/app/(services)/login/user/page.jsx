@@ -83,7 +83,7 @@ const CustomerLogin = () => {
         router.push("/services");
         setTimeout(() => {
           window.location.reload();
-        }, 100);
+        }, 500);
 
         return;
       }
