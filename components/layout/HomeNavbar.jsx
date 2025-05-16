@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { SiMqtt } from "react-icons/si";
 import { cn } from "@/lib/utils";
 import UserProfileMenu from "../layout/UserProfile";
+import Image from "next/image";
 
 const HomeNavbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -77,17 +78,14 @@ const HomeNavbar = () => {
         <div className="flex items-center gap-10">
           <div className="font-bold text-xl md:text-3xl -mt-1">
             <Link href="/" className="flex items-center gap-2.5">
-              <SiMqtt
-                className={cn("size-6", { "text-[#5f60b9]": !isScrolled })}
-              />
-              QProz
-              {/* <div className="relative w-14 h-14">
+              <div className="relative w-14 h-14 bg-white/30 backdrop-blur-sm rounded-xl p-1">
                 <Image
-                  src="/assets/images/brand-logo.jpg"
+                  src="/assets/images/qproz-logo.png"
                   alt="QProz Logo"
                   fill
+                  className="object-contain"
                 />
-              </div> */}
+              </div>
             </Link>
           </div>
 
