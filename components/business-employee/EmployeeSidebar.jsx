@@ -3,7 +3,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { LogOut, Calendar, BookCheck, Settings, Loader2 } from "lucide-react";
-import { PeopleAltSharp } from "@mui/icons-material";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import {
@@ -26,9 +25,8 @@ const EmployeeSidebar = ({ profileData }) => {
   const handleLogout = async () => {
     setLoadingLogout(true);
     try {
-      // Clear local storage
       localStorage.clear();
-      // Clear any auth cookies if using them
+
       document.cookie.split(";").forEach((cookie) => {
         document.cookie = cookie
           .replace(/^ +/, "")
@@ -36,7 +34,7 @@ const EmployeeSidebar = ({ profileData }) => {
       });
 
       // Redirect to login
-      router.push("/login");
+      router.push("login/service-provider");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {

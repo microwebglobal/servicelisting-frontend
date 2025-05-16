@@ -33,7 +33,7 @@ export const ServiceItemsPanel = ({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg bg-slate-100 p-2 text-center ">
+      <div className="rounded-lg bg-slate-100 p-2 text-center">
         <div>
           <h3 className="text-lg font-medium">{service.name} Items</h3>
           <p className="text-sm text-gray-500">${service.price}</p>
@@ -62,8 +62,8 @@ export const ServiceItemsPanel = ({
               className="flex items-center justify-between p-3 rounded-lg border bg-white"
             >
               <div
-                className="flex-1"
-                // onClick={() => onClick("service_item", item)}
+                className="flex-1 cursor-pointer"
+                onClick={() => onClick?.("service_item", item)}
               >
                 <p className="font-medium">{item.name}</p>
               </div>

@@ -15,36 +15,111 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Clock, MapPin, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { profileAPI } from "@/api/profile";
+import { cartService } from "@/api/cartService";
+import { debounce } from "lodash";
 
-const BookingForm = ({ onBookingSubmit, city }) => {
+const BookingForm = ({ onBookingSubmit, city, selectedItems }) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [savedAddresses, setSavedAddress] = useState([]);
+  const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [bookingDetails, setBookingDetails] = useState({
-    bookingDate: new Date(),
+    bookingDate: null,
     startTime: "",
     serviceAddress: "",
     coordinates: {
       type: "Point",
-      coordinates: [0, 0], // Default coordinates
+      coordinates: [0, 0],
     },
     customerNotes: "",
   });
   const [validationError, setValidationError] = useState("");
 
-  const generateTimeSlots = useCallback(() => {
-    const slots = [];
-    const startHour = 11;
-    const endHour = 20;
-
-    for (let hour = startHour; hour <= endHour; hour++) {
-      slots.push(`${hour.toString().padStart(2, "0")}:00`);
-      if (hour !== endHour) {
-        slots.push(`${hour.toString().padStart(2, "0")}:30`);
+  const fetchAvailableTimeSlots = useCallback(
+    async (date) => {
+      if (
+        !date ||
+        !selectedItems?.length ||
+        !selectedItems.every(
+          (item) =>
+            item.id && ["service_item", "package_item"].includes(item.type)
+        )
+      ) {
+        console.log("Invalid input:", { date, selectedItems });
+        setAvailableTimeSlots([]);
+        setBookingDetails((prev) => ({ ...prev, startTime: "" }));
+        return;
       }
-    }
-    return slots;
-  }, []);
+
+      setIsLoadingSlots(true);
+      try {
+        const dateStr = `${date.getFullYear()}-${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+        const data = {
+          items: selectedItems.map((item) => ({
+            item_id: item.id,
+            type: item.type,
+          })),
+          date: dateStr,
+        };
+
+        console.log("Sending request to /api/booking/availability:", data);
+        const response = await cartService.getAvailableTimeSlotes(data);
+        console.log("Raw response:", response);
+
+        const responseData = response.data?.data || response.data || response;
+
+        if (Array.isArray(responseData)) {
+          const availableSlots = responseData
+            .filter((slot) => slot.status === "available")
+            .map((slot) => slot.time);
+          console.log("Available slots:", availableSlots);
+          setAvailableTimeSlots(availableSlots);
+
+          if (!availableSlots.includes(bookingDetails.startTime)) {
+            setBookingDetails((prev) => ({ ...prev, startTime: "" }));
+          }
+        } else if (responseData && Array.isArray(responseData.slots)) {
+          const availableSlots = responseData.slots
+            .filter((slot) => slot.status === "available")
+            .map((slot) => slot.time);
+          console.log("Available slots:", availableSlots);
+          setAvailableTimeSlots(availableSlots);
+
+          if (!availableSlots.includes(bookingDetails.startTime)) {
+            setBookingDetails((prev) => ({ ...prev, startTime: "" }));
+          }
+        } else {
+          throw new Error(
+            responseData.message ||
+              responseData.error ||
+              "Invalid response format - expected array of slots"
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching time slots:", error);
+        toast({
+          title: "Error",
+          description:
+            error.message ||
+            "Failed to fetch available time slots. Please try again.",
+          variant: "destructive",
+        });
+        setAvailableTimeSlots([]);
+        setBookingDetails((prev) => ({ ...prev, startTime: "" }));
+      } finally {
+        setIsLoadingSlots(false);
+      }
+    },
+    [selectedItems, bookingDetails.startTime, toast]
+  );
+
+  const debouncedFetch = useCallback(debounce(fetchAvailableTimeSlots, 300), [
+    fetchAvailableTimeSlots,
+  ]);
 
   const handleInputChange = (field, value) => {
     setBookingDetails((prev) => ({
@@ -52,6 +127,10 @@ const BookingForm = ({ onBookingSubmit, city }) => {
       [field]: value,
     }));
     setValidationError("");
+
+    if (field === "bookingDate" && value) {
+      debouncedFetch(value);
+    }
   };
 
   useEffect(() => {
@@ -59,14 +138,14 @@ const BookingForm = ({ onBookingSubmit, city }) => {
       try {
         const response = await profileAPI.getAddressBelongsToCity(city);
         setSavedAddress(response.data);
-        console.log(response.data);
+        console.log("Addresses:", response.data);
       } catch (error) {
-        console.error("error fetching user addresses", error);
+        console.error("Error fetching user addresses:", error);
       }
     };
 
     fetchUserAddresses();
-  }, []);
+  }, [city]);
 
   const addressOptions = savedAddresses.map((addr) => ({
     label: (
@@ -88,10 +167,9 @@ const BookingForm = ({ onBookingSubmit, city }) => {
       const address = selectedOption ? selectedOption.value : "";
       handleInputChange("serviceAddress", address);
 
-      // TO DO: Add geocoding logic here
       const dummyCoordinates = {
         type: "Point",
-        coordinates: [0, 0], // [longitude, latitude]
+        coordinates: [0, 0],
       };
       handleInputChange("coordinates", dummyCoordinates);
     } catch (error) {
@@ -135,8 +213,6 @@ const BookingForm = ({ onBookingSubmit, city }) => {
     }
   };
 
-  const timeSlots = generateTimeSlots();
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
@@ -168,11 +244,21 @@ const BookingForm = ({ onBookingSubmit, city }) => {
                   <SelectValue placeholder="Choose a time" />
                 </SelectTrigger>
                 <SelectContent>
-                  {timeSlots.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time}
+                  {isLoadingSlots ? (
+                    <SelectItem value="loading" disabled>
+                      Loading...
                     </SelectItem>
-                  ))}
+                  ) : availableTimeSlots.length > 0 ? (
+                    availableTimeSlots.map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {time}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>
+                      No available slots
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -217,7 +303,7 @@ const BookingForm = ({ onBookingSubmit, city }) => {
 
           <Button
             type="submit"
-            className="w-full font-semibold bg-[#5f60b9] hover:bg-[#5f60b9]/90"
+            className="w-full font-semibold"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Processing..." : "Confirm Booking"}

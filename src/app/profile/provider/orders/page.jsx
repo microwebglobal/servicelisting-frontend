@@ -463,11 +463,11 @@ const Page = () => {
           setCompleatedBookings(compleatedBookings);
           setError(null);
         } else {
-          setError("Invalid booking data received");
+          setError("No Active Bookings Found");
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
-        setError("Failed to load bookings. Please try again later.");
+        setError("No Active Bookings Found");
       } finally {
         setLoading(false);
       }

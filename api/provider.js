@@ -101,4 +101,8 @@ export const providerAPI = {
 
   verifyProviderDuePayment: (data) =>
     api.post("/provider/payouts/due/verify", data),
+
+  //profile overview
+
+  getActivityOverview: () => api.get("/provider/profile/overview"),
 };
