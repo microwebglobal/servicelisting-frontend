@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LoginAPI } from "@/api/login";
@@ -68,20 +68,27 @@ const CustomerLogin = () => {
   };
 
   const handleVerifyOtp = async () => {
-    try {
-      setIsLoading(true);
-      setError("");
+    setIsLoading(true);
+    setError("");
 
+    try {
       const response = await LoginAPI.customerLoginVerifyOTP(mobile, otp);
+
       if (response.data.success) {
         login({
           role: "customer",
           uId: response.data.user.id,
         });
-        router.push("/services").then(() => {
+
+        router.push("/services");
+        setTimeout(() => {
           window.location.reload();
-        });
+        }, 100);
+
+        return;
       }
+
+      setError("Invalid OTP");
     } catch (error) {
       setError(error.response?.data?.message || "Invalid OTP");
     } finally {
@@ -195,6 +202,7 @@ const CustomerLogin = () => {
               </p>
 
               <button
+                type="button"
                 className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-blue-600 transition disabled:opacity-50"
                 onClick={handleVerifyOtp}
                 disabled={isLoading || otp.length !== 6}

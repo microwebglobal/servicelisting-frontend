@@ -117,9 +117,9 @@ const Home = () => {
   ];
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden mt-16 lg:mt-20">
       {/* Hero Section */}
-      <section className="relative min-h-[30rem] h-[55svh] pt-10 md:h-[40rem] flex flex-col justify-center items-center text-white overflow-hidden">
+      <section className="relative min-h-[25rem] h-[55svh] md:h-[35rem] flex flex-col justify-center items-center text-white overflow-hidden">
         {/* Background Image Slider */}
         <div className="absolute inset-0 w-full h-full">
           <Swiper
@@ -138,7 +138,7 @@ const Home = () => {
                   alt="Home Maintenance 1"
                   fill
                   priority
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>
@@ -151,7 +151,7 @@ const Home = () => {
                   src="/assets/images/herobg-6.jpg"
                   alt="Home Maintenance 2"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>
@@ -164,7 +164,7 @@ const Home = () => {
                   src="/assets/images/herobg-7.jpg"
                   alt="Home Maintenance 3"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>

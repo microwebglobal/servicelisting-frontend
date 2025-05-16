@@ -7,8 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import UserProfileMenu from "./UserProfile";
-import { SiMqtt } from "react-icons/si";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const Navbar = () => {
   const { logout } = useAuth();
@@ -61,15 +60,14 @@ const Navbar = () => {
           {/* Logo (Left Side) */}
           <div className="font-bold text-xl md:text-3xl -mt-1">
             <Link href="/" className="flex items-center gap-2.5">
-              <SiMqtt />
-              QProz
-              {/* <div className="relative w-14 h-14">
+              <div className="relative size-12 lg:size-14 bg-white/25 backdrop-blur-sm rounded-xl p-1">
                 <Image
-                  src="/assets/images/brand-logo.jpg"
+                  src="/assets/images/qproz-logo.png"
                   alt="QProz Logo"
                   fill
+                  className="object-contain"
                 />
-              </div> */}
+              </div>
             </Link>
           </div>
 
