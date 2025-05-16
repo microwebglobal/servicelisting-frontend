@@ -44,6 +44,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import ProviderBookingEditModel from "@/components/business-employee/ProviderBookingEditModel";
 import BookingStopModal from "@/components/business-employee/BookingStopModal";
 import { io } from "socket.io-client";
+import withSuspensionCheck from "@/src/hoc/withSuspensionCheck";
 
 const CountdownTimer = ({ targetDate }) => {
   const [timeLeft, setTimeLeft] = useState({
@@ -462,11 +463,11 @@ const Page = () => {
           setCompleatedBookings(compleatedBookings);
           setError(null);
         } else {
-          setError("Invalid booking data received");
+          setError("No Active Bookings Found");
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
-        setError("Failed to load bookings. Please try again later.");
+        setError("No Active Bookings Found");
       } finally {
         setLoading(false);
       }
@@ -962,4 +963,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withSuspensionCheck(Page);

@@ -54,7 +54,7 @@ const TransactionPage = ({ params }) => {
         merchantOrderId: transactionId,
         date,
       };
-      const response = await providerAPI.verifyProviderDailyPayment(reqBody);
+      const response = await providerAPI.verifyProviderDuePayment(reqBody);
       setStatus(response.data.success);
       if (response.data.bookingIds) {
         setBookingIds(response.data.bookingIds);

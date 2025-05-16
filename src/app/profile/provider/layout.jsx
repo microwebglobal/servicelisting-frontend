@@ -1,11 +1,8 @@
 "use client";
 import React from "react";
 import withAuth from "@components/isAuth";
-import {
-  ProfileRefreshProvider,
-  useProfileRefresh,
-} from "@src/context/ProfileRefreshContext";
 import ServiceProviderSideBar from "@components/serviceProvider/ServiceProviderSideBar";
+import { ProfileRefreshProvider } from "@/src/context/ProfileRefreshContext";
 
 const layout = ({ children }) => {
   return (
