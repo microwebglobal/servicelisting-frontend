@@ -33,7 +33,7 @@ export const ServiceItemsPanel = ({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg bg-slate-100 p-2 text-center ">
+      <div className="rounded-lg bg-slate-100 p-2 text-center">
         <div>
           <h3 className="text-lg font-medium">{service.name} Items</h3>
           <p className="text-sm text-gray-500">${service.price}</p>

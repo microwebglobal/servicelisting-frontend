@@ -482,7 +482,6 @@ export const ServiceItemForm = ({ mode, data, selectedData, onClose }) => {
         <TextEditor
           value={formData.overview}
           onChange={(value) => setFormData({ ...formData, overview: value })}
-          className="my-custom-class"
         />
       </div>
 

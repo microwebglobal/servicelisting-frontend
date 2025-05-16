@@ -13,6 +13,16 @@ const spokenLanguages = [
   { label: "Tamil", value: "tamil" },
 ];
 
+const daysOfWeek = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
+
 const IndividualRegistrationForm = ({
   enquiryData,
   previousRegData,
@@ -116,6 +126,15 @@ const IndividualRegistrationForm = ({
   );
 
   const router = useRouter();
+
+  const handleDayToggle = (day, isChecked) => {
+    handleChange({
+      target: {
+        name: `availability_hours.${day}.isOpen`,
+        value: isChecked,
+      },
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value, type, files, required } = e.target;
@@ -262,6 +281,8 @@ const IndividualRegistrationForm = ({
 
   const validateStep = (stepNumber) => {
     let newErrors = {};
+
+    console.log(stepNumber);
 
     switch (stepNumber) {
       case 1:
@@ -606,7 +627,7 @@ const IndividualRegistrationForm = ({
 
   const renderServiceDetails = () => (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Service Details</h2>
+      {/* Service Radius and Availability Type */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {renderInputField(
           "service_radius",
@@ -621,55 +642,109 @@ const IndividualRegistrationForm = ({
           onChange={handleChange}
           className="p-2 border rounded w-full h-11"
           disabled={
-            isReRegistration && !rejectedFields.includes("availability_hours")
+            isReRegistration && !rejectedFields.includes("availability_type")
           }
         >
           <option value="full_time">Full Time</option>
           <option value="part_time">Part Time</option>
         </select>
       </div>
+
+      {/* Part-Time Schedule Editor */}
       {formData.availability_type === "part_time" && (
-        <div className="space-y-2">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <input
-                type="time"
-                name="availability_hours.start"
-                value={formData.availability_hours.start}
-                disabled={
-                  isReRegistration &&
-                  !rejectedFields.includes("availability_hours")
-                }
-                onChange={handleChange}
-                className={cn("p-2 border rounded w-full", {
-                  "border-red-500 bg-red-500/5 text-red-500": errors.start_time,
-                })}
-              />
-              {errors.start_time && (
-                <p className="text-red-500 text-sm mt-1">{errors.start_time}</p>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Weekly Availability
+          </h3>
+          {daysOfWeek.map((day) => (
+            <div
+              key={day}
+              className="border p-4 rounded-lg bg-gray-50 space-y-2"
+            >
+              {/* Day Toggle */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`isOpen-${day}`}
+                  checked={formData.availability_hours[day]?.isOpen || false}
+                  onChange={(e) => handleDayToggle(day, e.target.checked)}
+                  disabled={
+                    isReRegistration &&
+                    !rejectedFields.includes("availability_hours")
+                  }
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor={`isOpen-${day}`}
+                  className="ml-2 capitalize text-gray-700"
+                >
+                  {day}
+                </label>
+              </div>
+
+              {/* Time Inputs for Open Days */}
+              {formData.availability_hours[day]?.isOpen && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label
+                      htmlFor={`start-${day}`}
+                      className="text-sm text-gray-600"
+                    >
+                      Start Time
+                    </label>
+                    <input
+                      type="time"
+                      id={`start-${day}`}
+                      name={`availability_hours.${day}.start`}
+                      value={formData.availability_hours[day]?.start || ""}
+                      onChange={handleChange}
+                      disabled={
+                        isReRegistration &&
+                        !rejectedFields.includes("availability_hours")
+                      }
+                      className={cn("p-2 border rounded w-full", {
+                        "border-red-500 bg-red-500/5 text-red-500":
+                          errors[`${day}_start_time`],
+                      })}
+                    />
+                    {errors[`${day}_start_time`] && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors[`${day}_start_time`]}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      htmlFor={`end-${day}`}
+                      className="text-sm text-gray-600"
+                    >
+                      End Time
+                    </label>
+                    <input
+                      type="time"
+                      id={`end-${day}`}
+                      name={`availability_hours.${day}.end`}
+                      value={formData.availability_hours[day]?.end || ""}
+                      onChange={handleChange}
+                      disabled={
+                        isReRegistration &&
+                        !rejectedFields.includes("availability_hours")
+                      }
+                      className={cn("p-2 border rounded w-full", {
+                        "border-red-500 bg-red-500/5 text-red-500":
+                          errors[`${day}_end_time`],
+                      })}
+                    />
+                    {errors[`${day}_end_time`] && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors[`${day}_end_time`]}
+                      </p>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
-
-            <div className="space-y-2">
-              <input
-                type="time"
-                name="availability_hours.end"
-                value={formData.availability_hours.end || ""}
-                disabled={
-                  isReRegistration &&
-                  !rejectedFields.includes("availability_hours")
-                }
-                onChange={handleChange}
-                className={cn("p-2 border rounded w-full", {
-                  "border-red-500 bg-red-500/5 text-red-500": errors.end_time,
-                })}
-              />
-              {errors.end_time && (
-                <p className="text-red-500 text-sm mt-1">{errors.end_time}</p>
-              )}
-            </div>
-          </div>
-
+          ))}
           {errors.availability_hours && (
             <p className="text-red-500 text-sm mt-1">
               {errors.availability_hours}
@@ -677,6 +752,7 @@ const IndividualRegistrationForm = ({
           )}
         </div>
       )}
+
       <textarea
         name="specializations"
         value={formData.specializations}

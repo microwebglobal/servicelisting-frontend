@@ -40,7 +40,6 @@ const ProviderDetails = ({
     languages_spoken: provider?.languages_spoken || [],
     service_radius: provider?.service_radius || "",
     availability_type: provider?.availability_type || "full_time",
-
     availability_hours: {
       monday: provider?.availability_hours?.monday || {
         start: "09:00",

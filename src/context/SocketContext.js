@@ -9,7 +9,7 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:8080", {
+    const newSocket = io(process.env.NEXT_PUBLIC_API_ENDPOINT, {
       path: "/socket.io/",
       withCredentials: true,
       transports: ["websocket", "polling"],

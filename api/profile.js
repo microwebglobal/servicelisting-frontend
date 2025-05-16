@@ -5,7 +5,7 @@ export const profileAPI = {
   getAllCustomers: () => api.get("/customers/all"),
   updateCustomerProfileStatus: (id, data) =>
     api.put(`/customer/status/${id}`, data),
-  getProfileByUserId: (id) => api.get(`/customer-profiles/user/${id}`),
+  getProfileByUserId: (id) => api.get(`/profile/user/${id}`),
   updateProfile: (data, id) => api.put(`/users/profile/${id}`, data),
   uploadPhoto: (formData) =>
     api.post("/users/profile/photo", formData, {
