@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -26,11 +26,28 @@ import { AccountBalance } from "@mui/icons-material";
 import { formatCurrency } from "@/utils/bookingUtils";
 import { profileAPI } from "@/api/profile";
 import { toast } from "@hooks/use-toast";
+import { providerAPI } from "@/api/provider";
 
 const ProfileOverview = ({ userData, onSettle }) => {
   console.log(userData);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activityOverview, setActivityOverview] = useState();
+
+  useEffect(() => {
+    fetchActivityOverview();
+  }, []);
+
+  const fetchActivityOverview = async () => {
+    try {
+      const response = await providerAPI.getActivityOverview();
+      setActivityOverview(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error();
+    }
+  };
+
   // Calculate profile completion percentage
   const getProfileCompletion = () => {
     const requiredFields = ["email", "gender", "dob", "mobile", "photo"];
@@ -196,28 +213,28 @@ const ProfileOverview = ({ userData, onSettle }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookCheck className="h-5 w-5 text-blue-500" />
-                    <span className="text-sm">Total Bookings</span>
+                    <span className="text-sm">Total Compleated Bookings</span>
                   </div>
                   <span className="font-medium">
-                    {serviceUsage.totalBookings}
+                    {activityOverview?.completedCount}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Heart className="h-5 w-5 text-red-500" />
-                    <span className="text-sm">Saved Services</span>
+                    <span className="text-sm">Total Selected Categories</span>
                   </div>
                   <span className="font-medium">
-                    {serviceUsage.savedServices}
+                    {userData?.providerCategories?.length}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-green-500" />
-                    <span className="text-sm">Favorite Locations</span>
+                    <span className="text-sm">Total Serve Cities</span>
                   </div>
                   <span className="font-medium">
-                    {serviceUsage.favoriteLocations}
+                    {userData?.serviceCities?.length}
                   </span>
                 </div>
               </div>
@@ -230,15 +247,25 @@ const ProfileOverview = ({ userData, onSettle }) => {
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
             <div className="space-y-4">
-              {serviceUsage.upcomingBookings > 0 && (
+              {activityOverview?.acceptedCount > 0 ? (
                 <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                   <Calendar className="h-5 w-5 text-blue-500" />
                   <div>
                     <p className="text-sm font-medium text-blue-900">
-                      {serviceUsage.upcomingBookings} Upcoming{" "}
-                      {serviceUsage.upcomingBookings === 1
+                      {activityOverview?.acceptedCount} Accepted{" "}
+                      {activityOverview?.acceptedCount === 1
                         ? "Booking"
                         : "Bookings"}
+                    </p>
+                    <p className="text-xs text-blue-700">Check your schedule</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                  <Calendar className="h-5 w-5 text-blue-500" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">
+                      No Accepted Bookings Found
                     </p>
                     <p className="text-xs text-blue-700">Check your schedule</p>
                   </div>
@@ -247,10 +274,18 @@ const ProfileOverview = ({ userData, onSettle }) => {
               <div className="flex items-center gap-3 p-3 rounded-lg border">
                 <Clock className="h-5 w-5 text-gray-500" />
                 <div>
-                  <p className="text-sm font-medium">Last Booking</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(serviceUsage.lastBooking).toLocaleDateString()}
-                  </p>
+                  <p className="text-sm font-medium">Next Booking</p>
+                  {activityOverview?.nextBooking ? (
+                    <p className="text-xs text-gray-500">
+                      {new Date(
+                        activityOverview?.nextBooking?.booking_date
+                      ).toLocaleDateString()}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-500">
+                      No Sheduled Booking Found
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

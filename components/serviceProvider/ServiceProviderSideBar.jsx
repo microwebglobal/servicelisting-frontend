@@ -10,8 +10,10 @@ import {
   Calendar,
   BookCheck,
   Settings,
+  ChartArea,
   Loader2,
   DollarSignIcon,
+  HandCoins,
 } from "lucide-react";
 import { PeopleAltSharp } from "@mui/icons-material";
 import { format } from "date-fns";
@@ -96,6 +98,11 @@ const ServiceProviderSideBar = () => {
 
   const navigationItems = [
     {
+      label: "Overview",
+      icon: ChartArea,
+      path: "/profile/provider",
+    },
+    {
       label: "Service Management",
       icon: Calendar,
       path: "/profile/provider/services",
@@ -109,6 +116,11 @@ const ServiceProviderSideBar = () => {
       label: "Booking Payments",
       icon: DollarSignIcon,
       path: "/profile/provider/payments",
+    },
+    {
+      label: "Payouts",
+      icon: HandCoins,
+      path: "/profile/provider/payouts",
     },
     ...(profileData?.business_type !== "individual"
       ? [
