@@ -61,10 +61,7 @@ export const ServiceItemsPanel = ({
               key={item.item_id}
               className="flex items-center justify-between p-3 rounded-lg border bg-white"
             >
-              <div
-                className="flex-1"
-                onClick={() => onClick("service_item", item)}
-              >
+              <div className="flex-1">
                 <p className="font-medium">{item.name}</p>
               </div>
               <DropdownMenu>
