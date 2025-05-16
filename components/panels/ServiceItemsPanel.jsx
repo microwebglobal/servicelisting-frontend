@@ -63,7 +63,7 @@ export const ServiceItemsPanel = ({
             >
               <div
                 className="flex-1"
-                onClick={() => onClick("service_item", item)}
+                // onClick={() => onClick("service_item", item)}
               >
                 <p className="font-medium">{item.name}</p>
               </div>
