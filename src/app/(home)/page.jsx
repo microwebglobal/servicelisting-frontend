@@ -138,7 +138,7 @@ const Home = () => {
                   alt="Home Maintenance 1"
                   fill
                   priority
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>
@@ -151,7 +151,7 @@ const Home = () => {
                   src="/assets/images/herobg-6.jpg"
                   alt="Home Maintenance 2"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>
@@ -164,7 +164,7 @@ const Home = () => {
                   src="/assets/images/herobg-7.jpg"
                   alt="Home Maintenance 3"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               </div>
