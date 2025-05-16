@@ -69,7 +69,7 @@ const HomeNavbar = () => {
     >
       {/* Overlay */}
       {!isScrolled && !isMobileMenuOpen && (
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent pointer-events-none z-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent pointer-events-none z-0" />
       )}
 
       <div className="flex items-center justify-between w-full max-w-7xl z-10">
