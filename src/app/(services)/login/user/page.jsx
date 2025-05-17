@@ -83,7 +83,7 @@ const CustomerLogin = () => {
         router.push("/services");
         setTimeout(() => {
           window.location.reload();
-        }, 100);
+        }, 500);
 
         return;
       }
@@ -102,7 +102,7 @@ const CustomerLogin = () => {
         {/* Image Section */}
         <div className="flex justify-center w-full lg:w-1/2">
           <Image
-            src="/assets/images/become-provider.jpg"
+            src="/assets/images/login.jpg"
             alt="Coming Soon"
             width={600}
             height={400}

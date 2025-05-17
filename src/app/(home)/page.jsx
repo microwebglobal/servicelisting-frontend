@@ -134,7 +134,7 @@ const Home = () => {
             <SwiperSlide>
               <div className="relative w-full h-full">
                 <Image
-                  src="/assets/images/herobg-5.jpg"
+                  src="/assets/images/swiper-1.jpg"
                   alt="Home Maintenance 1"
                   fill
                   priority
@@ -148,7 +148,7 @@ const Home = () => {
             <SwiperSlide>
               <div className="relative w-full h-full">
                 <Image
-                  src="/assets/images/herobg-6.jpg"
+                  src="/assets/images/swiper-2.jpg"
                   alt="Home Maintenance 2"
                   fill
                   className="object-cover object-top"
@@ -161,7 +161,7 @@ const Home = () => {
             <SwiperSlide>
               <div className="relative w-full h-full">
                 <Image
-                  src="/assets/images/herobg-7.jpg"
+                  src="/assets/images/swiper-3.jpg"
                   alt="Home Maintenance 3"
                   fill
                   className="object-cover object-top"
@@ -261,7 +261,7 @@ const Home = () => {
         >
           <div className="w-full h-full lg:w-1/2">
             <Image
-              src="/assets/images/roof_work.jpg"
+              src="/assets/images/card-1.jpg"
               alt="Professional"
               priority
               width={600}
