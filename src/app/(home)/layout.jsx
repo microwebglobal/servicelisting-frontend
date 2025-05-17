@@ -1,10 +1,10 @@
 import Footer from "@/components/layout/Footer";
-import HomeNavbar from "@/components/layout/HomeNavbar";
+import Navbar from "@/components/layout/Navbar";
 
 export default function HomeLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <HomeNavbar />
+      <Navbar />
       {children}
       <Footer />
     </div>
